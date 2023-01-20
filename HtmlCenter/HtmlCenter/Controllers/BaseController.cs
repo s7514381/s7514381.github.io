@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WebsiteBase.Library.Utility;
@@ -86,6 +88,33 @@ namespace HtmlCenter.Controllers
         {
             if (string.IsNullOrEmpty(formAction)) { formAction = CurrentAction; }
             return $"~/Views/Shared/FormComponents/{formAction}.cshtml";
+        }
+
+        public string ViewRenderResult(string? sAction = null, string? sController = null)
+        {
+            ViewBag.RenderController = sController ?? CurrentController;
+            ViewBag.RenderAction = sAction ?? CurrentAction;
+
+            return "Views/ViewRender/Index.cshtml";
+        }
+
+        public async Task RenderView(string renderController, string renderAction, ViewDataDictionary viewData)
+        {
+            string renderString = await _viewRenderService.RenderToStringAsync(ViewRenderResult(renderAction, renderController), viewData);
+
+            string renderPath = _configuration.GetValue<string>("RenderPath");
+            if (!string.IsNullOrEmpty(renderController) && renderController != "Home") { renderPath += $@"\{renderController}"; }
+
+            if (!Directory.Exists(renderPath))
+                Directory.CreateDirectory(renderPath);
+
+            string path = $@"{renderPath}\index.htm";
+
+            using (FileStream fs = System.IO.File.Create(path))
+            {
+                byte[] info = new UTF8Encoding(true).GetBytes(renderString);
+                fs.Write(info, 0, info.Length);
+            }
         }
 
 

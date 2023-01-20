@@ -18,6 +18,8 @@ namespace WebsiteBase.Library.Utility
     public interface IViewRenderService
     {
         Task<string> RenderToStringAsync(string viewName, object model);
+
+        Task<string> RenderToStringAsync(string viewName, ViewDataDictionary viewDictionary);
     }
     public class ViewRenderService : IViewRenderService
     {
@@ -38,36 +40,36 @@ namespace WebsiteBase.Library.Utility
             _contextAccessor = httpContextAccessor;
         }
 
-        //public async Task<string> RenderToStringAsync(string viewName, object model)
-        //{
-        //    var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
-        //    var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-
-        //    using (var sw = new StringWriter())
-        //    {
-        //        var viewResult = _razorViewEngine.FindView(actionContext, viewName, true);
-        //        if (viewResult.View == null)
-        //        {
-        //            throw new ArgumentNullException($"{viewName} does not match any available view");
-        //        }
-        //        var viewDictionary = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-        //        {
-        //            Model = model
-        //        };
-        //        var viewContext = new ViewContext(
-        //            actionContext,
-        //            viewResult.View,
-        //            viewDictionary,
-        //            new TempDataDictionary(actionContext.HttpContext, _tempDataProvider),
-        //            sw,
-        //            new HtmlHelperOptions()
-        //        );
-        //        await viewResult.View.RenderAsync(viewContext);
-        //        return sw.ToString();
-        //    }
-        //}
-
         public async Task<string> RenderToStringAsync(string viewName, object model)
+        {
+            var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+
+            using (var sw = new StringWriter())
+            {
+                var viewResult = _razorViewEngine.FindView(actionContext, viewName, true);
+                if (viewResult.View == null)
+                {
+                    throw new ArgumentNullException($"{viewName} does not match any available view");
+                }
+                var viewDictionary = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    Model = model
+                };
+                var viewContext = new ViewContext(
+                    actionContext,
+                    viewResult.View,
+                    viewDictionary,
+                    new TempDataDictionary(actionContext.HttpContext, _tempDataProvider),
+                    sw,
+                    new HtmlHelperOptions()
+                );
+                await viewResult.View.RenderAsync(viewContext);
+                return sw.ToString();
+            }
+        }
+
+        public async Task<string> RenderToStringAsync(string viewName, ViewDataDictionary viewDictionary)
         {
             var actionContext = new ActionContext(_contextAccessor.HttpContext, _contextAccessor.HttpContext.GetRouteData(), new ActionDescriptor());
 
@@ -78,14 +80,6 @@ namespace WebsiteBase.Library.Utility
             {
                 throw new ArgumentNullException($"{viewName} does not match any available view");
             }
-
-            var viewDictionary = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-            {
-                Model = new { }
-            };
-
-            foreach (var info in model.GetType().GetProperties())
-                viewDictionary.Add(info.Name, info.GetValue(model));
 
             var viewContext = new ViewContext(
                 actionContext,

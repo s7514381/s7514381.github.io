@@ -103,7 +103,7 @@ namespace HtmlCenter.Controllers
             string renderString = await _viewRenderService.RenderToStringAsync(ViewRenderResult(renderAction, renderController), viewData);
 
             string renderPath = _configuration.GetValue<string>("RenderPath");
-            if (!string.IsNullOrEmpty(renderController) && renderController != "Home") { renderPath += $@"\{renderController}"; }
+            if (!string.IsNullOrEmpty(renderController) && renderController != "Home") { renderPath += $@"\{renderController.ToLower()}"; }
 
             if (!Directory.Exists(renderPath))
                 Directory.CreateDirectory(renderPath);

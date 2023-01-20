@@ -1,8 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\news"
+    "\\news",
+    "\\wwwroot",
+    "\\wwwroot\\js"
   ],
-  "SelectedNode": "\\index.htm",
+  "SelectedNode": "\\wwwroot\\js\\site.js",
   "PreviewInSolutionExplorer": false
 }

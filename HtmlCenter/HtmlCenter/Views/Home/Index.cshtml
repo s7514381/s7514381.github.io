@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="app" class="text-center">
+
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">存款:</div>
+        <div class="col text-start">
+            <input v-model="Deposit" type="number" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">每月存入:</div>
+        <div class="col text-start">
+            <input v-model="DepositPerMonth" type="number" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">利率(%):</div>
+        <div class="col text-start">
+            <input v-model="AnnualRatePerYear" type="number" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">年數:</div>
+        <div class="col text-start">
+            <input v-model="Year" type="number" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">月數:</div>
+        <div class="col text-start">
+            <input v-model="Month" type="number" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">累計金額:</div>
+        <div class="col text-start">
+            {{Math.round(Accumulation)}}
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">利息:</div>
+        <div class="col text-start">
+            {{Math.round(Interest)}}
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">複利:</div>
+        <div class="col text-start">
+            {{Math.round(CompoundInterest)}}
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5 text-end pr-0">複利比率:</div>
+        <div class="col text-start">
+            {{CompoundRate.toFixed(2)}}%
+        </div>
+    </div>
+
+</div>
+
+<script>
+    axios.get(`https://us-central1-timwu19950429.cloudfunctions.net/function-1`).then(function (res) {
+        console.log(res.data)
+    });
+
+    var app = Vue.createApp({
+        data() {
+            return {
+                Deposit: 1000000,
+                DepositPerMonth: 0,
+                AnnualRatePerYear: 4.2,
+                Month: 1,
+                Year: 0,
+            }
+        },
+        created() {
+
+        },
+        computed: {
+            CalculateMonth() {
+                return this.Month + this.Year * 12
+            },
+            Accumulation() {
+                let result = this.Deposit;
+
+                for (let i = 0; i < this.CalculateMonth; i++) {
+                    result += result * (this.AnnualRatePerYear / 12) / 100 + this.DepositPerMonth;
+                }
+                return result
+            },
+            Interest() {
+                return this.Accumulation - this.Deposit - (this.DepositPerMonth * this.CalculateMonth);
+            },
+            CompoundInterest() {
+                let result = this.Deposit;
+
+                for (let i = 0; i < this.CalculateMonth; i++) {
+                    result += this.Deposit * (this.AnnualRatePerYear / 12) / 100 + this.DepositPerMonth;
+                }
+                return this.Accumulation - result
+            },
+            CompoundRate() {
+                return this.CompoundInterest / this.Interest * 100;
+            },
+        },
+        methods: {
+
+        },
+    }).mount('#app')
+
+</script>

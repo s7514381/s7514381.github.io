@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using HtmlCenter.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -115,6 +117,21 @@ namespace HtmlCenter.Controllers
                 byte[] info = new UTF8Encoding(true).GetBytes(renderString);
                 fs.Write(info, 0, info.Length);
             }
+        }
+
+        public List<ControllerAction> GetControllerActionList()
+        {
+            Assembly asm = Assembly.GetExecutingAssembly();
+            var controlleractionlist = asm.GetTypes()
+                    .Where(type => typeof(Controller).IsAssignableFrom(type))
+                    .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public))
+                    .Select(x => new ControllerAction
+                    {
+                        Controller = x.DeclaringType.Name,
+                        Action = x.Name,
+                        CustomAttributes = x.CustomAttributes.ToList(),
+                    }).ToList();
+            return controlleractionlist;
         }
 
 

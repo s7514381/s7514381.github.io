@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "5ZzrG8Qm6nmoAOGIH05+C/L+oEjJxJNGBu/caRTFIz8=",
+  "Hash": "WZ1TxXAJBS/jwsObCb4xo98dXHIcmuJUIrrZryKbJjM=",
   "Source": "HtmlCenter",
   "BasePath": "_content/HtmlCenter",
   "Mode": "Default",
@@ -85,6 +85,23 @@
       "OriginalItemSpec": "wwwroot\\favicon.ico"
     },
     {
+      "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\file\\unity.zip",
+      "SourceId": "HtmlCenter",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\",
+      "BasePath": "_content/HtmlCenter",
+      "RelativePath": "file/unity.zip",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\file\\unity.zip"
+    },
+    {
       "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\image\\bbbd733be66ab7457ea33c2dc0021ed4_t.jpeg",
       "SourceId": "HtmlCenter",
       "SourceType": "Discovered",
@@ -100,6 +117,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\image\\bbbd733be66ab7457ea33c2dc0021ed4_t.jpeg"
+    },
+    {
+      "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\image\\wdc.jpg",
+      "SourceId": "HtmlCenter",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\",
+      "BasePath": "_content/HtmlCenter",
+      "RelativePath": "image/wdc.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\image\\wdc.jpg"
     },
     {
       "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\js\\site.js",

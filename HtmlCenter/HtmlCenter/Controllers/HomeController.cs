@@ -24,6 +24,18 @@ namespace HtmlCenter.Controllers
             return View(ViewRenderResult());
         }
 
+        public async Task<IActionResult> UpdateRenderView() 
+        {
+            List<ControllerAction> ControllerActionList = GetControllerActionList();
+            var renderControllers = ControllerActionList.Where(x => x.Action == "Index").ToList();
+
+            foreach (ControllerAction controllerAction in renderControllers) {
+                string controllerName = controllerAction.Controller.Replace("Controller", "");
+                await RenderView(controllerName, "Index", ViewData);
+            }
+            return RedirectToAction("Index");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

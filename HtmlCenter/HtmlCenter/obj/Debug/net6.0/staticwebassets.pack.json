@@ -5,6 +5,10 @@
       "PackagePath": "staticwebassets\\HtmlCenter.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\css\\image-cover-frame.css",
+      "PackagePath": "staticwebassets\\css\\image-cover-frame.css"
+    },
+    {
       "Id": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },

@@ -1,0 +1,160 @@
+﻿
+
+
+<div class="form-group row">
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="row">
+                        <p class="fw-bold fs-5 title-text">功能說明</p>
+                        <div>
+                            此功能為實作考試出題系統中，針對圖片類型"選出圖中正確選項"之需求而研發出該功能。<br />
+                            上傳一張圖片後可以在圖片內的隨意區域以拖曳的方式產生一個紅色方框作為考題選項。
+                        </div>
+                        <div class="mt-2" style="font-size: 14px; color: #777;">
+                            網頁內的功能皆為自製，並且使用之套件皆為開放套件，歡迎有學習之需求者使用(預計未來開放整頁下載)。
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="fw-bold fs-5 title-text">請先上傳一張圖片</p>
+    <div class="col-lg-12 mb-3">
+        <input @@change="setImage($event.target)" type="file" accept=".jpg, .png" class="form-control" />
+    </div>
+
+    <div v-if="PreviewSrc" class="col-lg-12">
+        <label class="fs-5 text-danger m-0 fw-bold">*請在圖片上拖曳以產生選項方框</label>
+        <br />
+        <label class="fs-5 text-danger m-0 fw-bold">*正確答案請點選方框右上角按鈕</label>
+    </div>
+    <div class="col-lg-12">
+        <div class="image-frame" style="overflow-x:auto"
+             :class="{'rendering': currentImageCover}"
+             @@mousedown="createImageCover($event)"
+             @@mousemove="changeImageCover"
+             @@mouseup="endImageCover">
+
+            <img :src="PreviewSrc" />
+
+            <div v-for="(option, i2) in OptionList"
+                 class="img-cover-option"
+                 :key="option.id"
+                 :id="option.id"
+                 :style="{
+                    left: option.AxisX + 'px',
+                    top: option.AxisY + 'px',
+                    width: option.Width + 'px',
+                    height: option.Height + 'px',
+                    transform: `translate(${option.IsReverseX ? '-100' : '0'}%, ${option.IsReverseY ? '-100' : '0'}%)`,
+                    }">
+
+                <div v-if="!currentImageCover" class="d-contents">
+                    <div class="image-frame">
+                        <div class="image-cover-function">
+                            <div class="mb-1">
+                                <input v-model="CorrectOptionId"
+                                       :value="option.id"
+                                       class="form-check-input fs-3 m-0 image-cover-selected" type="radio"
+                                       title="選擇為正確答案" />
+                            </div>
+                            <div @@click="deleteItem(OptionList, option)">
+                                <span class="fas fa-times-circle fs-3 text-danger" title="刪除"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    component = {
+        mixins: [baseMixin],
+        data() {
+            return {
+                pageTitle: '圖片框選',
+                ImageUrl: null,
+                PreviewSrc: '',
+                OptionList: [],
+                currentImageCover: null,
+                CorrectOptionId: '',
+            }
+        },
+        created() {
+        },
+        methods: {
+            setImage: async function (inputDom) {
+                let file;
+                if (inputDom.files.length > 0) { file = inputDom.files[0]; }
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    thisApp.ImageUrl = file;
+                    thisApp.PreviewSrc = e.target.result;
+                    thisApp.OptionList = []
+                };
+                reader.readAsDataURL(file);
+            },
+            @* 產生圖片選項 *@
+            createImageCover: function (e) {
+                e.preventDefault();
+                if (e.target.nodeName != "IMG") { return false }
+
+                let item = {};
+                item.id = thisApp.newGuid();
+                item.AxisX = e.offsetX
+                item.AxisY = e.offsetY
+
+                thisApp.currentImageCover = item
+                thisApp.OptionList.push(item)
+            },
+            @* 改變圖片選項寬高 *@
+            changeImageCover: function (e) {
+                if (e.target.nodeName != "IMG") { return false }
+                let item = thisApp.currentImageCover
+
+                if (item) {
+                    if (e.offsetX >= item.AxisX) {
+                        item.Width = e.offsetX - item.AxisX
+                        if (item.IsReverseX) { item.IsReverseX = false; }
+                    }
+                    else {
+                        item.Width = item.AxisX - e.offsetX
+                        if (!item.IsReverseX) { item.IsReverseX = true; }
+                    }
+
+                    if (e.offsetY >= item.AxisY) {
+                        item.Height = e.offsetY - item.AxisY
+                        if (item.IsReverseY) { item.IsReverseY = false; }
+                    }
+                    else {
+                        item.Height = item.AxisY - e.offsetY
+                        if (!item.IsReverseY) { item.IsReverseY = true; }
+                    }
+                }
+            },
+            @* 定型圖片選項 *@
+            endImageCover: function (e) {
+                if (e.target.nodeName != "IMG") { return false }
+
+                thisApp.currentImageCover = null;
+            },
+            deleteItem: function (list, item) {
+                list.splice(list.indexOf(item), 1);
+
+                @* 重新排序 *@
+                list.forEach(function (v, i) {
+                    v.Sequence = i
+                })
+            },
+        },
+    }
+</script>

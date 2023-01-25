@@ -33,6 +33,18 @@
       "PackagePath": "staticwebassets\\js\\site.js"
     },
     {
+      "Id": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\lib\\Sortable\\Sortable.min.js",
+      "PackagePath": "staticwebassets\\lib\\Sortable\\Sortable.min.js"
+    },
+    {
+      "Id": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\lib\\vue\\vue.global.prod.js",
+      "PackagePath": "staticwebassets\\lib\\vue\\vue.global.prod.js"
+    },
+    {
+      "Id": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\lib\\vue\\vuedraggable.umd.min.js",
+      "PackagePath": "staticwebassets\\lib\\vue\\vuedraggable.umd.min.js"
+    },
+    {
       "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.HtmlCenter.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

@@ -1,19 +1,19 @@
 ﻿
 
-<p class="fw-bold fs-5 title-text">預計推出項目</p>
+<p class="fw-bold fs-5 title-text">最近推出項目</p>
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <span class="fw-bold fs-5 title-text">框選圖片</span>
+        <a class="fw-bold fs-5 title-text" asp-controller="imagecoverframe" asp-action="Index">圖片框選器</a>
     </div>
 </div>
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <span class="fw-bold fs-5 title-text">動態表單</span>
+        <a class="fw-bold fs-5 title-text" asp-controller="dynamicform" asp-action="Index">動態表單</a>
     </div>
 </div>
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <span class="fw-bold fs-5 title-text">遊戲</span>
+        <a class="fw-bold fs-5 title-text" asp-controller="unitywebgl" asp-action="Index">遊戲</a>
     </div>
 </div>
 
@@ -34,4 +34,5 @@
 
         },
     }
+    var formComponent = Vue.createApp(component)
 </script>

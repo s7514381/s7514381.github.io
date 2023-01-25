@@ -23,6 +23,48 @@
     </div>
 </div>
 
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                    <p class="fw-bold fs-5 title-text">經歷</p>
+                    <div>
+                        <p class="fw-bold fs-6">專案：</p>
+                        1.師資生運用數位教學檢測工具系統-千人同時考試：<br />
+                        使用技術: .Net 6 MVC、Channel、SignalR、Dapper、Vue3、scss、MS Sql<br />
+                        *Channel技術:<br />
+                        實作 高流量-千人同時考試<br />
+                        考生登入時已C# Channel機制 限制同時只會有一個請求讀取同一場考試，並且在完成後將考試物件存放至MemoryCache。<br />
+                        其他考生則會等待考試讀取完成後，跳轉至MemoryCache取得考試物件，以降低多人同時向資料庫取資料的效能負載。<br />
+                        *SignalR:<br />
+                        考試過程中，以SignalR監聽線上考生狀態，紀錄連線與斷線的事件以實現如果有學生斷線後連回考場可以把斷線時間加回去的機制。<br />
+                        <br />
+                        專案簡述：以.Net 6製作 後台出題審核系統+前台考試系統<br />
+                        在後台製作題庫，題型包含單選題、多選題、實作題、題組題。<br />
+                        經過學術審核以及形式審核之後成為定稿題目。<br />
+                        建立考試資訊後，在前台考試系統進行Session登入後並且讀取考試資訊，才能夠開始考試。<br />
+                        前後端通訊使用"輕裝Vue3"、axios，安全性上，網站採取白名單的方式限制IP登入，並且在後端的Action以ValidateAntiForgeryToken來防止使用者直接對網站使用參數Post請求的方式進行攻擊<br />
+                        <br />
+                        2.新北市政府都市更新申辦系統：<br />
+                        * 線上申請節省了80%都更申辦的過程時間。<br />
+                        * 節省上千元的紙張費用，目標為實現無紙化系統。<br />
+                        使用技術: .Net core 3.1 MVC、SignalR、Dapper、Vue.js、css、MS Sql<br />
+                        <br />
+                        專案簡述：以.Net Core 3.1開發，<br />
+                        使用動態頁面的方式快速製作靜態頁面，例：介紹新北市都市更新處的歷史、業務職掌。<br />
+                        以少量的code達到快速開發的效果。<br />
+                        並且網站的核心是可以無紙化的申請都市更新，<br />
+                        包含"後台審核系統"、使用"OpenXml"製作文件或列印為PDF，<br />
+                        審核完成的案件可以在Arcgis圖資系統裡面查詢該案件的狀況。<br />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body">
         <p class="fw-bold fs-5 title-text">現居台北市大同區</p>

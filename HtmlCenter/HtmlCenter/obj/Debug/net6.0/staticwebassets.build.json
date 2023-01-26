@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "JPPRvbtjpJ7aSVapv8SjSOyACxdH8bImn3mrUB0Pqmw=",
+  "Hash": "AkLvN1zTjCa+4XgfHKOrYWzDuXPbXdCkOW923VxJ7Bo=",
   "Source": "HtmlCenter",
   "BasePath": "_content/HtmlCenter",
   "Mode": "Default",
@@ -49,6 +49,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\obj\\Debug\\net6.0\\scopedcss\\projectbundle\\HtmlCenter.bundle.scp.css"
+    },
+    {
+      "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\css\\dynamic-form.css",
+      "SourceId": "HtmlCenter",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\",
+      "BasePath": "_content/HtmlCenter",
+      "RelativePath": "css/dynamic-form.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\dynamic-form.css"
     },
     {
       "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\css\\image-cover-frame.css",
@@ -168,6 +185,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\site.js"
+    },
+    {
+      "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\js\\vue-mixin.js",
+      "SourceId": "HtmlCenter",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\",
+      "BasePath": "_content/HtmlCenter",
+      "RelativePath": "js/vue-mixin.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\vue-mixin.js"
     },
     {
       "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\lib\\Sortable\\Sortable.min.js",

@@ -1,1 +1,13 @@
-# s7514381.github.io
+想使用github做出自己的作品集的靜態網頁，卻會遇到每一頁都必須寫一樣的Layout、Menu、Footet，該怎麼辦呢?
+-
+
+# 靜態頁面產生器HtmlCenter
+
+利用Microsoft.AspNetCore.Mvc.ViewEngines的RenderAsync，改寫原本MVC會產生對應Views路徑的機制，
+轉而使用ViewRender的方式將cshtml的內容轉變成靜態網頁。
+
+再將每一個Controller的Index都輸出成獨立的資料夾以及專用頁面index.htm，
+
+以及把MVC的wwwroot的檔案直接轉成靜態頁面能夠使用的資料夾。
+
+即可達到單純使用MVC開發網頁，並產生所見即所得的github靜態網頁。

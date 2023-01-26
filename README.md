@@ -1,4 +1,4 @@
-想使用github做出自己的作品集的靜態網頁，卻會遇到每一頁都必須寫一樣的Layout、Menu、Footet，該怎麼辦呢?
+想使用github做出自己的作品集的靜態網頁，卻會遇到每一頁都必須寫一樣的Layout、Menu、Footer，該怎麼辦呢?
 -
 
 # 靜態頁面產生器HtmlCenter

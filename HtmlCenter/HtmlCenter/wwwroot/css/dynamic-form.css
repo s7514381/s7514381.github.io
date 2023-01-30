@@ -1,0 +1,109 @@
+.dynamic-form-field {
+    position: relative;
+    overflow: hidden;
+    padding: 0.7em 1em;
+    border-radius: 0.4em;
+    box-shadow: 0px 1px 2px 1px #ddd;
+}
+
+.card-detail {
+    padding: 0.7em 1em;
+    box-shadow: 1px 2px 5px 0px #ddd;
+    border-radius: 0.3em;
+}
+
+.dynamic-form-functionArea {
+    padding: 0.7em 0.5em;
+    border-radius: 0.4em;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.layoutEmpty {
+    border-radius: 5px;
+    height: 100%;
+}
+
+    .layoutEmpty.moved {
+        box-shadow: inset 0px 1px 4px 0px #999;
+    }
+
+.cancel-image-icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+    transform: translate(30%, -30%);
+    opacity: 0.7;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+    .cancel-image-icon:hover {
+        opacity: 1;
+    }
+
+.form-field-optionList {
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 50vh;
+    max-height: 50vh;
+    display: block;
+}
+
+.form-field-sign {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0.4em;
+    height: 100%;
+    opacity: 0.5;
+}
+
+    .form-field-sign.sign-blue {
+        background-color: #27bcfd;
+    }
+
+    .form-field-sign.sign-green {
+        background-color: #00d27a;
+    }
+
+    .form-field-sign.sign-red {
+        background-color: #e63757;
+    }
+
+    .form-field-sign.sign-yellow {
+        background-color: #f5d63e;
+    }
+
+.option-span {
+    padding: 0.2em 0.5em;
+    box-shadow: 0 1px 2px 1px #ccc;
+    border-radius: 0.3em;
+    margin-right: 0.5em;
+    cursor: default;
+    white-space: nowrap;
+    line-height: 2.2em;
+}
+
+.FormLayout {
+    min-height: 100%;
+    max-height: 100%;
+    overflow: auto;
+}
+
+#form-modal .modal-dialog {
+    max-width: 50vw;
+}
+
+#form-modal .modal-content {
+}
+
+@media (max-width: 576px) {
+    #form-modal .modal-dialog {
+        max-width: 96vw;
+    }
+}
+
+

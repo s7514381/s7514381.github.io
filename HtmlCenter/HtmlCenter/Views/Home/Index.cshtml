@@ -1,114 +1,56 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div id="app" class="text-center">
-
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">存款:</div>
-        <div class="col text-start">
-            <input v-model="Deposit" type="number" />
+﻿<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <p class="fw-bold fs-5 title-text">網站介紹</p>
+                各位好，我叫Tim<br />
+                <br />
+                網頁內的功能皆為自製，並且使用之套件皆為開放套件(Vue3、vue draggable、Sortable、font-awesome...等)，<br />
+                程式範圍涉略Css(元件外觀)、前端(Vue3、Axios、javascript)、後端(頁面產生器、預計未來會對接<a href="https://us-central1-timwu19950429.cloudfunctions.net/function-1" target="_blank">google cloud function</a>做為後端資料庫API)，<br />
+                歡迎有需求者參考學習。<br />
+                <br />
+                本github靜態頁面的產生方法為自製靜態頁面產生器，使用語言為C#、.Net 6 MVC，程式碼以及說明在<a href="https://github.com/s7514381/s7514381.github.io" target="_blank">s7514381.github.io</a>，功能皆為開放使用。<br />
+                使用靜態頁面產生器的好處是，可以沿用MVC的partial概念來產生靜態頁面，減少重複的程式碼。<br />
+                <br />
+                如果有任何想反饋的歡迎寄信至<a href="mailto:s7514381@gmail.com">s7514381@gmail.com</a>，感謝各位!
+            </div>
         </div>
     </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">每月存入:</div>
-        <div class="col text-start">
-            <input v-model="DepositPerMonth" type="number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">利率(%):</div>
-        <div class="col text-start">
-            <input v-model="AnnualRatePerYear" type="number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">年數:</div>
-        <div class="col text-start">
-            <input v-model="Year" type="number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">月數:</div>
-        <div class="col text-start">
-            <input v-model="Month" type="number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">累計金額:</div>
-        <div class="col text-start">
-            {{Math.round(Accumulation)}}
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">利息:</div>
-        <div class="col text-start">
-            {{Math.round(Interest)}}
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">複利:</div>
-        <div class="col text-start">
-            {{Math.round(CompoundInterest)}}
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">複利比率:</div>
-        <div class="col text-start">
-            {{CompoundRate.toFixed(2)}}%
-        </div>
-    </div>
-
 </div>
 
-<script>
-    axios.get(`https://us-central1-timwu19950429.cloudfunctions.net/function-1`).then(function (res) {
-        console.log(res.data)
-    });
+<p class="fw-bold fs-5 title-text">最近推出項目</p>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" asp-controller="imagecoverframe" asp-action="Index">圖片框選器</a>
+    </div>
+</div>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" asp-controller="dynamicform" asp-action="Index">動態表單</a>
+    </div>
+</div>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" asp-controller="unitywebgl" asp-action="Index">遊戲</a>
+    </div>
+</div>
 
-    var app = Vue.createApp({
+
+<script>
+    component = {
+        mixins: [baseMixin],
         data() {
             return {
-                Deposit: 1000000,
-                DepositPerMonth: 0,
-                AnnualRatePerYear: 4.2,
-                Month: 1,
-                Year: 0,
+                pageTitle: '首頁',
+
             }
         },
         created() {
-
-        },
-        computed: {
-            CalculateMonth() {
-                return this.Month + this.Year * 12
-            },
-            Accumulation() {
-                let result = this.Deposit;
-
-                for (let i = 0; i < this.CalculateMonth; i++) {
-                    result += result * (this.AnnualRatePerYear / 12) / 100 + this.DepositPerMonth;
-                }
-                return result
-            },
-            Interest() {
-                return this.Accumulation - this.Deposit - (this.DepositPerMonth * this.CalculateMonth);
-            },
-            CompoundInterest() {
-                let result = this.Deposit;
-
-                for (let i = 0; i < this.CalculateMonth; i++) {
-                    result += this.Deposit * (this.AnnualRatePerYear / 12) / 100 + this.DepositPerMonth;
-                }
-                return this.Accumulation - result
-            },
-            CompoundRate() {
-                return this.CompoundInterest / this.Interest * 100;
-            },
+            
         },
         methods: {
 
         },
-    }).mount('#app')
-
+    }
+    var formComponent = Vue.createApp(component)
 </script>

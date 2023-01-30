@@ -1,0 +1,500 @@
+﻿@model Guid?
+
+    <div class="mobile-limit">
+        <span class="fw-bold fs-5 title-text">本功能僅限電腦版使用。</span>
+    </div>
+
+    <div class="row pc-limit" style="height: calc(100vh - 17.7rem);">
+
+        @* 表單介面 *@
+        <div class="col-lg-10 h-100" style="">
+
+            <div v-show="layoutLoading" class="h-100">
+                <div class="d-flex flex-center h-100">
+                    <div class="spinner-border text-primary text-center" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <draggable v-show="!layoutLoading" class="row FormLayout p-3 ps-0 mb-3"
+                       v-model="fieldLayout"
+                       v-bind="dragOptions"
+                       handle=".dragHandle"
+                       @@start="layoutStart"
+                       @@end="layoutEnd"
+                       @@change=""
+                       :move="layoutMove"
+                       group="field"
+                       item-key="`k${DynamicFormFieldId}`">
+                @*目前研究使用draggable的話物件只能用element*@
+                <template #item="{ element }">
+
+                    <div class="mb-3 pe-0 position-relative" style="min-height: 3.5rem;"
+                         :class="`col-${element.ColumnWidth}`"
+                         @@mouseenter="element.Hovering=true"
+                         @@mouseleave="element.Hovering=false">
+
+                        <div v-if="!element.DynamicFormFieldId" class="layoutEmpty border"
+                             :class="{'moved': element.MoveCover, 'bg-400': element.Placeholder}"></div>
+
+                        @*欄位資訊*@
+                        <div v-show="element.DynamicFormFieldId" class="d-contents">
+
+                            <div v-show="element.Hovering" @@click="fieldRemove(element)" class="cancel-image-icon">
+                                <span class="fas fa-times-circle fs-4 text-danger"></span>
+                            </div>
+
+                            <div class="dynamic-form-field bg-white bg-hover">
+                                <div class="form-field-sign "
+                                     :class="`${element.SignColorClass}`"></div>
+
+                                <div class="form-group row">
+                                    <div class="col-lg-auto align-self-center mb-lg-0 mb-3 pe-0 dragHandle">
+                                        <i class="fas fa-arrows-alt"></i>
+                                    </div>
+
+                                    <div class="col-lg mb-lg-0 mb-3 pe-0">
+                                        <input :id="setChildId(element, 'Title')" v-model="element.Title"
+                                               :placeholder="element.Placeholder" class="form-control col-md-12" />
+                                        <span class="text-danger text-validation" :data-validationfor="setChildId(element, 'Title')"></span>
+                                    </div>
+
+                                    <div @@click="modalTrigger(element)" class="col-lg-auto align-self-center mb-lg-0 mb-3" style="cursor:pointer">
+                                        <i class="fas fa-pen-square fs-5"></i>
+                                    </div>
+
+                                    <div v-show="element.HasOption && element.OptionList.length>0" class="col-lg-12 mt-1">
+                                        <span v-for="option in element.OptionList" class="option-span">{{option.Title}}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </template>
+            </draggable>
+
+        </div>
+
+        @* 表單設定列表 *@
+        <div class="col-lg-2 dynamic-form-functionArea border">
+
+            @*<div class="row mb-3">
+                    <div class="col">
+                        <label for="Title" class="form-label fs-0 required">表單名稱</label>
+                        <input v-model="Title" class="form-control" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="Code" class="form-label fs-0 required">表單代號</label>
+                        <input v-model="Code" class="form-control" />
+                    </div>
+                </div>*@
+
+            <div class="row mb-3">
+                <label class="form-label fs-0 required">欄位寬度</label>
+                <div class="col">
+                    <select v-model="ColumnWidth" class="form-select">
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                        <option>11</option>
+                        <option>12</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <label class="form-label fs-0 required">請選擇類型</label>
+            </div>
+
+            <draggable class="row mb-3"
+                       v-model="fieldTypeList"
+                       @@start=""
+                       @@end="cloneEnd"
+                       @@change=""
+                       group="field"
+                       :move="cloneMove"
+                       item-key="Type">
+                <template #item="{ element }">
+                    <div class=" mb-1 col-lg-12">
+
+                        <div class="border rounded-1 bg-white bg-hover p-2 position-relative overflow-hidden">
+
+                            <div class="form-field-sign"
+                                 :class="`${element.SignColorClass}`"></div>
+
+                            <div class="form-group row">
+                                <div class="col-lg mb-lg-0">
+                                    <label :for="setChildId(element, 'Text')" class="form-label mb-0 fs-0 required">{{element.Text}}</label>
+                                    <span class="text-danger text-validation" :data-validationfor="setChildId(element, 'Text')"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </draggable>
+
+            @*<div v-show="!layoutLoading" class="text-center">
+                    <a @@click="addLayoutRow()" class="btn btn-primary">
+                        <span class="fas fa-plus"></span>
+                        新增一行
+                    </a>
+                </div>*@
+
+        </div>
+    </div>
+
+    <button style="display:none" ref="modalTrigger" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#form-modal"></button>
+    <div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content position-relative">
+                <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
+                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base border" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="rounded-top-lg py-3 ps-4 pe-6 bg-light">
+                        <h4 class="mb-0 fw-bold text-700">表單欄位設定</h4>
+                    </div>
+                    <div class="pt-3 px-4">
+                        @* 表單內容 *@
+                        <div class="form-group row">
+                            <div class="col-lg-8 mb-3">
+                                <label for="Field_Title" class="form-label fs-0 required">欄位名稱</label>
+                                <input id="Field_Title" v-model="currentFieldModel.Title"
+                                       :placeholder="currentFieldModel.Placeholder" class="form-control col-md-12" />
+                                <span class="text-danger text-validation" data-validationfor="Field_Title"></span>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <label class="form-label fs-0 required">欄位類型</label>
+                                <select v-model="currentFieldModel.Type" class="form-select col-md-6" disabled>
+                                    <option v-for="(v, i) in fieldTypeList" :value="v.Value">{{v.Text}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row">
+                            <div class="col-lg mb-3 d-flex align-items-center">
+                                <input id="Field_IsRequired" v-model="currentFieldModel.IsRequired" class="form-check-input fs-4 mt-0 me-2 mb-1" type="checkbox">
+                                <label class="m-0" for="Field_IsRequired">是否必填</label>
+                            </div>
+                        </div>
+
+
+                        <div v-show="currentFieldModel.HasOption" class="d-contents">
+
+                            <div class="form-group row">
+                                <div class="col-auto pe-0 align-self-center">
+                                    <label class="form-label fs-5 fw-bold mb-0">新增選項</label>
+                                </div>
+
+                                <div class="col-auto">
+                                    <a @@click="createOption(currentFieldModel)" href="javascript:;">
+                                        <i class="fas fa-plus-circle fa-2x text-success"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <draggable class="form-group row form-field-optionList pt-3"
+                                       v-model="currentFieldModel.OptionList"
+                                       v-bind="dragOptions"
+                                       handle=".dragHandle"
+                                       @@start=""
+                                       @@end=""
+                                       @@change="dragChange(currentFieldModel.OptionList, 'Sequence')"
+                                       group="option"
+                                       item-key="Sequence">
+                                <template #item="{ element }">
+                                    <div class="col-lg-12 mb-3">
+
+                                        <div class="card-detail bg-light position-relative">
+
+                                            <div @@click="deleteItem(currentFieldModel.OptionList, element)" class="cancel-image-icon">
+                                                <span class="fas fa-times-circle fs-4 text-danger"></span>
+                                            </div>
+
+                                            <div class="row align-items-center ">
+
+                                                <div class="col-lg-auto mb-lg-0 mb-3 pe-0 dragHandle">
+                                                    <i class="fas fa-arrows-alt"></i>
+                                                </div>
+
+                                                <div class="col-auto pe-0">
+                                                    {{element.Sequence + 1}}
+                                                </div>
+
+                                                <div class="col pe-0">
+                                                    <input v-model="element.Title" class="form-control" placeholder="請輸入選項內容" />
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <input :id="`${element.DynamicFormFieldOptionId}_CanInput`" v-model="element.CanInput" type="checkbox" value="true" class="form-check-input fs-5 mt-1 me-2" />
+                                                    <label :for="`${element.DynamicFormFieldOptionId}_CanInput`" class="m-0 fs-0">可輸入內容</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </template>
+                            </draggable>
+
+                        </div>
+
+                        @* 表單內容 *@
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">關閉</button>
+                    <button @@click="modalSave(currentFieldModel)" class="btn btn-primary" type="button">儲存設定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    component = {
+        mixins: [baseMixin, dragMixin],
+        data() {
+            return {
+                pageTitle: '動態表單',
+                layoutLoading: true,
+                fieldLayout: [],
+                RowNumber: 8,
+                ColumnNumber: 12,
+                ColumnWidth: 4,
+                StatusItems: [],
+                fieldTypeList: [],
+                movedEmptyList: [],
+                movedIndex: null,
+                dragEvent: null,
+                dragModel: null,
+                currentFieldModel: {},
+                FieldList:[],
+            }
+        },
+        created() {
+            let emptyRegionNumber = thisApp.emptyRegionNumber;
+            for (let i = 0; i < emptyRegionNumber; i++) {
+                thisApp.fieldLayout.push(thisApp.newEmptyRegion());
+            }
+
+            thisApp.fieldTypeList = [{ Text: '文字輸入', Value: 1 }, { Text: '單一選擇', Value: 3 }]
+            thisApp.fieldTypeList.forEach(function (v, i) {
+                v["SignColorClass"] = thisApp.getSignColorClass(v.Value)
+            })
+        },
+        mounted() {
+        },
+        computed: {
+            emptyRegionNumber() {
+                return thisApp.ColumnNumber * thisApp.RowNumber;
+            },
+        },
+        methods: {
+            fieldRemove: async function (element) {
+                if (await confirm("是否確認要刪除欄位?")) { thisApp.layoutRemove(element) }
+            },
+            createOption: async function (field) {
+                let newOption = {};
+                //await axios.post(`/DynamicFormFieldOption/GetModel`).then(function (res) {
+                //    newOption = res.data;
+                //    newOption.DynamicFormFieldId = field.DynamicFormFieldId;
+
+                //    field.OptionList.push(newOption);
+                //    field.OptionList.forEach(function (v, i) { v.Sequence = i; })
+                //});
+
+                newOption.DynamicFormFieldId = thisApp.newGuid();
+
+                field.OptionList.push(newOption);
+                field.OptionList.forEach(function (v, i) { v.Sequence = i; })
+            },
+            addLayoutRow: function () {
+                thisApp.RowNumber++;
+                for (let i = 1; i <= thisApp.ColumnNumber; i++) {
+                    thisApp.fieldLayout.push(thisApp.newEmptyRegion())
+                }
+            },
+            newEmptyRegion: function () {
+                return { ColumnWidth: 1, MoveCover: false, emptyRegion: true, Placeholder: false }
+            },
+            layoutAdd: function (element, newIndex) {
+                for (let i = 0; i < element.ColumnWidth; i++) { thisApp.fieldLayout.splice(newIndex, 1); }
+                thisApp.fieldLayout.splice(newIndex, 0, element);
+                thisApp.resetLayoutIndex();
+
+                thisApp.FieldList.push(element)
+            },
+            layoutRemove: function (element) {
+                let elementIndex = thisApp.fieldLayout.indexOf(element)
+
+                thisApp.deleteItem(thisApp.fieldLayout, element);
+                for (let i = element.ColumnWidth; i > 0; i--) {
+                    thisApp.fieldLayout.splice(elementIndex, 0, thisApp.newEmptyRegion());
+                }
+                thisApp.resetLayoutIndex();
+                thisApp.deleteItem(thisApp.FieldList, element)
+            },
+            layoutStart: function (customEvent) {
+                let e = customEvent;
+
+                thisApp.dragModel = e.item.__draggable_context.element;
+                thisApp.layoutRemove(thisApp.fieldLayout[e.oldIndex])
+                thisApp.fieldLayout[e.oldIndex].Placeholder = true;
+            },
+            layoutEnd: async function (customEvent) {
+                let e = customEvent;
+
+                thisApp.clearMovedEmptyList();
+                thisApp.fieldLayout[e.oldIndex].Placeholder = false;
+
+                if (!await thisApp.checkPlacePath(thisApp.dragModel.ColumnWidth, thisApp.movedIndex)) {
+                    thisApp.layoutAdd(thisApp.dragModel, e.oldIndex);
+                    return false;
+                }
+                thisApp.layoutAdd(thisApp.dragModel, thisApp.movedIndex);
+                thisApp.dragEvent = null;
+            },
+            layoutMove: function (e) {
+                if (thisApp.movedIndex != e.relatedContext.index) {
+                    thisApp.clearMovedEmptyList();
+                    thisApp.dragEvent = e;
+                    thisApp.movedIndex = e.relatedContext.index;
+                    thisApp.dragMoveCover(e.draggedContext.element.ColumnWidth, thisApp.movedIndex);
+                }
+                return false;
+            },
+            cloneEnd: async function (e) {
+                thisApp.clearMovedEmptyList();
+                if (!e.originalEvent.target.classList.contains("layoutEmpty")) { return false; }
+                if (!thisApp.dragEvent || !thisApp.dragEvent.to.classList.contains("FormLayout")) { return false; }
+                if (!await thisApp.checkPlacePath(thisApp.ColumnWidth, thisApp.movedIndex)) { return false; }
+
+                let fieldTypeElement = thisApp.dragEvent.draggedContext.element;
+                let cloneElement = await thisApp.createField(fieldTypeElement);
+
+                thisApp.layoutAdd(cloneElement, thisApp.movedIndex);
+                thisApp.dragEvent = null;
+                thisApp.modalTrigger(cloneElement);
+            },
+            cloneMove: function (e) {
+                if (thisApp.movedIndex != e.relatedContext.index)
+                    if (e.to.classList.contains("FormLayout")) {
+                        thisApp.clearMovedEmptyList();
+                        thisApp.dragEvent = e;
+                        thisApp.movedIndex = e.relatedContext.index;
+                        thisApp.dragMoveCover(thisApp.ColumnWidth, thisApp.movedIndex);
+                    }
+
+                return false;
+            },
+            dragMoveCover: function (columnWidth, index) {
+                for (let i = 0; i < columnWidth; i++) {
+                    let emptyIndex = index + i;
+                    if (thisApp.fieldLayout.length <= emptyIndex) { continue; }
+                    thisApp.fieldLayout[emptyIndex].MoveCover = true;
+                }
+            },
+            checkPlacePath: async function (columnWidth, index) {
+                for (let i = 0; i < columnWidth; i++) {
+                    let pathRegion = thisApp.fieldLayout[index + i];
+                    if (!pathRegion) { thisApp.addLayoutRow(); return thisApp.checkPlacePath(columnWidth, index); }
+                    if (!pathRegion.emptyRegion) { alert("路徑上有其他欄位，請重新確認。"); return false; }
+                }
+                return true;
+            },
+            clearMovedEmptyList: function () {
+                thisApp.fieldLayout.filter(x => x.MoveCover).forEach(function (v, i) { v.MoveCover = false; })
+            },
+            resetLayoutIndex: function () {
+                thisApp.fieldLayout.forEach(function (v, i) {
+                    if (v.DynamicFormFieldId) { v.LayoutIndex = i; }
+                })
+            },
+            createField: async function (typeElement) {
+                let result = {};
+
+                result.DynamicFormFieldId = thisApp.newGuid()
+                result.Type = typeElement.Value;
+                result.DynamicFormId = thisApp.newGuid()
+                result.SignColorClass = thisApp.getSignColorClass(result.Type)
+                result.Placeholder = typeElement.Text;
+                result.ColumnWidth = thisApp.ColumnWidth;
+
+                switch (typeElement.Value) {
+                    case 3:
+                    case 4:
+                        result.HasOption = true;
+                        result.OptionList = [];
+                        break;
+                }
+
+                return result;
+            },
+            setChildId: function (model, field) {
+                return model.DynamicFormId + "_" + field;
+            },
+            deleteItem: function (list, item) {
+                list.splice(list.indexOf(item), 1);
+            },
+            modalTrigger: function (element) {
+                thisApp.currentFieldModel = DeepClone(element);
+                this.$refs.modalTrigger.click();
+            },
+            modalSave: function (element) {
+                let origin = thisApp.FieldList.filter(x => x.DynamicFormFieldId == element.DynamicFormFieldId)[0];
+                let modelIndex = thisApp.FieldList.indexOf(origin)
+                thisApp.FieldList[modelIndex] = element
+
+                thisApp.fieldLayout[element.LayoutIndex] = element
+                this.$refs.modalTrigger.click();
+            },
+            getSignColorClass: function (fieldType) {
+                let prefix = "sign-", color;
+                switch (Number(fieldType)) {
+                    default:
+                    case @((int)EDynamicFormFieldType.Input):
+                        color = "blue"; break;
+                    case @((int)EDynamicFormFieldType.Textarea):
+                        color = "green"; break;
+                    case @((int)EDynamicFormFieldType.Select):
+                        color = "red"; break;
+                    case @((int)EDynamicFormFieldType.MultiSelect):
+                        color = "yellow"; break;
+                }
+                return prefix + color;
+            },
+        },
+        watch: {
+            model(nv, ov) {
+                @* 產生介面 *@
+
+            },
+            fieldTypeList(nv, ov) {
+                @* 更新欄位資訊 *@
+                thisApp.fieldLayout.forEach(function (v, i) {
+                    let type = thisApp.fieldTypeList.filter(x => x.Value == v.Type)[0];
+                    if (type) {
+                        v.SignColorClass = type.SignColorClass;
+                        v.Placeholder = type.Text;
+                    }
+                })
+                thisApp.layoutLoading = false;
+            },
+        }
+    }
+    var formComponent = Vue.createApp(component)
+    formComponent.component("draggable", vuedraggable);
+    //component.component("draggable", vuedraggable);
+    </script>
+

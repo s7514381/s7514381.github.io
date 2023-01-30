@@ -1,0 +1,42 @@
+.image-frame {
+    position: relative;
+}
+
+    .image-frame .img-cover-option {
+        border: 3px solid red;
+        position: absolute;
+        border-radius: 0.5em;
+    }
+
+    .image-frame.rendering .img-cover-option {
+        pointer-events: none;
+    }
+
+.image-cover-function {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: grid;
+    transform: translateX(115%);
+}
+
+    .image-cover-function div {
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .image-cover-function div:hover {
+            opacity: 1;
+        }
+
+.image-cover-selected {
+    border: 2px solid #2c7be5;
+}
+
+    .image-cover-selected:before {
+        content: "";
+        display: block;
+        height: inherit;
+        width: inherit;
+        border-radius: 1em;
+    }

@@ -4,148 +4,148 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>123</title>
+    <title>自由發揮 園丁Tim</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/css/site.css?v=AKvNjO3dCPPS0eSU1Ez8T2wI280i08yGycV9ndytL-c" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="stylesheet" href="/css/image-cover-frame.css" />
+    <link rel="stylesheet" href="/css/dynamic-form.css" />
 
-    <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js" type="text/javascript"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js" type="text/javascript"></script>
+    <script src="/lib/Sortable/Sortable.min.js?v=triwwTQbab50G53J2FyiXb7JlioSKMdmFfzZ1rel42Y"></script>
+    <script src="/lib/vue/vuedraggable.umd.min.js?v=Lw1ELK88FKeUDXLNnLnHq0i7DjoaZVc2XqGnomXivjU"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="/js/site.js?v=Dczxt5NuA0rUBOxULTgExDzm3GOIcsTv--kGt06O6mg"></script>
+    <script src="/js/vue-mixin.js?v=60-8lnAHDhQs4zrnv01y_MNen1l1tnXdiqLCDE4wdc4"></script>
 </head>
+
 <body>
+
+    <script>
+        var thisApp;
+        var component;
+        const baseMixin = {
+            data() {
+                return {
+                    Layout: {
+                        headTitle: document.getElementsByTagName("title")[0].innerHTML,
+                    },
+
+                }
+            },
+            beforeCreate() {
+                thisApp = this
+            },
+            created() {
+                thisApp.setHeadTitle(thisApp.pageTitle)
+            },
+            computed: {
+            },
+            methods: {
+                newGuid: function () {
+                    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+                    );
+                }, 
+                setHeadTitle(title) {
+                    if (!title) { return; }
+                    document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
+                },
+
+            },
+        }
+    </script>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/">HtmlCenter</a>
+                <a class="navbar-brand fw-bold fs-3 logo-text" href="/">Github重劃區</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/">Home</a>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/imagecoverframe">圖片框選器</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Home/Privacy">Privacy</a>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/dynamicform">動態表單v1.0</a>
+                        </li>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/interest">利息計算機</a>
+                        </li>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/unitywebgl">Unity遊戲</a>
+                        </li>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/aboutme">關於我</a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div id="app" class="container header-margin">
         <main role="main" class="pb-3">
-            
-<div id="app" class="text-center">
-
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">存款:</div>
-        <div class="col text-start">
-            <input v-model="Deposit" type="number" />
+            <div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <p class="fw-bold fs-5 title-text">網站介紹</p>
+                各位好，我叫Tim<br />
+                <br />
+                網頁內的功能皆為自製，並且使用之套件皆為開放套件(Vue3、vue draggable、Sortable、font-awesome...等)，<br />
+                程式範圍涉略Css(元件外觀)、前端(Vue3、Axios、javascript)、後端(頁面產生器、預計未來會對接<a href="https://us-central1-timwu19950429.cloudfunctions.net/function-1" target="_blank">google cloud function</a>做為後端資料庫API)，<br />
+                歡迎有需求者參考學習。<br />
+                <br />
+                本github靜態頁面的產生方法為自製靜態頁面產生器，使用語言為C#、.Net 6 MVC，程式碼以及說明在<a href="https://github.com/s7514381/s7514381.github.io" target="_blank">s7514381.github.io</a>，功能皆為開放使用。<br />
+                使用靜態頁面產生器的好處是，可以沿用MVC的partial概念來產生靜態頁面，減少重複的程式碼。<br />
+                <br />
+                如果有任何想反饋的歡迎寄信至<a href="mailto:s7514381@gmail.com">s7514381@gmail.com</a>，感謝各位!
+            </div>
         </div>
     </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">每月存入:</div>
-        <div class="col text-start">
-            <input v-model="DepositPerMonth" type="number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">利率(%):</div>
-        <div class="col text-start">
-            <input v-model="AnnualRatePerYear" type="number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">年數:</div>
-        <div class="col text-start">
-            <input v-model="Year" type="number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">月數:</div>
-        <div class="col text-start">
-            <input v-model="Month" type="number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">累計金額:</div>
-        <div class="col text-start">
-            {{Math.round(Accumulation)}}
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">利息:</div>
-        <div class="col text-start">
-            {{Math.round(Interest)}}
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">複利:</div>
-        <div class="col text-start">
-            {{Math.round(CompoundInterest)}}
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-5 text-end pr-0">複利比率:</div>
-        <div class="col text-start">
-            {{CompoundRate.toFixed(2)}}%
-        </div>
-    </div>
-
 </div>
 
-<script>
-    axios.get(`https://us-central1-timwu19950429.cloudfunctions.net/function-1`).then(function (res) {
-        console.log(res.data)
-    });
+<p class="fw-bold fs-5 title-text">最近推出項目</p>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" href="/imagecoverframe">圖片框選器</a>
+    </div>
+</div>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" href="/dynamicform">動態表單</a>
+    </div>
+</div>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" href="/unitywebgl">遊戲</a>
+    </div>
+</div>
 
-    var app = Vue.createApp({
+
+<script>
+    component = {
+        mixins: [baseMixin],
         data() {
             return {
-                Deposit: 1000000,
-                DepositPerMonth: 0,
-                AnnualRatePerYear: 4.2,
-                Month: 1,
-                Year: 0,
+                pageTitle: '首頁',
+
             }
         },
         created() {
-
-        },
-        computed: {
-            CalculateMonth() {
-                return this.Month + this.Year * 12
-            },
-            Accumulation() {
-                let result = this.Deposit;
-
-                for (let i = 0; i < this.CalculateMonth; i++) {
-                    result += result * (this.AnnualRatePerYear / 12) / 100 + this.DepositPerMonth;
-                }
-                return result
-            },
-            Interest() {
-                return this.Accumulation - this.Deposit - (this.DepositPerMonth * this.CalculateMonth);
-            },
-            CompoundInterest() {
-                let result = this.Deposit;
-
-                for (let i = 0; i < this.CalculateMonth; i++) {
-                    result += this.Deposit * (this.AnnualRatePerYear / 12) / 100 + this.DepositPerMonth;
-                }
-                return this.Accumulation - result
-            },
-            CompoundRate() {
-                return this.CompoundInterest / this.Interest * 100;
-            },
+            
         },
         methods: {
 
         },
-    }).mount('#app')
-
+    }
+    var formComponent = Vue.createApp(component)
 </script>
 
         </main>
@@ -153,10 +153,13 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2023 - HtmlCenter - <a href="/Home/Privacy">Privacy</a>
+            &copy; 2023 - Github - <a style="color: #6c757d" href="/Home/UpdateRenderView">更新</a>
         </div>
     </footer>
 
-    
+    <script>
+        var app = formComponent.mount('#app')
+    </script>
+
 </body>
 </html>

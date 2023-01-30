@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>自由發揮 園丁Tim</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="stylesheet" href="/css/image-cover-frame.css" />
+    <link rel="stylesheet" href="/css/dynamic-form.css" />
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js" type="text/javascript"></script>
+    <script src="/lib/Sortable/Sortable.min.js?v=triwwTQbab50G53J2FyiXb7JlioSKMdmFfzZ1rel42Y"></script>
+    <script src="/lib/vue/vuedraggable.umd.min.js?v=Lw1ELK88FKeUDXLNnLnHq0i7DjoaZVc2XqGnomXivjU"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="/js/site.js?v=Dczxt5NuA0rUBOxULTgExDzm3GOIcsTv--kGt06O6mg"></script>
+    <script src="/js/vue-mixin.js?v=60-8lnAHDhQs4zrnv01y_MNen1l1tnXdiqLCDE4wdc4"></script>
+</head>
+
+<body>
+
+    <script>
+        var thisApp;
+        var component;
+        const baseMixin = {
+            data() {
+                return {
+                    Layout: {
+                        headTitle: document.getElementsByTagName("title")[0].innerHTML,
+                    },
+
+                }
+            },
+            beforeCreate() {
+                thisApp = this
+            },
+            created() {
+                thisApp.setHeadTitle(thisApp.pageTitle)
+            },
+            computed: {
+            },
+            methods: {
+                newGuid: function () {
+                    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+                    );
+                }, 
+                setHeadTitle(title) {
+                    if (!title) { return; }
+                    document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
+                },
+
+            },
+        }
+    </script>
+
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold fs-3 logo-text" href="/">Github重劃區</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/imagecoverframe">圖片框選器</a>
+                        </li>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/dynamicform">動態表單v1.0</a>
+                        </li>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/interest">利息計算機</a>
+                        </li>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/unitywebgl">Unity遊戲</a>
+                        </li>
+                        <li class="nav-item me-3 px-2">
+                            <a class="nav-link text-dark" href="/aboutme">關於我</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div id="app" class="container header-margin">
+        <main role="main" class="pb-3">
+            
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-lg-3 d-flex flex-center">
+                <div class=" d-flex flex-center" style="width:100%;height:12em">
+                    <i class="fas fa-user" style="font-size: 10em; color: #666; "></i>
+                </div>
+                
+            </div>
+            <div class="col-12 col-lg-9 ">
+                <div class="row">
+                    <p class="fw-bold fs-5 title-text">簡述</p>
+                    <p>嚴格要求程式碼的品質與結構，儘可能不寫重複邏輯</p>
+                    <p>擅長的能力是模組化功能，盡可能地重複利用function，保證維護的品質與速度，</p>
+                    <p>大幅度的減少了開發的時間(基礎CRUD可在20分鐘內產出)</p>
+                    <p>以及降低與同事接交程式碼的負擔。</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                    <p class="fw-bold fs-5 title-text">經歷</p>
+                    <div>
+                        <p class="fw-bold fs-6">專案：</p>
+                        1.師資生運用數位教學檢測工具系統-千人同時考試：<br />
+                        使用技術: .Net 6 MVC、Channel、SignalR、Dapper、Vue3、scss、MS Sql<br />
+                        *Channel技術:<br />
+                        實作 高流量-千人同時考試<br />
+                        考生登入時已C# Channel機制 限制同時只會有一個請求讀取同一場考試，並且在完成後將考試物件存放至MemoryCache。<br />
+                        其他考生則會等待考試讀取完成後，跳轉至MemoryCache取得考試物件，以降低多人同時向資料庫取資料的效能負載。<br />
+                        *SignalR:<br />
+                        考試過程中，以SignalR監聽線上考生狀態，紀錄連線與斷線的事件以實現如果有學生斷線後連回考場可以把斷線時間加回去的機制。<br />
+                        <br />
+                        專案簡述：以.Net 6製作 後台出題審核系統+前台考試系統<br />
+                        在後台製作題庫，題型包含單選題、多選題、實作題、題組題。<br />
+                        經過學術審核以及形式審核之後成為定稿題目。<br />
+                        建立考試資訊後，在前台考試系統進行Session登入後並且讀取考試資訊，才能夠開始考試。<br />
+                        前後端通訊使用"輕裝Vue3"、axios，安全性上，網站採取白名單的方式限制IP登入，並且在後端的Action以ValidateAntiForgeryToken來防止使用者直接對網站使用參數Post請求的方式進行攻擊<br />
+                        <br />
+                        2.新北市政府都市更新申辦系統：<br />
+                        * 線上申請節省了80%都更申辦的過程時間。<br />
+                        * 節省上千元的紙張費用，目標為實現無紙化系統。<br />
+                        使用技術: .Net core 3.1 MVC、SignalR、Dapper、Vue.js、css、MS Sql<br />
+                        <br />
+                        專案簡述：以.Net Core 3.1開發，<br />
+                        使用動態頁面的方式快速製作靜態頁面，例：介紹新北市都市更新處的歷史、業務職掌。<br />
+                        以少量的code達到快速開發的效果。<br />
+                        並且網站的核心是可以無紙化的申請都市更新，<br />
+                        包含"後台審核系統"、使用"OpenXml"製作文件或列印為PDF，<br />
+                        審核完成的案件可以在Arcgis圖資系統裡面查詢該案件的狀況。<br />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <p class="fw-bold fs-5 title-text">現居台北市大同區</p>
+        <div class="row">
+            <div class="col">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.149170625159!2d121.51330480878798!3d25.062932728035157!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a93ee261540b%3A0xea34a16eef2e900c!2z5bu25LiJ5aSc5biC!5e0!3m2!1szh-TW!2stw!4v1674203071035!5m2!1szh-TW!2stw"
+                        width="600" height="450" style="border:0;width:100%" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    component = {
+        mixins: [baseMixin],
+        data() {
+            return {
+                pageTitle: '關於我',
+
+            }
+        },
+        created() {
+
+        },
+        methods: {
+
+        },
+    }
+    var formComponent = Vue.createApp(component)
+</script>
+
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - Github - <a style="color: #6c757d" href="/Home/UpdateRenderView">更新</a>
+        </div>
+    </footer>
+
+    <script>
+        var app = formComponent.mount('#app')
+    </script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ebbKFK2IEBul7YEb3QVrmI1ss/wsAlvCKEl1yL6AFCI=",
+  "Hash": "cP/DNjM5VKRAz8ry7XgJoVyKqSC8Pc+YwYwQ4H5bnSk=",
   "Source": "HtmlCenter",
   "BasePath": "_content/HtmlCenter",
   "Mode": "Default",
@@ -270,6 +270,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\video\\pexels-german-korb-5644053.mp4"
+    },
+    {
+      "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\video\\pexels-mamunur-rashid-6336968.mp4",
+      "SourceId": "HtmlCenter",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\",
+      "BasePath": "_content/HtmlCenter",
+      "RelativePath": "video/pexels-mamunur-rashid-6336968.mp4",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\video\\pexels-mamunur-rashid-6336968.mp4"
     },
     {
       "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\video\\video.mp4",

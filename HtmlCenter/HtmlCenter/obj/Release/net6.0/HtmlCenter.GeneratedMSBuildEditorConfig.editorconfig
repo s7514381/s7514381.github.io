@@ -15,6 +15,14 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes = true
 build_property.MSBuildProjectDirectory = C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/AboutMe/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWJvdXRNZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/DynamicForm/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRHluYW1pY0Zvcm1cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -23,12 +31,28 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/ImageCoverFrame/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW1hZ2VDb3ZlckZyYW1lXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/Interest/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW50ZXJlc3RcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/News/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/UnityWebGL/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVW5pdHlXZWJHTFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/ViewRender/Index.cshtml]
@@ -46,3 +70,7 @@ build_metadata.AdditionalFiles.CssScope =
 [C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-0lpihl6jt4
+
+[C:/Users/s7514/source/repos/s7514381.github.io/HtmlCenter/HtmlCenter/Views/Shared/_ScriptCss.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TY3JpcHRDc3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-ovcc8ur3w6

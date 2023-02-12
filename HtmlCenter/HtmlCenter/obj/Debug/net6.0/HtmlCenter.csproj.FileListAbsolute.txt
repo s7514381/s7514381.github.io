@@ -348,3 +348,8 @@ C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\bin\Debug\n
 C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\bin\Debug\net6.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\obj\Debug\net6.0\HtmlCenter.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\obj\Debug\net6.0\scopedcss\Views\Shared\_ScriptCss.cshtml.rz.scp.css
+C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\obj\Debug\net6.0\staticwebassets\msbuild.HtmlCenter.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\obj\Debug\net6.0\staticwebassets\msbuild.build.HtmlCenter.props
+C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\obj\Debug\net6.0\staticwebassets\msbuild.buildMultiTargeting.HtmlCenter.props
+C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\obj\Debug\net6.0\staticwebassets\msbuild.buildTransitive.HtmlCenter.props
+C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\obj\Debug\net6.0\staticwebassets.pack.json

@@ -1,4 +1,17 @@
-﻿<div class="card shadow-sm mb-3">
+﻿
+<div class="background-video pc-limit" >
+    <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw">
+        <source class="" src="~/video/video.mp4" type="video/mp4" />
+    </video>
+</div>
+
+<div class="background-video mobile-limit">
+    <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw">
+        <source src="~/video/pexels-mamunur-rashid-6336968.mp4" type="video/mp4" />
+    </video>
+</div>
+
+<div class="card shadow-sm mb-3">
     <div class="card-body">
         <div class="row">
             <div class="col-12">
@@ -18,8 +31,8 @@
     </div>
 </div>
 
-<p class="fw-bold fs-5 title-text">最近推出項目</p>
 <div class="card shadow-sm mb-3">
+    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">最近推出項目</p></div>
     <div class="card-body">
         <a class="fw-bold fs-5 title-text" asp-controller="imagecoverframe" asp-action="Index">圖片框選器</a>
     </div>

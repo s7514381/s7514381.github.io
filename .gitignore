@@ -2,3 +2,6 @@
 # 這個 .gitignore 檔案由 Microsoft(R) Visual Studio 自動建立。
 ################################################################################
 
+/HtmlCenter/HtmlCenter/bin/Debug/net6.0
+/HtmlCenter/HtmlCenter/obj/Debug/net6.0
+/HtmlCenter/HtmlCenter/obj

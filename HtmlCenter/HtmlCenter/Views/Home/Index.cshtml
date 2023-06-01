@@ -1,8 +1,9 @@
 ﻿
 <div class="background-video pc-limit" >
-    <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw">
+    <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw;">
         <source class="" src="~/video/video.mp4" type="video/mp4" />
     </video>
+@*    <img src="~/image/bg.jpg" style="width:100vw; height:auto" />*@
 </div>
 
 <div class="background-video mobile-limit">
@@ -11,7 +12,7 @@
     </video>
 </div>
 
-<div class="card shadow-sm mb-3">
+<div class="card card-transparent shadow-sm mb-3">
     <div class="card-body">
         <div class="row">
             <div class="col-12">
@@ -48,7 +49,6 @@
     </div>
 </div>
 
-
 <script>
     component = {
         mixins: [baseMixin],
@@ -58,8 +58,23 @@
 
             }
         },
-        created() {
-            
+        async created() {
+
+            let q = await thisApp.dbInsert("users", {
+                first: new Date(),
+                last: "Lovelace11",
+                born: 44543
+            })
+
+            let { db, query, collection, where } = thisApp.dbAssembly;
+            let list = await thisApp.dbQuery(query(
+                collection(db, "users"),
+                where("last", "==", 'Lovelace11'),
+                where("born", "==", 44543)
+            ))
+            list.forEach((doc) => {
+                console.log(doc.id, " => ", doc.data());
+            });
         },
         methods: {
 

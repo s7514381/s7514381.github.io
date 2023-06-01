@@ -12,13 +12,15 @@
     <link rel="stylesheet" href="/css/dynamic-form.css" />
 
 
+    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js" type="text/javascript"></script>
     <script src="/lib/Sortable/Sortable.min.js?v=triwwTQbab50G53J2FyiXb7JlioSKMdmFfzZ1rel42Y"></script>
     <script src="/lib/vue/vuedraggable.umd.min.js?v=Lw1ELK88FKeUDXLNnLnHq0i7DjoaZVc2XqGnomXivjU"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    <script src="/js/site.js?v=Dczxt5NuA0rUBOxULTgExDzm3GOIcsTv--kGt06O6mg"></script>
+    <script src="/js/site.js?v=7zy2lQfplQHWIvjyGwWHMPu7byB1vB5atFKLbvzX2Zs"></script>
     <script src="/js/vue-mixin.js?v=60-8lnAHDhQs4zrnv01y_MNen1l1tnXdiqLCDE4wdc4"></script>
 </head>
 
@@ -26,17 +28,26 @@
     <script>
         var thisApp;
         var component;
+
         const baseMixin = {
             data() {
                 return {
                     Layout: {
                         headTitle: document.getElementsByTagName("title")[0].innerHTML,
                     },
-
+                    dbAssembly:{
+                        db: null,
+                        collection: null,
+                        addDoc: null,
+                        getDocs: null,
+                        doc: null,
+                        query: null,
+                        where: null,
+                    },
                 }
             },
             beforeCreate() {
-                thisApp = this
+                thisApp = this;
             },
             created() {
                 thisApp.setHeadTitle(thisApp.pageTitle)
@@ -44,6 +55,47 @@
             computed: {
             },
             methods: {
+                dbInit: function (db, collection, addDoc, getDocs, doc, query, where) {
+                    let da = thisApp.dbAssembly;
+                    da.db = db;
+                    da.collection = collection;
+                    da.addDoc = addDoc;
+                    da.getDocs = getDocs;
+                    da.doc = doc;
+                    da.query = query;
+                    da.where = where;
+                },
+                dbReady:async function() {
+                    let { db } = thisApp.dbAssembly;
+
+                    return new Promise((complete, failed) => {
+                        if (db != null) { complete(true); }
+                        else { 
+                            setTimeout(async function () { complete(await thisApp.dbReady()); }, 100)
+                        }
+                    });
+                },
+                dbInsert: async function (collectionName, data) {                    
+                    let result = null;
+
+                    if (await thisApp.dbReady()) {
+                        let { addDoc, collection, db } = thisApp.dbAssembly;
+
+                        result = await addDoc(collection(db, collectionName), data);
+                    }
+                    return result;
+                },
+                dbQuery: async function (queryCondition) {
+                    let result = null;
+
+                    if (await thisApp.dbReady()) {
+                        let { db, getDocs, query, collection, where } = thisApp.dbAssembly
+
+
+                        result = await getDocs(queryCondition);
+                    }
+                    return result;
+                },
                 newGuid: function () {
                     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
                         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
@@ -53,8 +105,7 @@
                     if (!title) { return; }
                     document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
                 },
-
-            },
+            }
         }
     </script>
 
@@ -92,7 +143,7 @@
         <main role="main" class="pb-3">
             
 <div class="background-video pc-limit" >
-    <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw">
+    <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw;">
         <source class="" src="/video/video.mp4" type="video/mp4" />
     </video>
 </div>
@@ -103,7 +154,7 @@
     </video>
 </div>
 
-<div class="card shadow-sm mb-3">
+<div class="card card-transparent shadow-sm mb-3">
     <div class="card-body">
         <div class="row">
             <div class="col-12">
@@ -140,7 +191,6 @@
     </div>
 </div>
 
-
 <script>
     component = {
         mixins: [baseMixin],
@@ -150,8 +200,29 @@
 
             }
         },
-        created() {
+        async created() {
+
+
+            let q = await thisApp.dbInsert("users", {
+                first: new Date(),
+                last: "Lovelace11",
+                born: 44543
+            })
+
+            let { db, query, collection, where } = thisApp.dbAssembly
+            const queryCondition = query(
+                collection(db, "users"),
+                where("last", "==", 'Lovelace11'),
+                where("born", "==", 44543)
+            );
+
+            let q2 = await thisApp.dbQuery(queryCondition)
             
+
+            q2.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
+            });
         },
         methods: {
 
@@ -170,8 +241,10 @@
     </footer>
 
     <script>
-        var app = formComponent.mount('#app')
+        var vApp = formComponent.mount('#app')
     </script>
+
+    <script src="/js/firestore.js" type="module"></script>
 
 </body>
 </html>

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "J1aGqTpcgbebWWCyBfWgD3l6V1guCuEgHp73Ixn+eas=",
+  "Hash": "GdofgGw6+3dCHM/dKxCTfVBWDsSQDHfGdpS4lYsyizY=",
   "Source": "HtmlCenter",
   "BasePath": "_content/HtmlCenter",
   "Mode": "Default",
@@ -170,6 +170,23 @@
       "OriginalItemSpec": "wwwroot\\image\\bbbd733be66ab7457ea33c2dc0021ed4_t.jpeg"
     },
     {
+      "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\image\\bg.jpg",
+      "SourceId": "HtmlCenter",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\",
+      "BasePath": "_content/HtmlCenter",
+      "RelativePath": "image/bg.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\image\\bg.jpg"
+    },
+    {
       "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\image\\wdc.jpg",
       "SourceId": "HtmlCenter",
       "SourceType": "Discovered",
@@ -185,6 +202,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\image\\wdc.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\js\\firestore.js",
+      "SourceId": "HtmlCenter",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\",
+      "BasePath": "_content/HtmlCenter",
+      "RelativePath": "js/firestore.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\firestore.js"
     },
     {
       "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\js\\site.js",

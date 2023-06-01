@@ -11,7 +11,7 @@ namespace HtmlCenter.Controllers
 {
     public class HomeController : BaseController
     {
-        public HomeController(BaseControllerArgument argument, ILogger<HomeController> logger): base(argument)
+        public HomeController(BaseControllerArgument argument, ILogger<HomeController> logger) : base(argument)
         {
             _logger = logger;
 

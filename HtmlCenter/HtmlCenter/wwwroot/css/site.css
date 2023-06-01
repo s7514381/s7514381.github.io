@@ -141,3 +141,7 @@ header {
 .headshot img {
     border-radius: inherit;
 }
+
+.card-transparent {
+    background-color: #ffffff8a !important;
+}

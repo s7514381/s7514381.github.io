@@ -90,7 +90,87 @@
     </header>
     <div id="app" class="container header-margin">
         <main role="main" class="pb-3">
-            1234
+            
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+
+        <div class="form-check form-check-inline">
+            <input v-model="tagList" value="1" class="form-check-input" type="checkbox" id="tagCheckbox1">
+            <label class="form-check-label" for="tagCheckbox1">標籤1</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input v-model="tagList" value="2" class="form-check-input" type="checkbox" id="tagCheckbox2">
+            <label class="form-check-label" for="tagCheckbox2">標籤2</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input v-model="tagList" value="3" class="form-check-input" type="checkbox" id="tagCheckbox3">
+            <label class="form-check-label" for="tagCheckbox3">標籤3</label>
+        </div>
+
+        <div v-for="(v,i) in itemList">
+            <div v-show="hasIntersection(v.tag, tagList)"> {{v.name}}</div>
+        </div>
+
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row row align-items-center">
+            <div class="col-sm-2">
+                <img src="/image/Manga/manga_0001.jpg" style="max-height: 100px; max-width: 50px;" />
+            </div>
+            <div class="col-sm-10">
+                <div class="row">
+                    <p class="mb-0">名稱:安達與島村</p>
+                    <p class="mb-0">原文:安達としまむら</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    component = {
+        mixins: [baseMixin],
+        data() {
+            return {
+                pageTitle: '連載百合漫畫區',
+                tagList:['1'],
+                itemList:[
+                    {name: "項目1", tag:['1']}
+                    , { name: "項目2", tag: ['2'] }
+                    , { name: "項目3", tag: ['3']}
+                    , { name: "項目4", tag: ['1', '3']}
+                ]
+            }
+        },
+        created() {
+
+        },
+        computed: {
+        },
+        methods: {
+            hasIntersection: function (list1, list2) {
+                let bool= false;
+
+                for (let i = 0; i < list1.length; i++){
+                    if (list2.includes(list1[i])) { bool = true; break; }
+                }
+                return bool;
+            }
+        },
+        watch:{
+            tagList(nv, ov) {
+
+            },
+        }
+    }
+    var formComponent = Vue.createApp(component)
+</script>
+
         </main>
     </div>
 

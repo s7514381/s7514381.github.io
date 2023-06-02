@@ -42,13 +42,7 @@
                         headTitle: document.getElementsByTagName("title")[0].innerHTML,
                     },
                     dbAssembly:{
-                        db: null,
-                        collection: null,
-                        addDoc: null,
-                        getDocs: null,
-                        doc: null,
-                        query: null,
-                        where: null,
+                        ready: false,
                     },
                 }
             },
@@ -61,21 +55,14 @@
             computed: {
             },
             methods: {
-                dbInit: function (db, collection, addDoc, getDocs, doc, query, where) {
-                    let da = thisApp.dbAssembly;
-                    da.db = db;
-                    da.collection = collection;
-                    da.addDoc = addDoc;
-                    da.getDocs = getDocs;
-                    da.doc = doc;
-                    da.query = query;
-                    da.where = where;
+                dbInit: function (dbAssembly) {
+                    this.dbAssembly = dbAssembly
                 },
                 dbReady:async function() {
-                    let { db } = thisApp.dbAssembly;
+                    let { ready } = thisApp.dbAssembly;
 
                     return new Promise((complete, failed) => {
-                        if (db != null) { complete(true); }
+                        if (ready) { complete(true); }
                         else { 
                             setTimeout(async function () { complete(await thisApp.dbReady()); }, 100)
                         }
@@ -84,12 +71,30 @@
                 dbInsert: async function (collectionName, data) {                    
                     let result = null;
 
-                    if (await thisApp.dbReady()) 
-                    {
+                    if (await thisApp.dbReady())  {
                         let { addDoc, collection, db } = thisApp.dbAssembly;
+
                         result = await addDoc(collection(db, collectionName), data);
                     }
                     return result;
+                },
+                dbUpdate: async function (collectionName, docId, data) {
+                    let result = null;
+
+                    if (await thisApp.dbReady()) {
+                        let { doc, updateDoc, db } = thisApp.dbAssembly;
+
+                        const docRef = doc(db, collectionName, docId);
+                        result = await updateDoc(docRef, data);
+                    }
+                    return result;
+                },
+                dbDelete: async function (collectionName, docId) {
+                    if (await thisApp.dbReady()) 
+                    {
+                        let { doc, deleteDoc, db } = thisApp.dbAssembly;
+                        await deleteDoc(doc(db, collectionName, docId));
+                    }
                 },
                 dbQuery: async function (queryCondition) {
                     let result = null;
@@ -98,6 +103,16 @@
                     {
                         let { getDocs } = thisApp.dbAssembly;
                         result = await getDocs(queryCondition);
+                    }
+                    return result;
+                },
+                signIn: async function(){
+                    let result = null;
+
+                    if (await thisApp.dbReady()) 
+                    {
+                        let { googleSignIn } = thisApp.dbAssembly;
+                        result = await googleSignIn();
                     }
                     return result;
                 },
@@ -156,11 +171,18 @@
         </div>
     </footer>
 
+    <script src="/js/firestore.js" type="module"></script>
+    @*<script src="/js/firestore-encrypt.js" type="module"></script>*@
+
     <script>
         var vApp = formComponent.mount('#app')
     </script>
 
-    <script src="/js/firestore.js" type="module"></script>
+    <script type="module">
+        import { dbAssembly } from "/js/firestore.js";
+        vApp.dbInit(dbAssembly);
+    </script>
+
 
 </body>
 </html>

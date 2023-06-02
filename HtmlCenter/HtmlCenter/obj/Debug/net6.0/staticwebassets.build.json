@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "GdofgGw6+3dCHM/dKxCTfVBWDsSQDHfGdpS4lYsyizY=",
+  "Hash": "THpzDh4ZSv+HQsMTQv2O8VgW6a+1jjfg2+5Z47GKgEQ=",
   "Source": "HtmlCenter",
   "BasePath": "_content/HtmlCenter",
   "Mode": "Default",
@@ -219,6 +219,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\firestore.js"
+    },
+    {
+      "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\js\\firestore-encrypt.js",
+      "SourceId": "HtmlCenter",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\",
+      "BasePath": "_content/HtmlCenter",
+      "RelativePath": "js/firestore-encrypt.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\firestore-encrypt.js"
     },
     {
       "Identity": "C:\\Users\\s7514\\source\\repos\\s7514381.github.io\\HtmlCenter\\HtmlCenter\\wwwroot\\js\\site.js",

@@ -36,13 +36,7 @@
                         headTitle: document.getElementsByTagName("title")[0].innerHTML,
                     },
                     dbAssembly:{
-                        db: null,
-                        collection: null,
-                        addDoc: null,
-                        getDocs: null,
-                        doc: null,
-                        query: null,
-                        where: null,
+                        ready: false,
                     },
                 }
             },
@@ -55,21 +49,14 @@
             computed: {
             },
             methods: {
-                dbInit: function (db, collection, addDoc, getDocs, doc, query, where) {
-                    let da = thisApp.dbAssembly;
-                    da.db = db;
-                    da.collection = collection;
-                    da.addDoc = addDoc;
-                    da.getDocs = getDocs;
-                    da.doc = doc;
-                    da.query = query;
-                    da.where = where;
+                dbInit: function (dbAssembly) {
+                    this.dbAssembly = dbAssembly
                 },
                 dbReady:async function() {
-                    let { db } = thisApp.dbAssembly;
+                    let { ready } = thisApp.dbAssembly;
 
                     return new Promise((complete, failed) => {
-                        if (db != null) { complete(true); }
+                        if (ready) { complete(true); }
                         else { 
                             setTimeout(async function () { complete(await thisApp.dbReady()); }, 100)
                         }
@@ -78,21 +65,48 @@
                 dbInsert: async function (collectionName, data) {                    
                     let result = null;
 
-                    if (await thisApp.dbReady()) {
+                    if (await thisApp.dbReady())  {
                         let { addDoc, collection, db } = thisApp.dbAssembly;
 
                         result = await addDoc(collection(db, collectionName), data);
                     }
                     return result;
                 },
-                dbQuery: async function (queryCondition) {
+                dbUpdate: async function (collectionName, docId, data) {
                     let result = null;
 
                     if (await thisApp.dbReady()) {
-                        let { db, getDocs, query, collection, where } = thisApp.dbAssembly
+                        let { doc, updateDoc, db } = thisApp.dbAssembly;
 
+                        const docRef = doc(db, collectionName, docId);
+                        result = await updateDoc(docRef, data);
+                    }
+                    return result;
+                },
+                dbDelete: async function (collectionName, docId) {
+                    if (await thisApp.dbReady()) 
+                    {
+                        let { doc, deleteDoc, db } = thisApp.dbAssembly;
+                        await deleteDoc(doc(db, collectionName, docId));
+                    }
+                },
+                dbQuery: async function (queryCondition) {
+                    let result = null;
 
+                    if (await thisApp.dbReady()) 
+                    {
+                        let { getDocs } = thisApp.dbAssembly;
                         result = await getDocs(queryCondition);
+                    }
+                    return result;
+                },
+                signIn: async function(){
+                    let result = null;
+
+                    if (await thisApp.dbReady()) 
+                    {
+                        let { googleSignIn } = thisApp.dbAssembly;
+                        result = await googleSignIn();
                     }
                     return result;
                 },
@@ -162,7 +176,8 @@
                 各位好，我叫Tim<br />
                 <br />
                 網頁內的功能皆為自製，並且使用之套件皆為開放套件(Vue3、vue draggable、Sortable、font-awesome...等)，<br />
-                程式範圍涉略Css(元件外觀)、前端(Vue3、Axios、javascript)、後端(頁面產生器、預計未來會對接<a href="https://us-central1-timwu19950429.cloudfunctions.net/function-1" target="_blank">google cloud function</a>做為後端資料庫API)，<br />
+                程式範圍涉略Css(元件外觀)、前端(Vue3、Axios、javascript)、後端(MVC頁面產生器)<br />
+                、資料庫(由前端直接介接cloud firestore，速度比cloud function快了超過10倍)，<br />
                 歡迎有需求者參考學習。<br />
                 <br />
                 本github靜態頁面的產生方法為自製靜態頁面產生器，使用語言為C#、.Net 6 MVC，程式碼以及說明在<a href="https://github.com/s7514381/s7514381.github.io" target="_blank">s7514381.github.io</a>，功能皆為開放使用。<br />
@@ -202,27 +217,30 @@
         },
         async created() {
 
+            //let signInData = await thisApp.signIn();
+            //console.log(signInData)
 
-            let q = await thisApp.dbInsert("users", {
-                first: new Date(),
-                last: "Lovelace11",
-                born: 44543
-            })
+            //let ins = await thisApp.dbInsert("users", {
+            //    first: new Date(),
+            //    last: "Lovelace11",
+            //    born: 44543
+            //})
 
-            let { db, query, collection, where } = thisApp.dbAssembly
-            const queryCondition = query(
-                collection(db, "users"),
-                where("last", "==", 'Lovelace11'),
-                where("born", "==", 44543)
-            );
+            //let upd = await thisApp.dbUpdate("users", ins.id, {
+            //    born: 6666
+            //})
 
-            let q2 = await thisApp.dbQuery(queryCondition)
-            
+            //let { db, query, collection, where } = thisApp.dbAssembly;
+            //let list = await thisApp.dbQuery(query(
+            //    collection(db, "users")
+            //    , where("last", "==", 'Lovelace11')
+            //    , where("born", "==", 6666)
+            //))
+            //list.forEach((doc) => {
+            //    console.log(doc.id, " => ", doc.data());
+            //});
 
-            q2.forEach((doc) => {
-                // doc.data() is never undefined for query doc snapshots
-                console.log(doc.id, " => ", doc.data());
-            });
+            //await thisApp.dbDelete("users", ins.id,)
         },
         methods: {
 
@@ -240,11 +258,17 @@
         </div>
     </footer>
 
+    <script src="/js/firestore.js" type="module"></script>
+
     <script>
         var vApp = formComponent.mount('#app')
     </script>
 
-    <script src="/js/firestore.js" type="module"></script>
+    <script type="module">
+        import { dbAssembly } from "/js/firestore.js";
+        vApp.dbInit(dbAssembly);
+    </script>
+
 
 </body>
 </html>

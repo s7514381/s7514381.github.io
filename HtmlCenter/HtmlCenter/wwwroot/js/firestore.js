@@ -1,8 +1,8 @@
 ﻿// Import the functions you need from the SDKs you need
+//import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js'
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
-import { getAuth } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js'
-import { getFirestore, collection, addDoc, getDocs, doc, query, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -21,8 +21,31 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+//const analytics = getAnalytics(app);
+
+const provider = new GoogleAuthProvider();
+const auth = getAuth();
+
+console.log(auth)
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
-vApp.dbInit(db, collection, addDoc, getDocs, doc, query, where);
+
+async function googleSignIn() {
+    let result;
+
+    await signInWithPopup(auth, provider)
+        .then((res) => {
+            const credential = GoogleAuthProvider.credentialFromResult(res);
+            const token = credential.accessToken;
+            const user = res.user;
+
+            result = { credential, token, user }
+
+        }).catch((error) => { console.log(error) });
+    return result;
+}
+
+export const dbAssembly = {
+    ready: true, db, collection, addDoc, getDocs, doc, query, where, updateDoc, googleSignIn, deleteDoc
+}

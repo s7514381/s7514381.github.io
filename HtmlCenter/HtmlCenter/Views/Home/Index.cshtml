@@ -20,7 +20,8 @@
                 各位好，我叫Tim<br />
                 <br />
                 網頁內的功能皆為自製，並且使用之套件皆為開放套件(Vue3、vue draggable、Sortable、font-awesome...等)，<br />
-                程式範圍涉略Css(元件外觀)、前端(Vue3、Axios、javascript)、後端(頁面產生器、預計未來會對接<a href="https://us-central1-timwu19950429.cloudfunctions.net/function-1" target="_blank">google cloud function</a>做為後端資料庫API)，<br />
+                程式範圍涉略Css(元件外觀)、前端(Vue3、Axios、javascript)、後端(MVC頁面產生器)<br />
+                、資料庫(由前端直接介接cloud firestore，速度比cloud function快了超過10倍)，<br />
                 歡迎有需求者參考學習。<br />
                 <br />
                 本github靜態頁面的產生方法為自製靜態頁面產生器，使用語言為C#、.Net 6 MVC，程式碼以及說明在<a href="https://github.com/s7514381/s7514381.github.io" target="_blank">s7514381.github.io</a>，功能皆為開放使用。<br />
@@ -60,21 +61,30 @@
         },
         async created() {
 
-            let q = await thisApp.dbInsert("users", {
-                first: new Date(),
-                last: "Lovelace11",
-                born: 44543
-            })
+            //let signInData = await thisApp.signIn();
+            //console.log(signInData)
 
-            let { db, query, collection, where } = thisApp.dbAssembly;
-            let list = await thisApp.dbQuery(query(
-                collection(db, "users"),
-                where("last", "==", 'Lovelace11'),
-                where("born", "==", 44543)
-            ))
-            list.forEach((doc) => {
-                console.log(doc.id, " => ", doc.data());
-            });
+            //let ins = await thisApp.dbInsert("users", {
+            //    first: new Date(),
+            //    last: "Lovelace11",
+            //    born: 44543
+            //})
+
+            //let upd = await thisApp.dbUpdate("users", ins.id, {
+            //    born: 6666
+            //})
+
+            //let { db, query, collection, where } = thisApp.dbAssembly;
+            //let list = await thisApp.dbQuery(query(
+            //    collection(db, "users")
+            //    , where("last", "==", 'Lovelace11')
+            //    , where("born", "==", 6666)
+            //))
+            //list.forEach((doc) => {
+            //    console.log(doc.id, " => ", doc.data());
+            //});
+
+            //await thisApp.dbDelete("users", ins.id,)
         },
         methods: {
 

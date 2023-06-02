@@ -18,8 +18,6 @@ namespace HtmlCenter.Controllers
 
         public async Task<IActionResult> Index()
         {
-            await RenderView(CurrentController, CurrentAction, ViewData);
-
             return View(ViewRenderResult());
         }
 

@@ -18,32 +18,130 @@
     <script src="/lib/vue/vuedraggable.umd.min.js?v=Lw1ELK88FKeUDXLNnLnHq0i7DjoaZVc2XqGnomXivjU"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    <script src="/js/site.js?v=Dczxt5NuA0rUBOxULTgExDzm3GOIcsTv--kGt06O6mg"></script>
+    <script src="/js/site.js?v=7zy2lQfplQHWIvjyGwWHMPu7byB1vB5atFKLbvzX2Zs"></script>
     <script src="/js/vue-mixin.js?v=60-8lnAHDhQs4zrnv01y_MNen1l1tnXdiqLCDE4wdc4"></script>
 </head>
 
-<body>
+<body id="app">
     <script>
         var thisApp;
         var component;
+
         const baseMixin = {
             data() {
                 return {
                     Layout: {
                         headTitle: document.getElementsByTagName("title")[0].innerHTML,
                     },
-
+                    dbAssembly:{
+                        ready: false,
+                    },
+                    authInfo:{
+                        ready: false,
+                        user: null,
+                    }
                 }
             },
             beforeCreate() {
-                thisApp = this
+                thisApp = this;
             },
-            created() {
+            async created() {
                 thisApp.setHeadTitle(thisApp.pageTitle)
+ 
+                if (await thisApp.dbReady()) 
+                {
+                    let { waitForAuthStateChange, getAuth, signOut } = thisApp.dbAssembly;
+                    thisApp.authInfo.user = await waitForAuthStateChange();
+                    thisApp.authInfo.ready = true; 
+                }  
             },
             computed: {
             },
             methods: {
+                dbInit: function (dbAssembly) {
+                    this.dbAssembly = dbAssembly
+                },
+                dbReady:async function() {
+                    let { ready } = thisApp.dbAssembly;
+
+                    return new Promise((complete, failed) => {
+                        if (ready) { complete(true); }
+                        else { 
+                            setTimeout(async function () { complete(await thisApp.dbReady()); }, 100)
+                        }
+                    });
+                },
+                dbInsert: async function (collectionName, data) {                    
+                    let result = null;
+
+                    if (await thisApp.dbReady())  {
+                        let { addDoc, collection, db } = thisApp.dbAssembly;
+
+                        result = await addDoc(collection(db, collectionName), data);
+                    }
+                    return result;
+                },
+                dbUpdate: async function (collectionName, docId, data) {
+                    let result = null;
+
+                    if (await thisApp.dbReady()) {
+                        let { doc, updateDoc, db } = thisApp.dbAssembly;
+
+                        const docRef = doc(db, collectionName, docId);
+                        result = await updateDoc(docRef, data);
+                    }
+                    return result;
+                },
+                dbDelete: async function (collectionName, docId) {
+                    if (await thisApp.dbReady()) 
+                    {
+                        let { doc, deleteDoc, db } = thisApp.dbAssembly;
+                        await deleteDoc(doc(db, collectionName, docId));
+                    }
+                },
+                dbQuery: async function (queryCondition) {
+                    let result = null;
+
+                    if (await thisApp.dbReady()) 
+                    {
+                        let { getDocs } = thisApp.dbAssembly;
+                        result = await getDocs(queryCondition);
+                    }
+                    return result;
+                },
+                signIn: async function(){
+                    let result = null;
+
+                    if (await thisApp.dbReady()) 
+                    {
+                        let { googleSignIn, getAuth } = thisApp.dbAssembly;
+                        result = await googleSignIn();
+                        thisApp.authInfo.user = result.user;
+
+                        thisApp.dbInsert("LoginUser", {
+                            accessToken: result.user.accessToken,
+                            email: result.user.email,
+                            uid: result.user.uid,
+                            displayName: result.user.displayName,
+                            createDate: new Date(),
+                        })
+                    }
+                    return result;
+                },
+
+                signOut: async function () {
+                    if(!confirm("是否要登出?")){ return false; }
+
+                    if (await thisApp.dbReady()) {
+                        let { getAuth, signOut } = thisApp.dbAssembly;
+                        const auth = getAuth();
+                        signOut(auth).then(() => {
+                            thisApp.authInfo.user = null;
+                        }).catch((error) => {
+                            console.log(error)
+                        });
+                    }
+                },
                 newGuid: function () {
                     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
                         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
@@ -53,8 +151,9 @@
                     if (!title) { return; }
                     document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
                 },
-
             },
+            watch:{
+            }
         }
     </script>
 
@@ -84,11 +183,21 @@
                             <a class="nav-link text-dark" href="/aboutme">關於我</a>
                         </li>
                     </ul>
+
+                    <ul class="navbar-nav flex-grow-1" style="justify-content: flex-end">
+                        <li class="nav-item me-3 px-2">
+                            <div v-if="authInfo.ready">
+                                <a v-if="authInfo.user" class="nav-link text-dark" @click="signOut()" style="cursor:pointer">{{authInfo.user.displayName}}</a>
+                                <a v-if="!authInfo.user" class="nav-link text-dark" @click="signIn()" style="cursor:pointer">登入</a>
+                            </div>
+                            
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div id="app" class="container header-margin">
+    <div class="container header-margin">
         <main role="main" class="pb-3">
             
 <div class="mobile-limit">
@@ -259,9 +368,17 @@
         </div>
     </footer>
 
+    <script src="/js/firestore.js" type="module"></script>
+
     <script>
-        var app = formComponent.mount('#app')
+        var vApp = formComponent.mount('#app')
     </script>
+
+    <script type="module">
+        import { dbAssembly } from "/js/firestore.js";
+        vApp.dbInit(dbAssembly);
+    </script>
+
 
 </body>
 </html>

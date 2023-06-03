@@ -2,7 +2,7 @@
 //import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
 import { getAuth, signOut, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js'
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, where, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -54,7 +54,27 @@ function waitForAuthStateChange() {
 }
 
 
+const collectionRef = collection(db, 'LoginUser');
+onSnapshot(collectionRef, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+            const newDocument = change.doc.data();
+            // 處理新文檔插入事件
+            console.log('新文檔插入:', newDocument);
+        } else if (change.type === 'modified') {
+            const modifiedDocument = change.doc.data();
+            // 處理文檔修改事件
+            console.log('文檔修改:', modifiedDocument);
+        } else if (change.type === 'removed') {
+            const removedDocument = change.doc.data();
+            // 處理文檔刪除事件
+            console.log('文檔刪除:', removedDocument);
+        }
+    });
+});
+
+
 export const dbAssembly = {
     ready: true, db, collection, addDoc, getDocs, doc, query, where, updateDoc, googleSignIn, deleteDoc, getAuth, waitForAuthStateChange
-    , signOut
+    , signOut, onSnapshot
 }

@@ -64,26 +64,27 @@
             //let signInData = await thisApp.signIn();
             //console.log(signInData)
 
-            //let ins = await thisApp.dbInsert("users", {
+            //let ins = await thisApp.dbInsert("test", {
             //    first: new Date(),
             //    last: "Lovelace11",
             //    born: 44543
             //})
 
-            //let upd = await thisApp.dbUpdate("users", ins.id, {
+            //let upd = await thisApp.dbUpdate("test", ins.id, {
             //    born: 6666
             //})
 
-            //let { db, query, collection, where } = thisApp.dbAssembly;
+            //let { db, query, collection, where } = await thisApp.getDbAssembly();
             //let list = await thisApp.dbQuery(query(
-            //    collection(db, "users")
+            //    collection(db, "test")
             //    , where("last", "==", 'Lovelace11')
             //    , where("born", "==", 6666)
             //))
             //list.forEach((doc) => {
             //    console.log(doc.id, " => ", doc.data());
             //});
-
+           
+            
             //await thisApp.dbDelete("users", ins.id,)
         },
         methods: {

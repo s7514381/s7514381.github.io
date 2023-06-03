@@ -37,10 +37,10 @@
                     Layout: {
                         headTitle: document.getElementsByTagName("title")[0].innerHTML,
                     },
-                    dbAssembly:{
+                    dbAssembly: {
                         ready: false,
                     },
-                    authInfo:{
+                    authInfo: {
                         ready: false,
                         user: null,
                     }
@@ -51,99 +51,71 @@
             },
             async created() {
                 thisApp.setHeadTitle(thisApp.pageTitle)
- 
-                if (await thisApp.dbReady()) 
-                {
-                    let { waitForAuthStateChange } = thisApp.dbAssembly;
-                    thisApp.authInfo.user = await waitForAuthStateChange();
-                    thisApp.authInfo.ready = true; 
-                }  
+
+                let { waitForAuthStateChange } = await thisApp.getDbAssembly();
+                thisApp.authInfo.user = await waitForAuthStateChange();
+                thisApp.authInfo.ready = true;
             },
             computed: {
                 hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
-                dbInit: function (dbAssembly) {
-                    this.dbAssembly = dbAssembly
-                },
-                dbReady:async function() {
-                    let { ready } = thisApp.dbAssembly;
-
-                    return new Promise((complete, failed) => {
-                        if (ready) { complete(true); }
-                        else { 
-                            setTimeout(async function () { complete(await thisApp.dbReady()); }, 100)
-                        }
+                firestoreInit: function () {
+                    return new Promise((resolve, reject) => {
+                        import("/js/firebase/firestore.js")
+                            .then(module => { 
+                                thisApp.dbAssembly = module.dbAssembly;
+                                resolve(true);
+                            })
                     });
                 },
-                dbInsert: async function (collectionName, data) {                    
-                    let result = null;
+                getDbAssembly: async function () {
+                    let { ready } = thisApp.dbAssembly;
 
-                    if (await thisApp.dbReady())  {
-                        let { addDoc, collection, db } = thisApp.dbAssembly;
+                    if (!ready) { await thisApp.firestoreInit(); }
+                    return thisApp.dbAssembly;
+                },
+                dbInsert: async function (collectionName, data, docId = '') {
+                    let { addDoc, collection, db } = await thisApp.getDbAssembly();
 
-                        result = await addDoc(collection(db, collectionName), data);
-                    }
-                    return result;
+                    if (docId != '') { return await setDoc(doc(db, collectionName, docId), data); }
+                    return await addDoc(collection(db, collectionName), data);
                 },
                 dbUpdate: async function (collectionName, docId, data) {
-                    let result = null;
-
-                    if (await thisApp.dbReady()) {
-                        let { doc, updateDoc, db } = thisApp.dbAssembly;
-
-                        const docRef = doc(db, collectionName, docId);
-                        result = await updateDoc(docRef, data);
-                    }
-                    return result;
+                    let { doc, updateDoc, db } = await thisApp.getDbAssembly();
+                    const docRef = doc(db, collectionName, docId);
+                    return await updateDoc(docRef, data);
                 },
                 dbDelete: async function (collectionName, docId) {
-                    if (await thisApp.dbReady()) 
-                    {
-                        let { doc, deleteDoc, db } = thisApp.dbAssembly;
-                        await deleteDoc(doc(db, collectionName, docId));
-                    }
+                    let { doc, deleteDoc, db } = await thisApp.getDbAssembly();
+                    await deleteDoc(doc(db, collectionName, docId));
                 },
                 dbQuery: async function (queryCondition) {
-                    let result = null;
-
-                    if (await thisApp.dbReady()) 
-                    {
-                        let { getDocs } = thisApp.dbAssembly;
-                        result = await getDocs(queryCondition);
-                    }
-                    return result;
+                    let { getDocs } = await thisApp.getDbAssembly();
+                    return await getDocs(queryCondition);
                 },
-                signIn: async function(){
-                    let result = null;
+                signIn: async function () {
+                    let { googleSignIn, getAuth } = await thisApp.getDbAssembly();
+                    result = await googleSignIn();
+                    thisApp.authInfo.user = result.user;
 
-                    if (await thisApp.dbReady()) 
-                    {
-                        let { googleSignIn, getAuth } = thisApp.dbAssembly;
-                        result = await googleSignIn();
-                        thisApp.authInfo.user = result.user;
-
-                        thisApp.dbInsert("LoginUser", {
-                            email: result.user.email,
-                            displayName: result.user.displayName,
-                            createDate: new Date(),
-                        })
-                    }
-                    return result;
+                    thisApp.dbInsert("LoginUser", {
+                        email: result.user.email,
+                        displayName: result.user.displayName,
+                        createDate: new Date(),
+                    })
                 },
-
                 signOut: async function () {
-                    if(!confirm("是否要登出?")){ return false; }
+                    if (!confirm("是否要登出?")) { return false; }
 
-                    if (await thisApp.dbReady()) {
-                        let { getAuth, signOut } = thisApp.dbAssembly;
-                        const auth = getAuth();
-                        signOut(auth).then(() => {
-                            thisApp.authInfo.user = null;
-                        }).catch((error) => {
-                            console.log(error)
-                        });
-                    }
+                    let { getAuth, signOut } = await thisApp.getDbAssembly();
+                    const auth = getAuth();
+
+                    signOut(auth).then(() => {
+                        thisApp.authInfo.user = null;
+                    }).catch((error) => {
+                        console.log(error)
+                    });
                 },
                 newGuid: function () {
                     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -155,7 +127,7 @@
                     document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
                 },
             },
-            watch:{
+            watch: {
             }
         }
     </script>
@@ -193,7 +165,7 @@
                                 <a v-if="hasAuth" class="nav-link text-dark" @@click="signOut()" style="cursor:pointer">{{authInfo.user.displayName}}</a>
                                 <a v-if="!hasAuth" class="nav-link text-dark" @@click="signIn()" style="cursor:pointer">登入</a>
                             </div>
-                            
+
                         </li>
                     </ul>
                 </div>
@@ -212,16 +184,8 @@
         </div>
     </footer>
 
-    <script src="/js/firestore.js" type="module"></script>
-    @*<script src="/js/firestore-encrypt.js" type="module"></script>*@
-
     <script>
         var vApp = formComponent.mount('#app')
-    </script>
-
-    <script type="module">
-        import { dbAssembly } from "/js/firestore.js";
-        vApp.dbInit(dbAssembly);
     </script>
 
 

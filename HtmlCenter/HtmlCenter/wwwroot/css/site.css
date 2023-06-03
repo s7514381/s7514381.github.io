@@ -142,6 +142,6 @@ header {
     border-radius: inherit;
 }
 
-.card-transparent {
+.card-transparent { 
     background-color: #ffffff8a !important;
 }

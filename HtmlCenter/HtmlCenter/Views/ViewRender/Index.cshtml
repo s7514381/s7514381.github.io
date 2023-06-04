@@ -45,9 +45,7 @@
                         ready: false,
                         user: null,
                     },
-                    chat:{
-                        users:[],
-                    }
+
                 }
             },
             beforeCreate() {
@@ -60,24 +58,22 @@
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
 
-                thisApp.realtimeDb = await thisApp.realtimeDbInit();
-                let { addUserConnection, dbConnection, serverTimestamp, onDisconnect, removeConnection } = thisApp.realtimeDb;
-
+                let { addUserConnection, dbConnection, serverTimestamp } = await thisApp.getRealtimeDb();
                 let dbName = "connections";
-                dbConnection(dbName, async (key, childData) => {
-                    let users = thisApp.chat.users;
-                    let filterUsers = users.filter(x => x.key == key);
-                    let hasUser = filterUsers.length != 0;
-                    
-                    if (!hasUser) { users.push(childData); }
+                //dbConnection(dbName, addFunc = async (childData) => {
+                //    //console.log(childData)
+                //    //let users = thisApp.chat.users;
+                //    //let filterUsers = users.filter(x => x.key == key);
+                //    //let hasUser = filterUsers.length != 0;
 
-                    if (!childData.connections) {
-                        var originUser = filterUsers[0];
+                //    //if (!hasUser) { users.push(childData); }
 
-                        if (hasUser) { users.splice(users.indexOf(originUser), 1); }
-                    }
-                })
+                //    //if (!childData.connections) {
+                //    //    var originUser = filterUsers[0];
 
+                //    //    if (hasUser) { users.splice(users.indexOf(originUser), 1); }
+                //    //}
+                //})
                 let uid = thisApp.authInfo != null ? thisApp.authInfo.user.uid : thisApp.newGuid();
                 addUserConnection(dbName, uid, {
                     key: uid,
@@ -107,6 +103,10 @@
                                 resolve(true);
                             })
                     });
+                },
+                getRealtimeDb: async function () {
+                    if (thisApp.realtimeDb == null) { thisApp.realtimeDb = await thisApp.realtimeDbInit(); }
+                    return thisApp.realtimeDb;
                 },
                 getDbAssembly: async function () {
                     let { ready } = thisApp.dbAssembly;
@@ -167,12 +167,6 @@
                 },
             },
             watch: {
-                "chat.users": {
-                    handler(nv, ov) {
-                        console.log(nv);
-                    },
-                    deep: true
-                },
             }
         }
     </script>

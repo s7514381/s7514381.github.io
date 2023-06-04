@@ -1,9 +1,9 @@
 ﻿
-<div class="background-video pc-limit" >
+<div class="background-video pc-limit">
     <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw;">
         <source class="" src="~/video/video.mp4" type="video/mp4" />
     </video>
-@*    <img src="~/image/bg.jpg" style="width:100vw; height:auto" />*@
+    @*    <img src="~/image/bg.jpg" style="width:100vw; height:auto" />*@
 </div>
 
 <div class="background-video mobile-limit">
@@ -34,6 +34,18 @@
 </div>
 
 <div class="card shadow-sm mb-3">
+    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
+    <div class="card-body ">
+        <div class="row">
+            <div v-for="v in chat.users" class="col-auto">
+                {{v.displayName}}
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">最近推出項目</p></div>
     <div class="card-body">
         <a class="fw-bold fs-5 title-text" asp-controller="imagecoverframe" asp-action="Index">圖片框選器</a>
@@ -56,10 +68,32 @@
         data() {
             return {
                 pageTitle: '首頁',
-
+                chat: {
+                    users: [],
+                }
             }
         },
         async created() {
+
+
+            let { dbConnection } = await thisApp.getRealtimeDb();
+            let dbName = "connections";
+            dbConnection(dbName, valueFunc = async (childData) => {
+                thisApp.chat.users = [];
+                Object.keys(childData).forEach(function(v){
+                    thisApp.chat.users.push(childData[v])
+                })
+            }, addFunc = async (childData) => {
+                thisApp.chat.users.push(childData)
+            }, removeFunc = async (childData) => {
+                let users = thisApp.chat.users;
+                let filterUsers = users.filter(x => x.key == childData.key);
+                let hasUser = filterUsers.length != 0;
+                let originUser = filterUsers[0];
+
+                if (hasUser) { users.splice(users.indexOf(originUser), 1); }
+            })
+
 
             //axios.get(`https://ithelp.ithome.com.tw/questions/10212812`).then(function (res) {
             //    console.log(res.data)
@@ -87,8 +121,8 @@
             //list.forEach((doc) => {
             //    console.log(doc.id, " => ", doc.data());
             //});
-           
-            
+
+
             //await thisApp.dbDelete("users", ins.id,)
         },
         methods: {

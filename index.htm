@@ -35,10 +35,12 @@
                     dbAssembly: {
                         ready: false,
                     },
+                    realtimeDb: null,
                     authInfo: {
                         ready: false,
                         user: null,
-                    }
+                    },
+
                 }
             },
             beforeCreate() {
@@ -50,19 +52,56 @@
                 let { waitForAuthStateChange } = await thisApp.getDbAssembly();
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
+
+                let { addUserConnection, dbConnection, serverTimestamp } = await thisApp.getRealtimeDb();
+                let dbName = "connections";
+                //dbConnection(dbName, addFunc = async (childData) => {
+                //    //console.log(childData)
+                //    //let users = thisApp.chat.users;
+                //    //let filterUsers = users.filter(x => x.key == key);
+                //    //let hasUser = filterUsers.length != 0;
+
+                //    //if (!hasUser) { users.push(childData); }
+
+                //    //if (!childData.connections) {
+                //    //    var originUser = filterUsers[0];
+
+                //    //    if (hasUser) { users.splice(users.indexOf(originUser), 1); }
+                //    //}
+                //})
+                let uid = thisApp.authInfo != null ? thisApp.authInfo.user.uid : thisApp.newGuid();
+                addUserConnection(dbName, uid, {
+                    key: uid,
+                    title: '會員',
+                    displayName: thisApp.authInfo.user.displayName,
+                    timestamp: serverTimestamp(),
+                    connections: true,
+                });
             },
             computed: {
                 hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
+                realtimeDbInit: function () {
+                    return new Promise((resolve, reject) => {
+                        import("/js/firebase/database.js")
+                            .then(module => {
+                                resolve(module.exportModel);
+                            })
+                    });
+                },
                 firestoreInit: function () {
                     return new Promise((resolve, reject) => {
                         import("/js/firebase/firestore.js")
-                            .then(module => { 
+                            .then(module => {
                                 thisApp.dbAssembly = module.dbAssembly;
                                 resolve(true);
                             })
                     });
+                },
+                getRealtimeDb: async function () {
+                    if (thisApp.realtimeDb == null) { thisApp.realtimeDb = await thisApp.realtimeDbInit(); }
+                    return thisApp.realtimeDb;
                 },
                 getDbAssembly: async function () {
                     let { ready } = thisApp.dbAssembly;
@@ -128,6 +167,7 @@
     </script>
 
     <header>
+        <div style="display:contents"></div>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold fs-3 logo-text" href="/">Github重劃區</a>
@@ -170,7 +210,7 @@
     <div class="container header-margin">
         <main role="main" class="pb-3">
             
-<div class="background-video pc-limit" >
+<div class="background-video pc-limit">
     <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw;">
         <source class="" src="/video/video.mp4" type="video/mp4" />
     </video>
@@ -204,6 +244,18 @@
 </div>
 
 <div class="card shadow-sm mb-3">
+    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
+    <div class="card-body ">
+        <div class="row">
+            <div v-for="v in chat.users" class="col-auto">
+                {{v.displayName}}
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">最近推出項目</p></div>
     <div class="card-body">
         <a class="fw-bold fs-5 title-text" href="/imagecoverframe">圖片框選器</a>
@@ -226,10 +278,36 @@
         data() {
             return {
                 pageTitle: '首頁',
-
+                chat: {
+                    users: [],
+                }
             }
         },
         async created() {
+
+
+            let { dbConnection } = await thisApp.getRealtimeDb();
+            let dbName = "connections";
+            dbConnection(dbName, valueFunc = async (childData) => {
+                thisApp.chat.users = [];
+                Object.keys(childData).forEach(function(v){
+                    thisApp.chat.users.push(childData[v])
+                })
+            }, addFunc = async (childData) => {
+                thisApp.chat.users.push(childData)
+            }, removeFunc = async (childData) => {
+                let users = thisApp.chat.users;
+                let filterUsers = users.filter(x => x.key == childData.key);
+                let hasUser = filterUsers.length != 0;
+                let originUser = filterUsers[0];
+
+                if (hasUser) { users.splice(users.indexOf(originUser), 1); }
+            })
+
+
+            //axios.get(`https://ithelp.ithome.com.tw/questions/10212812`).then(function (res) {
+            //    console.log(res.data)
+            //});
 
             //let signInData = await thisApp.signIn();
             //console.log(signInData)
@@ -253,8 +331,8 @@
             //list.forEach((doc) => {
             //    console.log(doc.id, " => ", doc.data());
             //});
-           
-            
+
+
             //await thisApp.dbDelete("users", ins.id,)
         },
         methods: {

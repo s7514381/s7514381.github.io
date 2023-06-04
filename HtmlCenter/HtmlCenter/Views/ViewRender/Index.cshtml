@@ -40,9 +40,13 @@
                     dbAssembly: {
                         ready: false,
                     },
+                    realtimeDb: null,
                     authInfo: {
                         ready: false,
                         user: null,
+                    },
+                    chat:{
+                        users:[],
                     }
                 }
             },
@@ -55,15 +59,50 @@
                 let { waitForAuthStateChange } = await thisApp.getDbAssembly();
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
+
+                thisApp.realtimeDb = await thisApp.realtimeDbInit();
+                let { addUserConnection, dbConnection, serverTimestamp, onDisconnect, removeConnection } = thisApp.realtimeDb;
+
+                let dbName = "connections";
+                dbConnection(dbName, async (key, childData) => {
+                    let users = thisApp.chat.users;
+                    let filterUsers = users.filter(x => x.key == key);
+                    let hasUser = filterUsers.length != 0;
+                    
+                    if (!hasUser) { users.push(childData); }
+
+                    if (!childData.connections) {
+                        var originUser = filterUsers[0];
+
+                        if (hasUser) { users.splice(users.indexOf(originUser), 1); }
+                    }
+                })
+
+                let uid = thisApp.authInfo != null ? thisApp.authInfo.user.uid : thisApp.newGuid();
+                addUserConnection(dbName, uid, {
+                    key: uid,
+                    title: '會員',
+                    displayName: thisApp.authInfo.user.displayName,
+                    timestamp: serverTimestamp(),
+                    connections: true,
+                });
             },
             computed: {
                 hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
+                realtimeDbInit: function () {
+                    return new Promise((resolve, reject) => {
+                        import("/js/firebase/database.js")
+                            .then(module => {
+                                resolve(module.exportModel);
+                            })
+                    });
+                },
                 firestoreInit: function () {
                     return new Promise((resolve, reject) => {
                         import("/js/firebase/firestore.js")
-                            .then(module => { 
+                            .then(module => {
                                 thisApp.dbAssembly = module.dbAssembly;
                                 resolve(true);
                             })
@@ -128,11 +167,18 @@
                 },
             },
             watch: {
+                "chat.users": {
+                    handler(nv, ov) {
+                        console.log(nv);
+                    },
+                    deep: true
+                },
             }
         }
     </script>
 
     <header>
+        <div style="display:contents"></div>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold fs-3 logo-text" href="/">Github重劃區</a>

@@ -1,45 +1,58 @@
 ﻿import { app } from "/js/firebase/app.js";
-import { getDatabase, ref, onValue, set, serverTimestamp, onDisconnect, remove } from "/lib/firebase/gstatic.com_firebasejs_9.22.1_firebase-database.js";
+import { getDatabase, ref, onValue, set, serverTimestamp, onDisconnect, remove, push } from "/lib/firebase/gstatic.com_firebasejs_9.22.1_firebase-database.js";
 
 // 獲取 Realtime Database 的根節點引用
-const database = getDatabase(app);
+const db = getDatabase(app);
 
-// 監聽用戶連接狀態
-function trackUserConnections() {
-    const connectionsRef = ref(database, "connections");
+function dbConnection(dbName, func) {
+    const connectionsRef = ref(db, dbName);
 
     // 當節點數據變化時觸發的回調函數
-    onValue(connectionsRef, (snapshot) => {
-        snapshot.forEach((childSnapshot) => {
-            const userId = childSnapshot.key;
-            console.log(`User connected: ${userId}`);
-        });
+    onValue(connectionsRef, async (snapshot) => {
+        const snapshotVal = snapshot.val();
+        for (const key in snapshotVal) {
+            await func(key, snapshotVal[key]);
+        }
     });
 }
 
 // 添加用戶連接
-function addUserConnection(userId) {
-    const connectionsRef = ref(database, `connections/${userId}`);
+function addUserConnection(dbName, userId, data) {
+    const connectionsRef = ref(db, `${dbName}/${userId}`);
+    const lastOnlineRef = ref(db, 'users/joe/lastOnline');
 
-    set(connectionsRef, {
-        connected: true,
-        timestamp: serverTimestamp(),
-    }); 
+    set(connectionsRef, data);
 
-    // 在用戶斷開連接時刪除用戶連接信息
-    onDisconnect(connectionsRef).remove();
+    //onDisconnect(connectionsRef).update({ connections: false }).then(function (v) {
+    //    set(lastOnlineRef, true);
+    //    //remove(connectionsRef);
+    //});
+    onDisconnect(connectionsRef).remove()
+    //onDisconnect(connectionsRef).remove().then(() => {
+    //    //set(connectionsRef, null).the n(() => {
+    //    //    console.log('使用者移除成功');
+    //    //}).catch((error) => {
+    //    //    console.log('使用者移除時發生錯誤：', error);
+    //    //});
+
+    //    set(lastOnlineRef, {qq: 123});
+
+    //    //if (error) {
+    //    //    console.log('移除斷線時出現錯誤：', error);
+    //    //} else {
+    //    //    console.log('成功設定斷線事件');
+    //    //}
+    //});
 }
 
-// 測試用戶連接狀態追踪
-trackUserConnections();
 
-//// 添加用戶連接
-//addUserConnection("user1");
-//addUserConnection("user2");
 
-// 假裝斷開 user1 的連接（模擬用戶離線）
-//setTimeout(() => {
-//    remove(ref(database, "connections/user1"));
-//}, 5000);
 
-//export const rdAssembly
+
+function removeConnection(dbName, userId) {
+    remove(ref(db, `${dbName}/${userId}`));
+}
+
+export const exportModel = {
+    addUserConnection, dbConnection, serverTimestamp, onDisconnect, removeConnection
+}

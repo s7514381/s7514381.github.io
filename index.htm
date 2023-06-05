@@ -7,24 +7,21 @@
     <title>自由發揮 園丁Tim</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="/css/site.css" />
-    <link rel="stylesheet" href="/css/image-cover-frame.css" />
-    <link rel="stylesheet" href="/css/dynamic-form.css" />
-
-
-    
+    <link rel="stylesheet" href="/css/site.css?v=jaAkdpaYf-nb9iRSS4s59OdGT8MaILIAxhnLVhFcgSM" />
+    <link rel="stylesheet" href="/css/image-cover-frame.css?v=LndOvmdvYvfNGZ_Xby9XErY0d5p_LhPwLQ90eOPSTYg" />
+    <link rel="stylesheet" href="/css/dynamic-form.css?v=kHNWcsTiItzqiDc_ryxKuhJWXoUb9-TTxkcO2nCvOSU" />
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js" type="text/javascript"></script>
-    <script src="/lib/Sortable/Sortable.min.js?v=triwwTQbab50G53J2FyiXb7JlioSKMdmFfzZ1rel42Y"></script>
-    <script src="/lib/vue/vuedraggable.umd.min.js?v=Lw1ELK88FKeUDXLNnLnHq0i7DjoaZVc2XqGnomXivjU"></script>
+    <script src="/lib/Sortable/Sortable.min.js"></script>
+    <script src="/lib/vue/vuedraggable.umd.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <script src="/js/site.js?v=7zy2lQfplQHWIvjyGwWHMPu7byB1vB5atFKLbvzX2Zs"></script>
     <script src="/js/vue-mixin.js?v=60-8lnAHDhQs4zrnv01y_MNen1l1tnXdiqLCDE4wdc4"></script>
 </head>
 
-<body>
+<body id="app">
     <script>
         var thisApp;
         var component;
@@ -35,80 +32,124 @@
                     Layout: {
                         headTitle: document.getElementsByTagName("title")[0].innerHTML,
                     },
-                    dbAssembly:{
+                    dbAssembly: {
                         ready: false,
                     },
+                    realtimeDb: null,
+                    authInfo: {
+                        ready: false,
+                        user: null,
+                    },
+
                 }
             },
             beforeCreate() {
                 thisApp = this;
             },
-            created() {
+            async created() {
                 thisApp.setHeadTitle(thisApp.pageTitle)
+
+                let { waitForAuthStateChange } = await thisApp.getDbAssembly();
+                thisApp.authInfo.user = await waitForAuthStateChange();
+                thisApp.authInfo.ready = true;
+
+                let { addUserConnection, dbConnection, serverTimestamp } = await thisApp.getRealtimeDb();
+                let dbName = "connections";
+                //dbConnection(dbName, addFunc = async (childData) => {
+                //    //console.log(childData)
+                //    //let users = thisApp.chat.users;
+                //    //let filterUsers = users.filter(x => x.key == key);
+                //    //let hasUser = filterUsers.length != 0;
+
+                //    //if (!hasUser) { users.push(childData); }
+
+                //    //if (!childData.connections) {
+                //    //    var originUser = filterUsers[0];
+
+                //    //    if (hasUser) { users.splice(users.indexOf(originUser), 1); }
+                //    //}
+                //})
+                let uid = thisApp.authInfo != null ? thisApp.authInfo.user.uid : thisApp.newGuid();
+                addUserConnection(dbName, uid, {
+                    key: uid,
+                    title: '會員',
+                    displayName: thisApp.authInfo.user.displayName,
+                    timestamp: serverTimestamp(),
+                    connections: true,
+                });
             },
             computed: {
+                hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
-                dbInit: function (dbAssembly) {
-                    this.dbAssembly = dbAssembly
-                },
-                dbReady:async function() {
-                    let { ready } = thisApp.dbAssembly;
-
-                    return new Promise((complete, failed) => {
-                        if (ready) { complete(true); }
-                        else { 
-                            setTimeout(async function () { complete(await thisApp.dbReady()); }, 100)
-                        }
+                realtimeDbInit: function () {
+                    return new Promise((resolve, reject) => {
+                        import("/js/firebase/database.js")
+                            .then(module => {
+                                resolve(module.exportModel);
+                            })
                     });
                 },
-                dbInsert: async function (collectionName, data) {                    
-                    let result = null;
+                firestoreInit: function () {
+                    return new Promise((resolve, reject) => {
+                        import("/js/firebase/firestore.js")
+                            .then(module => {
+                                thisApp.dbAssembly = module.dbAssembly;
+                                resolve(true);
+                            })
+                    });
+                },
+                getRealtimeDb: async function () {
+                    if (thisApp.realtimeDb == null) { thisApp.realtimeDb = await thisApp.realtimeDbInit(); }
+                    return thisApp.realtimeDb;
+                },
+                getDbAssembly: async function () {
+                    let { ready } = thisApp.dbAssembly;
 
-                    if (await thisApp.dbReady())  {
-                        let { addDoc, collection, db } = thisApp.dbAssembly;
+                    if (!ready) { await thisApp.firestoreInit(); }
+                    return thisApp.dbAssembly;
+                },
+                dbInsert: async function (collectionName, data, docId = '') {
+                    let { addDoc, collection, db } = await thisApp.getDbAssembly();
 
-                        result = await addDoc(collection(db, collectionName), data);
-                    }
-                    return result;
+                    if (docId != '') { return await setDoc(doc(db, collectionName, docId), data); }
+                    return await addDoc(collection(db, collectionName), data);
                 },
                 dbUpdate: async function (collectionName, docId, data) {
-                    let result = null;
-
-                    if (await thisApp.dbReady()) {
-                        let { doc, updateDoc, db } = thisApp.dbAssembly;
-
-                        const docRef = doc(db, collectionName, docId);
-                        result = await updateDoc(docRef, data);
-                    }
-                    return result;
+                    let { doc, updateDoc, db } = await thisApp.getDbAssembly();
+                    const docRef = doc(db, collectionName, docId);
+                    return await updateDoc(docRef, data);
                 },
                 dbDelete: async function (collectionName, docId) {
-                    if (await thisApp.dbReady()) 
-                    {
-                        let { doc, deleteDoc, db } = thisApp.dbAssembly;
-                        await deleteDoc(doc(db, collectionName, docId));
-                    }
+                    let { doc, deleteDoc, db } = await thisApp.getDbAssembly();
+                    await deleteDoc(doc(db, collectionName, docId));
                 },
                 dbQuery: async function (queryCondition) {
-                    let result = null;
-
-                    if (await thisApp.dbReady()) 
-                    {
-                        let { getDocs } = thisApp.dbAssembly;
-                        result = await getDocs(queryCondition);
-                    }
-                    return result;
+                    let { getDocs } = await thisApp.getDbAssembly();
+                    return await getDocs(queryCondition);
                 },
-                signIn: async function(){
-                    let result = null;
+                signIn: async function () {
+                    let { googleSignIn, getAuth } = await thisApp.getDbAssembly();
+                    result = await googleSignIn();
+                    thisApp.authInfo.user = result.user;
 
-                    if (await thisApp.dbReady()) 
-                    {
-                        let { googleSignIn } = thisApp.dbAssembly;
-                        result = await googleSignIn();
-                    }
-                    return result;
+                    thisApp.dbInsert("LoginUser", {
+                        email: result.user.email,
+                        displayName: result.user.displayName,
+                        createDate: new Date(),
+                    })
+                },
+                signOut: async function () {
+                    if (!confirm("是否要登出?")) { return false; }
+
+                    let { getAuth, signOut } = await thisApp.getDbAssembly();
+                    const auth = getAuth();
+
+                    signOut(auth).then(() => {
+                        thisApp.authInfo.user = null;
+                    }).catch((error) => {
+                        console.log(error)
+                    });
                 },
                 newGuid: function () {
                     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -119,11 +160,14 @@
                     if (!title) { return; }
                     document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
                 },
+            },
+            watch: {
             }
         }
     </script>
 
     <header>
+        <div style="display:contents"></div>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold fs-3 logo-text" href="/">Github重劃區</a>
@@ -149,14 +193,24 @@
                             <a class="nav-link text-dark" href="/aboutme">關於我</a>
                         </li>
                     </ul>
+
+                    <ul class="navbar-nav flex-grow-1" style="justify-content: flex-end">
+                        <li class="nav-item me-3 px-2">
+                            <div v-if="authInfo.ready">
+                                <a v-if="hasAuth" class="nav-link text-dark" @click="signOut()" style="cursor:pointer">{{authInfo.user.displayName}}</a>
+                                <a v-if="!hasAuth" class="nav-link text-dark" @click="signIn()" style="cursor:pointer">登入</a>
+                            </div>
+
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div id="app" class="container header-margin">
+    <div class="container header-margin">
         <main role="main" class="pb-3">
             
-<div class="background-video pc-limit" >
+<div class="background-video pc-limit">
     <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw;">
         <source class="" src="/video/video.mp4" type="video/mp4" />
     </video>
@@ -190,6 +244,18 @@
 </div>
 
 <div class="card shadow-sm mb-3">
+    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
+    <div class="card-body ">
+        <div class="row">
+            <div v-for="v in chat.users" class="col-auto">
+                {{v.displayName}}
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">最近推出項目</p></div>
     <div class="card-body">
         <a class="fw-bold fs-5 title-text" href="/imagecoverframe">圖片框選器</a>
@@ -212,33 +278,60 @@
         data() {
             return {
                 pageTitle: '首頁',
-
+                chat: {
+                    users: [],
+                }
             }
         },
         async created() {
 
+
+            let { dbConnection } = await thisApp.getRealtimeDb();
+            let dbName = "connections";
+            dbConnection(dbName, valueFunc = async (childData) => {
+                thisApp.chat.users = [];
+                Object.keys(childData).forEach(function(v){
+                    thisApp.chat.users.push(childData[v])
+                })
+            }, addFunc = async (childData) => {
+                thisApp.chat.users.push(childData)
+            }, removeFunc = async (childData) => {
+                let users = thisApp.chat.users;
+                let filterUsers = users.filter(x => x.key == childData.key);
+                let hasUser = filterUsers.length != 0;
+                let originUser = filterUsers[0];
+
+                if (hasUser) { users.splice(users.indexOf(originUser), 1); }
+            })
+
+
+            //axios.get(`https://ithelp.ithome.com.tw/questions/10212812`).then(function (res) {
+            //    console.log(res.data)
+            //});
+
             //let signInData = await thisApp.signIn();
             //console.log(signInData)
 
-            //let ins = await thisApp.dbInsert("users", {
+            //let ins = await thisApp.dbInsert("test", {
             //    first: new Date(),
             //    last: "Lovelace11",
             //    born: 44543
             //})
 
-            //let upd = await thisApp.dbUpdate("users", ins.id, {
+            //let upd = await thisApp.dbUpdate("test", ins.id, {
             //    born: 6666
             //})
 
-            //let { db, query, collection, where } = thisApp.dbAssembly;
+            //let { db, query, collection, where } = await thisApp.getDbAssembly();
             //let list = await thisApp.dbQuery(query(
-            //    collection(db, "users")
+            //    collection(db, "test")
             //    , where("last", "==", 'Lovelace11')
             //    , where("born", "==", 6666)
             //))
             //list.forEach((doc) => {
             //    console.log(doc.id, " => ", doc.data());
             //});
+
 
             //await thisApp.dbDelete("users", ins.id,)
         },
@@ -258,15 +351,8 @@
         </div>
     </footer>
 
-    <script src="/js/firestore.js" type="module"></script>
-
     <script>
         var vApp = formComponent.mount('#app')
-    </script>
-
-    <script type="module">
-        import { dbAssembly } from "/js/firestore.js";
-        vApp.dbInit(dbAssembly);
     </script>
 
 

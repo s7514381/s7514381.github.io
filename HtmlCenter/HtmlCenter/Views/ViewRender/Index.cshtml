@@ -42,7 +42,7 @@
                         ready: false,
                         user: null,
                     },
-                    chatDbName: 'connections',
+                    connectionName: 'connections',
                 }
             },
             beforeCreate() {
@@ -65,11 +65,14 @@
                 userConnection: async function (userInfo) {
                     let { addConnection, serverTimestamp } = await thisApp.getRealtimeDb();
 
-                    let uid = userInfo != null ? userInfo.uid : thisApp.newGuid();
-                    addConnection(thisApp.chatDbName, uid, {
+                    let hasAuth = userInfo != null;
+                    let uid = hasAuth ? userInfo.uid : thisApp.newGuid();
+                    let displayName = hasAuth ? userInfo.displayName : "訪客";
+
+                    addConnection(thisApp.connectionName, uid, {
                         key: uid,
-                        title: '會員',
-                        displayName: userInfo.displayName,
+                        isMember: hasAuth,
+                        displayName: displayName,
                         timestamp: serverTimestamp(),
                         connections: true,
                     });
@@ -101,7 +104,7 @@
                     });
 
                     let { removeConnection } = await thisApp.getRealtimeDb();
-                    removeConnection(thisApp.chatDbName, uid);
+                    removeConnection(thisApp.connectionName, uid);
                 },
                 newGuid: function () {
                     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>

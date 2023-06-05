@@ -77,9 +77,8 @@
 
 
             let { dbConnection } = await thisApp.getRealtimeDb();
-            let dbName = "connections";
-            dbConnection(dbName, async (childData) => {
-                //onValue
+            dbConnection(thisApp.connectionName, async (childData) => {
+                //onValue(once)
                 thisApp.chat.users = [];
                  if(childData) {
                     Object.keys(childData).forEach(function(v){

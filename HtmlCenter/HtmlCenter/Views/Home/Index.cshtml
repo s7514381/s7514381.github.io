@@ -78,14 +78,19 @@
 
             let { dbConnection } = await thisApp.getRealtimeDb();
             let dbName = "connections";
-            dbConnection(dbName, valueFunc = async (childData) => {
+            dbConnection(dbName, async (childData) => {
+                //onValue
                 thisApp.chat.users = [];
-                Object.keys(childData).forEach(function(v){
-                    thisApp.chat.users.push(childData[v])
-                })
-            }, addFunc = async (childData) => {
+                 if(childData) {
+                    Object.keys(childData).forEach(function(v){
+                        thisApp.chat.users.push(childData[v])
+                    })
+                }
+            }, async (childData) => {
+                //onChildAdded
                 thisApp.chat.users.push(childData)
-            }, removeFunc = async (childData) => {
+            }, async (childData) => {
+                //onChildRemoved
                 let users = thisApp.chat.users;
                 let filterUsers = users.filter(x => x.key == childData.key);
                 let hasUser = filterUsers.length != 0;

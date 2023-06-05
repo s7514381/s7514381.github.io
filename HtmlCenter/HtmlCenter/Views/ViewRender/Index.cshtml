@@ -32,20 +32,17 @@
         var component;
 
         const baseMixin = {
+            mixins: [firestoreMixin, realtimeDbMixin],
             data() {
                 return {
                     Layout: {
                         headTitle: document.getElementsByTagName("title")[0].innerHTML,
-                    },
-                    dbAssembly: {
-                        ready: false,
-                    },
-                    realtimeDb: null,
+                    }, 
                     authInfo: {
                         ready: false,
                         user: null,
                     },
-
+                    chatDbName: 'connections',
                 }
             },
             beforeCreate() {
@@ -58,85 +55,30 @@
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
 
-                let { addUserConnection, dbConnection, serverTimestamp } = await thisApp.getRealtimeDb();
-                let dbName = "connections";
-                //dbConnection(dbName, addFunc = async (childData) => {
-                //    //console.log(childData)
-                //    //let users = thisApp.chat.users;
-                //    //let filterUsers = users.filter(x => x.key == key);
-                //    //let hasUser = filterUsers.length != 0;
-
-                //    //if (!hasUser) { users.push(childData); }
-
-                //    //if (!childData.connections) {
-                //    //    var originUser = filterUsers[0];
-
-                //    //    if (hasUser) { users.splice(users.indexOf(originUser), 1); }
-                //    //}
-                //})
-                let uid = thisApp.authInfo != null ? thisApp.authInfo.user.uid : thisApp.newGuid();
-                addUserConnection(dbName, uid, {
-                    key: uid,
-                    title: '會員',
-                    displayName: thisApp.authInfo.user.displayName,
-                    timestamp: serverTimestamp(),
-                    connections: true,
-                });
+                if(thisApp.authInfo.user != null)
+                    thisApp.userConnection(thisApp.authInfo.user);
             },
             computed: {
                 hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
-                realtimeDbInit: function () {
-                    return new Promise((resolve, reject) => {
-                        import("/js/firebase/database.js")
-                            .then(module => {
-                                resolve(module.exportModel);
-                            })
-                    });
-                },
-                firestoreInit: function () {
-                    return new Promise((resolve, reject) => {
-                        import("/js/firebase/firestore.js")
-                            .then(module => {
-                                thisApp.dbAssembly = module.dbAssembly;
-                                resolve(true);
-                            })
-                    });
-                },
-                getRealtimeDb: async function () {
-                    if (thisApp.realtimeDb == null) { thisApp.realtimeDb = await thisApp.realtimeDbInit(); }
-                    return thisApp.realtimeDb;
-                },
-                getDbAssembly: async function () {
-                    let { ready } = thisApp.dbAssembly;
+                userConnection: async function (userInfo) {
+                    let { addConnection, serverTimestamp } = await thisApp.getRealtimeDb();
 
-                    if (!ready) { await thisApp.firestoreInit(); }
-                    return thisApp.dbAssembly;
-                },
-                dbInsert: async function (collectionName, data, docId = '') {
-                    let { addDoc, collection, db } = await thisApp.getDbAssembly();
-
-                    if (docId != '') { return await setDoc(doc(db, collectionName, docId), data); }
-                    return await addDoc(collection(db, collectionName), data);
-                },
-                dbUpdate: async function (collectionName, docId, data) {
-                    let { doc, updateDoc, db } = await thisApp.getDbAssembly();
-                    const docRef = doc(db, collectionName, docId);
-                    return await updateDoc(docRef, data);
-                },
-                dbDelete: async function (collectionName, docId) {
-                    let { doc, deleteDoc, db } = await thisApp.getDbAssembly();
-                    await deleteDoc(doc(db, collectionName, docId));
-                },
-                dbQuery: async function (queryCondition) {
-                    let { getDocs } = await thisApp.getDbAssembly();
-                    return await getDocs(queryCondition);
+                    let uid = userInfo != null ? userInfo.uid : thisApp.newGuid();
+                    addConnection(thisApp.chatDbName, uid, {
+                        key: uid,
+                        title: '會員',
+                        displayName: userInfo.displayName,
+                        timestamp: serverTimestamp(),
+                        connections: true,
+                    });
                 },
                 signIn: async function () {
                     let { googleSignIn, getAuth } = await thisApp.getDbAssembly();
                     result = await googleSignIn();
                     thisApp.authInfo.user = result.user;
+                    thisApp.userConnection(thisApp.authInfo.user);
 
                     thisApp.dbInsert("LoginUser", {
                         email: result.user.email,
@@ -147,6 +89,8 @@
                 signOut: async function () {
                     if (!confirm("是否要登出?")) { return false; }
 
+                    let uid = thisApp.authInfo.user.uid;
+ 
                     let { getAuth, signOut } = await thisApp.getDbAssembly();
                     const auth = getAuth();
 
@@ -155,6 +99,9 @@
                     }).catch((error) => {
                         console.log(error)
                     });
+
+                    let { removeConnection } = await thisApp.getRealtimeDb();
+                    removeConnection(thisApp.chatDbName, uid);
                 },
                 newGuid: function () {
                     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>

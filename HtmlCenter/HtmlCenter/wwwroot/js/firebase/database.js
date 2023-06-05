@@ -39,13 +39,17 @@ function dbConnection(dbName, valueFunc = null, addFunc = null, removeFunc = nul
 }
 
 // 添加用戶連接
-function addUserConnection(dbName, userId, data) {
+function addConnection(dbName, userId, data) {
     const connectionsRef = ref(db, `${dbName}/${userId}`);
     onDisconnect(connectionsRef).remove()
     set(connectionsRef, data);
 }
 
+async function removeConnection(dbName, userId) {
+    await remove(ref(db, `${dbName}/${userId}`))
+}
+
 
 export const exportModel = {
-    addUserConnection, dbConnection, serverTimestamp, onDisconnect
+    addConnection, dbConnection, serverTimestamp, onDisconnect, removeConnection
 }

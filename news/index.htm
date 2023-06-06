@@ -7,7 +7,7 @@
     <title>自由發揮 園丁Tim</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="/css/site.css?v=MaXwaNs5RtHAZ4g3VkYB6nFJyTuhduUey4IXyQfiHcM" />
+    <link rel="stylesheet" href="/css/site.css?v=88xmvQKS4fdRofdhuGquumlw0rS73LTax3zfNMZBJQE" />
     <link rel="stylesheet" href="/css/image-cover-frame.css?v=LndOvmdvYvfNGZ_Xby9XErY0d5p_LhPwLQ90eOPSTYg" />
     <link rel="stylesheet" href="/css/dynamic-form.css?v=kHNWcsTiItzqiDc_ryxKuhJWXoUb9-TTxkcO2nCvOSU" />
 
@@ -18,7 +18,7 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <script src="/js/site.js?v=7zy2lQfplQHWIvjyGwWHMPu7byB1vB5atFKLbvzX2Zs"></script>
-    <script src="/js/vue-mixin.js?v=jM0vXQ3dCnngQh74DddhSH64p6pA3sLF9iCfz8UZ8Qo"></script>
+    <script src="/js/vue-mixin.js?v=PnJgjQVcEFMQNZGeowa0p8qaidIA2zl39xp-ddfgjkw"></script>
 </head>
 
 <body id="app">
@@ -32,73 +32,142 @@
                 return {
                     Layout: {
                         headTitle: document.getElementsByTagName("title")[0].innerHTML,
-                    }, 
+                    },
                     authInfo: {
                         ready: false,
                         user: null,
                     },
-                    connectionName: 'connections',
+                    visitId: null,
+                    connection: {
+                        name: 'connections',
+                        users: [],
+                    },
                 }
             },
             beforeCreate() {
                 thisApp = this;
             },
             async created() {
+                thisApp.visitId = thisApp.newGuid();
                 thisApp.setHeadTitle(thisApp.pageTitle)
 
                 let { waitForAuthStateChange } = await thisApp.getDbAssembly();
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
 
-                thisApp.userConnection(thisApp.authInfo.user);
+                let { dbConnection } = await thisApp.getRealtimeDb();
+                thisApp.connection.users = [];
+                dbConnection(thisApp.connection.name, async (childData) => {
+                    //onValue(once)
+                    thisApp.userConnection(thisApp.authInfo.user);
+                }, async (childData) => {
+                    //onChildAdded
+                    let keyArray = Object.keys(childData);
+                    let user = childData[keyArray[0]];
+                    user["connectCount"] = 1;
+                    thisApp.connection.users.push(user)
+                }, async (childData) => {
+                    //onChildRemoved
+                    let users = thisApp.connection.users;
+                    let keyArray = Object.keys(childData);
+                    let user = childData[keyArray[0]];
+                    user = thisApp.getObject(users, 'key', user.key)
+                    users.splice(users.indexOf(user), 1);
+                })
             },
             computed: {
                 hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
+                resetUserConnection: async function (userInfo, removeId) {
+                    let { removeConnection } = await thisApp.getRealtimeDb();
+
+                    removeConnection(thisApp.connection.name, removeId);
+                    thisApp.userConnection(userInfo);
+                },
                 userConnection: async function (userInfo) {
                     let { addConnection, serverTimestamp } = await thisApp.getRealtimeDb();
 
                     let hasAuth = userInfo != null;
-                    let uid = hasAuth ? userInfo.uid : thisApp.newGuid();
+                    let uid = hasAuth ? userInfo.uid : thisApp.visitId;
                     let displayName = hasAuth ? userInfo.displayName : "訪客";
 
-                    addConnection(thisApp.connectionName, uid, {
+                    let users = thisApp.connection.users;
+                    addConnection(thisApp.connection.name, uid, {
                         key: uid,
                         isMember: hasAuth,
                         displayName: displayName,
                         timestamp: serverTimestamp(),
-                        connections: true,
+                    }, async (childData) => {
+                        //onChildAdded
+                        let filterArray = users.filter(x => x.key == childData.key);
+                        let hasData = filterArray.length > 0;
+
+                        //console.log("user-onChildAdded", childData)
+
+                        //console.log(childData)
+
+                        //if (!hasData){
+                        //    childData["connectCount"] = 1;
+                        //    users.push(childData)
+                        //}else{
+                        //    //let fliter = filterArray[0];
+                        //    //let user = users[users.indexOf(fliter)];
+                        //    //user.connectCount++;
+
+                        //    let user = thisApp.getObject(users, 'key', childData.key);
+                        //    console.log(user)
+                        //    //user.connectCount += 10;
+                        //}
+                    }, async (childData) => {
+                        //onChildAdded
+                        let filterArray = users.filter(x => x.key == childData.key);
+                        let hasData = filterArray.length > 0;
+
+                        //console.log(childData)
+
+
+                        //if (hasData) {
+                        //    let fliter = filterArray[0];
+                        //    let user = users[users.indexOf(fliter)];
+                        //    user.connectCount--;
+
+                        //    childData["connectCount"] = 1;
+                        //    users.push(childData)
+                        //} else {
+                        //    let fliter = filterArray[0];
+                        //    let user = users[users.indexOf(fliter)];
+                        //    user.connectCount++;
+                        //}
                     });
                 },
                 signIn: async function () {
                     let { googleSignIn, getAuth } = await thisApp.getDbAssembly();
                     result = await googleSignIn();
                     thisApp.authInfo.user = result.user;
-                    thisApp.userConnection(thisApp.authInfo.user);
 
                     thisApp.dbInsert("LoginUser", {
                         email: result.user.email,
                         displayName: result.user.displayName,
                         createDate: new Date(),
                     })
+                    thisApp.resetUserConnection(thisApp.authInfo.user, thisApp.visitId);
                 },
                 signOut: async function () {
                     if (!confirm("是否要登出?")) { return false; }
 
                     let uid = thisApp.authInfo.user.uid;
- 
+
                     let { getAuth, signOut } = await thisApp.getDbAssembly();
                     const auth = getAuth();
 
-                    signOut(auth).then(() => {
+                    await signOut(auth).then(() => {
                         thisApp.authInfo.user = null;
                     }).catch((error) => {
                         console.log(error)
                     });
 
-                    let { removeConnection } = await thisApp.getRealtimeDb();
-                    removeConnection(thisApp.connectionName, uid);
+                    thisApp.resetUserConnection(null, uid);
                 },
                 newGuid: function () {
                     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -108,6 +177,14 @@
                 setHeadTitle(title) {
                     if (!title) { return; }
                     document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
+                },
+                getObject(list, keyField, key){
+                    let result;
+                    for(let i = 0; i< list.length; i++){
+                        let data = list[i];
+                        if (data[keyField] == key) { result = data; break; }
+                    }
+                    return result;
                 },
             },
             watch: {

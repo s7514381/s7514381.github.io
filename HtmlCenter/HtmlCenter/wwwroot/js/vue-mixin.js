@@ -32,7 +32,7 @@ const realtimeDbMixin = {
     methods: {
         realtimeDbInit: function () {
             return new Promise((resolve, reject) => {
-                import("/js/firebase/database.js")
+                import("/js/firebase/database.js?timestamp=" + Date.now())
                     .then(module => {
                         resolve(module.exportModel);
                     })

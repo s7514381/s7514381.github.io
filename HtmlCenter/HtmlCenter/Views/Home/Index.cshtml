@@ -37,7 +37,7 @@
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
     <div class="card-body ">
         <div class="row">
-            <div v-for="v in chat.users" class="col-auto">
+            <div v-for="v in connection.users" class="col-auto">
                 <div class="card card-shadow p-2 anim-fade-in">
                     <div class="d-flex mb-2">
                         <div class="flex-center level-tag me-2" style="background-color: #0da7fd; color: white;">
@@ -48,7 +48,7 @@
 
                     </div>
                     <div class="card p-2" style="box-shadow: inset 1px 1px 2px -1px #ccc;">
-                        這邊還不知道要放啥
+                        連線數: {{v.connectCount}}
                     </div>
 
                 </div>
@@ -81,36 +81,9 @@
         data() {
             return {
                 pageTitle: '首頁',
-                chat: {
-                    users: [],
-                },
             }
         },
         async created() {
-
-
-            let { dbConnection } = await thisApp.getRealtimeDb();
-            dbConnection(thisApp.connectionName, async (childData) => {
-                //onValue(once)
-                thisApp.chat.users = [];
-                if (childData) {
-                    Object.keys(childData).forEach(function (v) {
-                        thisApp.chat.users.push(childData[v])
-                    })
-                }
-            }, async (childData) => {
-                //onChildAdded
-                thisApp.chat.users.push(childData)
-            }, async (childData) => {
-                //onChildRemoved
-                let users = thisApp.chat.users;
-                let filterUsers = users.filter(x => x.key == childData.key);
-                let hasUser = filterUsers.length != 0;
-                let originUser = filterUsers[0];
-
-                if (hasUser) { users.splice(users.indexOf(originUser), 1); }
-            })
-
 
             //axios.get(`https://ithelp.ithome.com.tw/questions/10212812`).then(function (res) {
             //    console.log(res.data)

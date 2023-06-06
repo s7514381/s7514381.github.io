@@ -150,11 +150,6 @@ header {
     box-shadow: 2px 2px 2px 0px #ccc;
 }
 
-
-.anim-fade-in {
-    animation: fade-in .4s ease both;
-}
-
 .flex-center {
     display: flex;
     align-self: center;
@@ -169,6 +164,11 @@ header {
     .level-tag span {
         font-size: 0.5em
     }
+
+
+.anim-fade-in {
+    animation: fade-in .4s ease both;
+}
 
 @keyframes fade-in {
     0% {

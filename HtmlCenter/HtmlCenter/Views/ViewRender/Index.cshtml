@@ -55,8 +55,7 @@
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
 
-                if(thisApp.authInfo.user != null)
-                    thisApp.userConnection(thisApp.authInfo.user);
+                thisApp.userConnection(thisApp.authInfo.user);
             },
             computed: {
                 hasAuth() { return thisApp.authInfo.user != null; },

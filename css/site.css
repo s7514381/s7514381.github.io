@@ -145,3 +145,34 @@ header {
 .card-transparent { 
     background-color: #ffffff8a !important;
 }
+
+.card-shadow {
+    box-shadow: 2px 2px 2px 0px #ccc;
+}
+
+
+.anim-fade-in {
+    animation: fade-in .4s ease both;
+}
+
+.flex-center {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+}
+
+.level-tag {
+    border: 1px solid #ccc;
+    padding: 0.1em 0.3em;
+    border-radius: 1em;
+}
+    .level-tag span {
+        font-size: 0.5em
+    }
+
+@keyframes fade-in {
+    0% {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+}

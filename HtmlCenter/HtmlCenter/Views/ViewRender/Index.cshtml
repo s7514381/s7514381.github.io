@@ -64,12 +64,14 @@
                 thisApp.connection.users = [];
                 dbConnection(thisApp.connection.name, async (childData) => {
                     //onValue(once)
+                    //不知道為甚麼初始讀資料會在add也觸發一次，直接在那邊做
                     thisApp.userConnection(thisApp.authInfo.user);
                 }, async (childData) => {
                     //onChildAdded
                     let keyArray = Object.keys(childData);
                     let user = childData[keyArray[0]];
-                    user["connectCount"] = 1;
+                    user["connectCount"] = keyArray.length;
+
                     thisApp.connection.users.push(user)
                 }, async (childData) => {
                     //onChildRemoved
@@ -77,6 +79,7 @@
                     let keyArray = Object.keys(childData);
                     let user = childData[keyArray[0]];
                     user = thisApp.getObject(users, 'key', user.key)
+
                     users.splice(users.indexOf(user), 1);
                 })
             },
@@ -105,45 +108,16 @@
                         timestamp: serverTimestamp(),
                     }, async (childData) => {
                         //onChildAdded
+                        //這邊只做連線數增減
                         let filterArray = users.filter(x => x.key == childData.key);
                         let hasData = filterArray.length > 0;
 
-                        //console.log("user-onChildAdded", childData)
-
-                        //console.log(childData)
-
-                        //if (!hasData){
-                        //    childData["connectCount"] = 1;
-                        //    users.push(childData)
-                        //}else{
-                        //    //let fliter = filterArray[0];
-                        //    //let user = users[users.indexOf(fliter)];
-                        //    //user.connectCount++;
-
-                        //    let user = thisApp.getObject(users, 'key', childData.key);
-                        //    console.log(user)
-                        //    //user.connectCount += 10;
-                        //}
                     }, async (childData) => {
                         //onChildAdded
+                        //這邊只做連線數增減
                         let filterArray = users.filter(x => x.key == childData.key);
                         let hasData = filterArray.length > 0;
 
-                        //console.log(childData)
-
-
-                        //if (hasData) {
-                        //    let fliter = filterArray[0];
-                        //    let user = users[users.indexOf(fliter)];
-                        //    user.connectCount--;
-
-                        //    childData["connectCount"] = 1;
-                        //    users.push(childData)
-                        //} else {
-                        //    let fliter = filterArray[0];
-                        //    let user = users[users.indexOf(fliter)];
-                        //    user.connectCount++;
-                        //}
                     });
                 },
                 signIn: async function () {
@@ -184,7 +158,7 @@
                     document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
                 },
                 getObject(list, keyField, key){
-                    let result;
+                    let result = null;
                     for(let i = 0; i< list.length; i++){
                         let data = list[i];
                         if (data[keyField] == key) { result = data; break; }

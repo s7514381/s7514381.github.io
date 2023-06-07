@@ -56,7 +56,7 @@ const firestoreMixin = {
     methods: {
         firestoreInit: function () {
             return new Promise((resolve, reject) => {
-                import("/js/firebase/firestore.js")
+                import(`/js/firebase/firestore.js?timestamp=${ Date.now() }`)
                     .then(module => {
                         thisApp.dbAssembly = module.dbAssembly;
                         resolve(true);

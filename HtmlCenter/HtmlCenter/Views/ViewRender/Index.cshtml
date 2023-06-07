@@ -60,50 +60,25 @@
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
 
-                
-
                 let { dbConnection } = await thisApp.getRealtimeDb();
+                thisApp.connection.users = [];
                 dbConnection(thisApp.connection.name, async (childData) => {
                     //onValue(once)
-                    thisApp.connection.users = [];
-                    
-                    if (childData) {
-                        Object.keys(childData).forEach(function (vUser) {
-                            //每一個人
-                            let child = childData[vUser];
-                            let keyArray = Object.keys(child);//每個連線是一個key
-                            let user = child[keyArray[0]]; //每個人至少有一個連線，且都長一樣
-                            let connectCount = keyArray.length;
-                            user["connectCount"] = connectCount;
-
-                            thisApp.connection.users.push(user)
-                        })
-                    }
-                    //console.log(childData)
                     thisApp.userConnection(thisApp.authInfo.user);
                 }, async (childData) => {
                     //onChildAdded
-
                     let keyArray = Object.keys(childData);
                     let user = childData[keyArray[0]];
                     user["connectCount"] = 1;
-                    thisApp.connection.users.push(user);
+                    thisApp.connection.users.push(user)
                 }, async (childData) => {
                     //onChildRemoved
+                    let users = thisApp.connection.users;
                     let keyArray = Object.keys(childData);
                     let user = childData[keyArray[0]];
-                    console.log(user)
-                    let users = thisApp.connection.users;
-                    //users.splice(users.indexOf(originUser), 1);
-
-                    //let filterUsers = users.filter(x => x.key == childData.key);
-                    //let hasUser = filterUsers.length != 0;
-                    //let originUser = filterUsers[0];
-
-                    //if (hasUser) { users.splice(users.indexOf(originUser), 1); }
+                    user = thisApp.getObject(users, 'key', user.key)
+                    users.splice(users.indexOf(user), 1);
                 })
-                
-
             },
             computed: {
                 hasAuth() { return thisApp.authInfo.user != null; },
@@ -132,6 +107,11 @@
                         //onChildAdded
                         let filterArray = users.filter(x => x.key == childData.key);
                         let hasData = filterArray.length > 0;
+
+                        //console.log("user-onChildAdded", childData)
+
+                        //console.log(childData)
+
                         //if (!hasData){
                         //    childData["connectCount"] = 1;
                         //    users.push(childData)
@@ -148,6 +128,10 @@
                         //onChildAdded
                         let filterArray = users.filter(x => x.key == childData.key);
                         let hasData = filterArray.length > 0;
+
+                        //console.log(childData)
+
+
                         //if (hasData) {
                         //    let fliter = filterArray[0];
                         //    let user = users[users.indexOf(fliter)];

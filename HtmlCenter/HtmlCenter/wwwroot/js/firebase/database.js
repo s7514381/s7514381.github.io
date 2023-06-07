@@ -17,7 +17,7 @@ function dbConnection(dbName, valueFunc = null, addFunc = null, removeFunc = nul
             onlyOnce: true
         });
     }
- 
+
     if (addFunc) {
         onChildAdded(connectionsRef, async (snapshot) => {
             await addFunc(snapshot.val());

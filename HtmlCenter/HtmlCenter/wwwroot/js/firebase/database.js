@@ -47,19 +47,19 @@ function addConnection(dbName, userId, data, addFunc = null, removeFunc = null, 
 
     if (addFunc) {
         onChildAdded(connectionsRef, async (snapshot) => {
-            await addFunc(snapshot.val());
+            await addFunc(snapshot);
         });
     }
 
     if (removeFunc) {
         onChildRemoved(connectionsRef, async (snapshot) => {
-            await removeFunc(snapshot.val())
+            await removeFunc(snapshot)
         });
     }
 
     if (updateFunc) {
         onChildChanged(connectionsRef, async (snapshot) => {
-            await updateFunc(snapshot.val());
+            await updateFunc(snapshot);
         });
     }
 }

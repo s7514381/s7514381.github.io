@@ -46,6 +46,7 @@
                     connection: {
                         name: 'connections',
                         users: [],
+                        ready: false,
                     },
                 }
             },
@@ -70,9 +71,10 @@
                     //onChildAdded
                     let keyArray = Object.keys(childData);
                     let user = childData[keyArray[0]];
-                    user["connectCount"] = keyArray.length;
+                    user["connectIds"] = keyArray;
 
                     thisApp.connection.users.push(user)
+                    if (!thisApp.connection.ready) { thisApp.connection.ready = true; }
                 }, async (childData) => {
                     //onChildRemoved
                     let users = thisApp.connection.users;
@@ -106,18 +108,26 @@
                         isMember: hasAuth,
                         displayName: displayName,
                         timestamp: serverTimestamp(),
-                    }, async (childData) => {
+                    }, async (snapshot) => {
                         //onChildAdded
                         //這邊只做連線數增減
+                        let connectId = snapshot.key;
+                        let childData = snapshot.val();
                         let filterArray = users.filter(x => x.key == childData.key);
-                        let hasData = filterArray.length > 0;
+                        let user = thisApp.getObject(users, 'key', filterArray[0].key);
+                        let hasConnectId = user.connectIds.includes(connectId);
 
-                    }, async (childData) => {
+                        if (!hasConnectId) { user.connectIds.push(connectId); }
+                    }, async (snapshot) => {
                         //onChildAdded
                         //這邊只做連線數增減
+                        let connectId = snapshot.key;
+                        let childData = snapshot.val();
                         let filterArray = users.filter(x => x.key == childData.key);
-                        let hasData = filterArray.length > 0;
+                        let user = thisApp.getObject(users, 'key', filterArray[0].key);
+                        let hasConnectId = user.connectIds.includes(connectId);
 
+                        user.connectIds.splice(user.connectIds.indexOf(connectId), 1);
                     });
                 },
                 signIn: async function () {
@@ -157,9 +167,9 @@
                     if (!title) { return; }
                     document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
                 },
-                getObject(list, keyField, key){
+                getObject(list, keyField, key) {
                     let result = null;
-                    for(let i = 0; i< list.length; i++){
+                    for (let i = 0; i < list.length; i++) {
                         let data = list[i];
                         if (data[keyField] == key) { result = data; break; }
                     }

@@ -91,8 +91,15 @@
                 hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
+                async websiteInit(){
+
+                },
                 async getIpClient(){
-                    if (!thisApp.IpClient) { thisApp.IpClient = await axios.get('https://api.ipify.org?format=json'); }
+                    if (!thisApp.IpClient) { 
+                        await axios.get(`https://api.ipify.org?format=json`).then(function (res) {
+                            thisApp.IpClient = res.data
+                        });
+                    }
                     return thisApp.IpClient;
                 },
                 resetUserConnection: async function (userInfo, removeId) {
@@ -114,7 +121,7 @@
                         email: hasAuth ? userInfo.email : '',
                         timestamp: serverTimestamp(),
                         createDate: new Date(),
-                        ip: ipClien.data.ip,
+                        ip: ipClien.ip,
                     };
 
                     addConnection(thisApp.connection.name, uid, connectModel, async (snapshot) => {

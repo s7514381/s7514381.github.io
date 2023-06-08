@@ -48,6 +48,7 @@
                         users: [],
                         ready: false,
                     },
+                    IpClient: null,
                 }
             },
             beforeCreate() {
@@ -60,6 +61,7 @@
                 let { waitForAuthStateChange } = await thisApp.getDbAssembly();
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
+                await thisApp.getIpClient();
 
                 let { dbConnection } = await thisApp.getRealtimeDb();
                 thisApp.connection.users = [];
@@ -89,6 +91,17 @@
                 hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
+                async websiteInit(){
+
+                },
+                async getIpClient(){
+                    if (!thisApp.IpClient) { 
+                        await axios.get(`https://api.ipify.org?format=json`).then(function (res) {
+                            thisApp.IpClient = res.data
+                        });
+                    }
+                    return thisApp.IpClient;
+                },
                 resetUserConnection: async function (userInfo, removeId) {
                     let { removeConnection } = await thisApp.getRealtimeDb();
 
@@ -97,24 +110,27 @@
                 },
                 userConnection: async function (userInfo) {
                     let { addConnection, serverTimestamp } = await thisApp.getRealtimeDb();
+                    let users = thisApp.connection.users;
 
                     let hasAuth = userInfo != null;
                     let uid = hasAuth ? userInfo.uid : thisApp.visitId;
-                    let displayName = hasAuth ? userInfo.displayName : "訪客";
-
-                    let users = thisApp.connection.users;
-                    addConnection(thisApp.connection.name, uid, {
+                    let ipClien = await thisApp.getIpClient();
+                    let connectModel = {
                         key: uid,
-                        isMember: hasAuth,
-                        displayName: displayName,
+                        displayName: hasAuth ? userInfo.displayName : "訪客",
+                        email: hasAuth ? userInfo.email : '',
                         timestamp: serverTimestamp(),
-                    }, async (snapshot) => {
+                        createDate: new Date(),
+                        ip: ipClien.ip,
+                    };
+
+                    addConnection(thisApp.connection.name, uid, connectModel, async (snapshot) => {
                         //onChildAdded
                         //這邊只做連線數增減
                         let connectId = snapshot.key;
                         let childData = snapshot.val();
                         let filterArray = users.filter(x => x.key == childData.key);
-                        let user = thisApp.getObject(users, 'key', filterArray[0].key);
+                        let user = thisApp.getObject(users, 'key', filterArray[0]?.key);
                         let hasConnectId = user.connectIds.includes(connectId);
 
                         if (!hasConnectId) { user.connectIds.push(connectId); }
@@ -124,22 +140,18 @@
                         let connectId = snapshot.key;
                         let childData = snapshot.val();
                         let filterArray = users.filter(x => x.key == childData.key);
-                        let user = thisApp.getObject(users, 'key', filterArray[0].key);
-                        let hasConnectId = user.connectIds.includes(connectId);
+                        let user = thisApp.getObject(users, 'key', filterArray[0]?.key);
+                        let connectIndex = user.connectIds.indexOf(connectId);
 
-                        user.connectIds.splice(user.connectIds.indexOf(connectId), 1);
+                        if (connectIndex != -1) { user.connectIds.splice(connectIndex, 1) }
                     });
+                    thisApp.dbInsert("ConnectLog", connectModel);
                 },
                 signIn: async function () {
                     let { googleSignIn, getAuth } = await thisApp.getDbAssembly();
                     result = await googleSignIn();
                     thisApp.authInfo.user = result.user;
 
-                    thisApp.dbInsert("LoginUser", {
-                        email: result.user.email,
-                        displayName: result.user.displayName,
-                        createDate: new Date(),
-                    })
                     thisApp.resetUserConnection(thisApp.authInfo.user, thisApp.visitId);
                 },
                 signOut: async function () {

@@ -1,6 +1,8 @@
 using HtmlCenter.Controllers;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting.Internal;
 using WebsiteBase.Library.Utility;
 
 namespace HtmlCenter
@@ -88,6 +90,7 @@ namespace HtmlCenter
         private void ConfigureSingletonService(IServiceCollection services)
         {
             services.AddSingleton<FileExtensionContentTypeProvider>();
+            services.AddSingleton<IFileProvider>(sp => new PhysicalFileProvider(sp.GetRequiredService<IWebHostEnvironment>().ContentRootPath));
         }
 
         private void ConfigureScopedService(IServiceCollection services)

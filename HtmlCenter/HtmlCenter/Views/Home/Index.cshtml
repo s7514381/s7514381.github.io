@@ -33,10 +33,20 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-3">
+<div class="card shadow-sm mb-3 "
+     :class="{'placeholder-glow': !connection.ready}">
+
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
-    <div class="card-body ">
+    <div class="card-body"
+         :class="{'placeholder': !connection.ready}">
+
         <div class="row">
+            <div v-if="!connection.ready" class="col card-loading flex-center ">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
             <div v-for="v in connection.users" class="col-auto">
                 <div class="card card-shadow p-2 anim-fade-in">
                     <div class="d-flex mb-2">
@@ -48,7 +58,10 @@
 
                     </div>
                     <div class="card p-2" style="box-shadow: inset 1px 1px 2px -1px #ccc;">
-                        連線數: {{v.connectCount}}
+                        <div class="d-flex">
+                            連線數: <span class="fw-bold">{{v.connectIds.length}}</span>
+                        </div>
+                        
                     </div>
 
                 </div>

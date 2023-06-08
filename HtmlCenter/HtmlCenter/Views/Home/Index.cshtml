@@ -33,8 +33,7 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-3 "
-     :class="{'placeholder-glow': !connection.ready}">
+<div class="card shadow-sm mb-3 placeholder-glow">
 
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
     <div class="card-body"
@@ -54,14 +53,16 @@
                             <span>天龍人</span>
                         </div>
 
-                        <span class="title-text">{{v.displayName}}</span>
-
+                        <span class="title-text">
+                            {{v.displayName}}
+                            <span v-if="v.key == visitId || authInfo.user?.uid == v.key">(你)</span>
+                        </span>
                     </div>
+
                     <div class="card p-2" style="box-shadow: inset 1px 1px 2px -1px #ccc;">
                         <div class="d-flex">
                             連線數: <span class="fw-bold">{{v.connectIds.length}}</span>
                         </div>
-                        
                     </div>
 
                 </div>

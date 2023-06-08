@@ -17,7 +17,7 @@
     <script src="/lib/vue/vuedraggable.umd.min.js"></script>
     <script src="/lib/axios/unpkg.com_axios@1.4.0_dist_axios.min.js"></script>
 
-    <script src="/js/site.js?v=7zy2lQfplQHWIvjyGwWHMPu7byB1vB5atFKLbvzX2Zs"></script>
+    <script src="/js/site.js?v=OhHmNc6vPOK-VgWjAenf8kmOoXXoyR2DVYUeYA7Pppo"></script>
     <script src="/js/vue-mixin.js?v=oGfWI9PcHSdqrbXA3KFuR81xwNZJbZRyKX3N4ouSDo4"></script>
 </head>
 
@@ -43,6 +43,7 @@
                         users: [],
                         ready: false,
                     },
+                    IpClient: null,
                 }
             },
             beforeCreate() {
@@ -55,6 +56,7 @@
                 let { waitForAuthStateChange } = await thisApp.getDbAssembly();
                 thisApp.authInfo.user = await waitForAuthStateChange();
                 thisApp.authInfo.ready = true;
+                await thisApp.getIpClient();
 
                 let { dbConnection } = await thisApp.getRealtimeDb();
                 thisApp.connection.users = [];
@@ -84,6 +86,10 @@
                 hasAuth() { return thisApp.authInfo.user != null; },
             },
             methods: {
+                async getIpClient(){
+                    if (!thisApp.IpClient) { thisApp.IpClient = await axios.get('https://api.ipify.org?format=json'); }
+                    return thisApp.IpClient;
+                },
                 resetUserConnection: async function (userInfo, removeId) {
                     let { removeConnection } = await thisApp.getRealtimeDb();
 
@@ -92,24 +98,27 @@
                 },
                 userConnection: async function (userInfo) {
                     let { addConnection, serverTimestamp } = await thisApp.getRealtimeDb();
+                    let users = thisApp.connection.users;
 
                     let hasAuth = userInfo != null;
                     let uid = hasAuth ? userInfo.uid : thisApp.visitId;
-                    let displayName = hasAuth ? userInfo.displayName : "訪客";
-
-                    let users = thisApp.connection.users;
-                    addConnection(thisApp.connection.name, uid, {
+                    let ipClien = await thisApp.getIpClient();
+                    let connectModel = {
                         key: uid,
-                        isMember: hasAuth,
-                        displayName: displayName,
+                        displayName: hasAuth ? userInfo.displayName : "訪客",
+                        email: hasAuth ? userInfo.email : '',
                         timestamp: serverTimestamp(),
-                    }, async (snapshot) => {
+                        createDate: new Date(),
+                        ip: ipClien.data.ip,
+                    };
+
+                    addConnection(thisApp.connection.name, uid, connectModel, async (snapshot) => {
                         //onChildAdded
                         //這邊只做連線數增減
                         let connectId = snapshot.key;
                         let childData = snapshot.val();
                         let filterArray = users.filter(x => x.key == childData.key);
-                        let user = thisApp.getObject(users, 'key', filterArray[0].key);
+                        let user = thisApp.getObject(users, 'key', filterArray[0]?.key);
                         let hasConnectId = user.connectIds.includes(connectId);
 
                         if (!hasConnectId) { user.connectIds.push(connectId); }
@@ -119,22 +128,18 @@
                         let connectId = snapshot.key;
                         let childData = snapshot.val();
                         let filterArray = users.filter(x => x.key == childData.key);
-                        let user = thisApp.getObject(users, 'key', filterArray[0].key);
-                        let hasConnectId = user.connectIds.includes(connectId);
+                        let user = thisApp.getObject(users, 'key', filterArray[0]?.key);
+                        let connectIndex = user.connectIds.indexOf(connectId);
 
-                        user.connectIds.splice(user.connectIds.indexOf(connectId), 1);
+                        if (connectIndex != -1) { user.connectIds.splice(connectIndex, 1) }
                     });
+                    thisApp.dbInsert("ConnectLog", connectModel);
                 },
                 signIn: async function () {
                     let { googleSignIn, getAuth } = await thisApp.getDbAssembly();
                     result = await googleSignIn();
                     thisApp.authInfo.user = result.user;
 
-                    thisApp.dbInsert("LoginUser", {
-                        email: result.user.email,
-                        displayName: result.user.displayName,
-                        createDate: new Date(),
-                    })
                     thisApp.resetUserConnection(thisApp.authInfo.user, thisApp.visitId);
                 },
                 signOut: async function () {
@@ -253,8 +258,7 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-3 "
-     :class="{'placeholder-glow': !connection.ready}">
+<div class="card shadow-sm mb-3 placeholder-glow">
 
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
     <div class="card-body"
@@ -274,14 +278,16 @@
                             <span>天龍人</span>
                         </div>
 
-                        <span class="title-text">{{v.displayName}}</span>
-
+                        <span class="title-text">
+                            {{v.displayName}}
+                            <span v-if="v.key == visitId || authInfo.user?.uid == v.key">(你)</span>
+                        </span>
                     </div>
+
                     <div class="card p-2" style="box-shadow: inset 1px 1px 2px -1px #ccc;">
                         <div class="d-flex">
                             連線數: <span class="fw-bold">{{v.connectIds.length}}</span>
                         </div>
-                        
                     </div>
 
                 </div>

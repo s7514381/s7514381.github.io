@@ -1,5 +1,4 @@
 ﻿var thisApp;
-var component;
 
 const baseMixin = {
     mixins: [firestoreMixin, realtimeDbMixin],
@@ -26,7 +25,11 @@ const baseMixin = {
         thisApp = this;
     },
     async created() {
-        
+
+        let $this = this
+        setInterval(function () {
+            console.log("baseMixin", $this.connection.users.length)
+        }, 2000)
     },
     computed: {
         hasAuth() { return thisApp.authInfo.user != null; },
@@ -133,7 +136,7 @@ const baseMixin = {
     }
 }
 
-const formComponent = Vue.createApp({
+const appComponent = Vue.createApp({
     mixins: [baseMixin, routerMixin],
     data() {
         return {
@@ -141,7 +144,11 @@ const formComponent = Vue.createApp({
         }
     },
     async created() {
-
+        //let $this = this
+        //setInterval(function () {
+        //    console.log("appComponent", $this.connection.users.length)
+        //}, 2000)
+        
         thisApp.visitId = thisApp.newGuid();
         thisApp.setHeadTitle(thisApp.pageTitle)
 
@@ -180,4 +187,4 @@ const formComponent = Vue.createApp({
 });
 
 const router = VueRouter.createRouter({ history: VueRouter.createWebHistory(), routes: [] });
-const vApp = formComponent.use(router).mount('#app');
+const vApp = appComponent.use(router).mount('#app');

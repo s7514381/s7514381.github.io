@@ -99,6 +99,8 @@ const routerMixin = {
     },
     created() {
         thisApp.$router.beforeEach(async to => {
+            console.log(thisApp)
+
             if (!this.$router.hasRoute(to.name)) {
                 let pathArray = to.path.split('/');
                 let controllerName = pathArray[1];

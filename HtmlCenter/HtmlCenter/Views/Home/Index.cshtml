@@ -32,9 +32,11 @@
     </div>
 </div>
 
+
+
 <div class="card shadow-sm mb-3 placeholder-glow">
 
-    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
+    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳{{connection.ready}}</p></div>
     <div class="card-body"
          :class="{'placeholder': !connection.ready}">
 

@@ -90,3 +90,61 @@ const firestoreMixin = {
         },
     }
 }
+
+const routerMixin = {
+    data() {
+        return {
+            pageLoading: false,
+        }
+    },
+    created() {
+        thisApp.$router.beforeEach(async to => {
+            if (!this.$router.hasRoute(to.name)) {
+                let pathArray = to.path.split('/');
+                let controllerName = pathArray[1];
+                if (controllerName == '') { controllerName = "home"; }
+
+                let component;
+
+                switch (controllerName) {
+                    case "imagecoverframe":
+                    case "dynamicform":
+                    case "interest":
+                        //客製化
+                        let importPath = `/js/vue-component/${controllerName}.js?timestamp=${Date.now()}`
+                        await import(importPath).then(module => { component = module.component })
+                        break;
+                    default:
+                        component = { data() { return thisApp.$data; }, template: null };
+                        break;
+                }
+
+                thisApp.$router.addRoute({
+                    name: controllerName,
+                    path: to.path,
+                    component: component,
+                })
+                return to.fullPath;
+            }
+        })
+
+        thisApp.$router.beforeResolve(async to => {
+            thisApp.pageLoading = true;
+
+            const routeComponent = to.matched[0]?.components?.default;
+
+            if (routeComponent && !routeComponent?.template) {
+                routeComponent.template = await this.getHtmlContent(to.name);
+                routeComponent.template = routeComponent.template.replaceAll('@@', '@');
+            }
+            thisApp.pageLoading = false;
+        })
+    },
+    methods: {
+        async getHtmlContent(controllerName) {
+            let result;
+            result = await axios.get(`/${controllerName}/HtmlContent`);
+            return result.data;
+        }
+    },
+}

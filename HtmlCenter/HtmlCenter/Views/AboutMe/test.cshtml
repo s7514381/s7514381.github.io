@@ -1,0 +1,101 @@
+﻿@{
+    Layout = null;
+    string renderController = ViewBag.RenderController;
+    string renderAction = ViewBag.RenderAction;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>自由發揮 園丁Tim</title>
+    <link rel="stylesheet" href="/lib/bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.2.3_dist_css_bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/image-cover-frame.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dynamic-form.css" asp-append-version="true" />
+
+    <script src="/lib/bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.2.3_dist_js_bootstrap.bundle.min.js"></script>
+    <script src="/lib/vue/vue.global.prod.js" type="text/javascript"></script>
+    <script src="~/lib/Sortable/Sortable.min.js"></script>
+    <script src="~/lib/vue/vuedraggable.umd.min.js"></script>
+    <script src="/lib/axios/unpkg.com_axios@1.4.0_dist_axios.min.js"></script>
+    <script src="https://unpkg.com/vue-router@4.2.2/dist/vue-router.global.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/vue-mixin.js" asp-append-version="true"></script>
+</head>
+<body>
+    <div id="app">
+        <router-link to="/">Home</router-link>
+        <router-link to="/about">About</router-link>
+
+        <router-view></router-view>
+    </div>
+
+    <script>
+
+        
+         axios.get('/AboutMe/GetIndexContent')
+          .then(response => {
+            const indexContent = response.data;
+            console.log(indexContent);
+
+                const ChildComponent = {
+                    props: ['myObject'],
+                    template: `
+                    <div>
+                      <h3>Child Component</h3>
+                      <p>Name: {{ myObject.name }}</p>
+                      <p>Age: {{ myObject.age }}</p>
+                    </div>
+                  `
+                };
+                const ParentComponent = {
+                    data() {
+                        return {
+                            myObject: {
+                                name: 'John',
+                                age: 30
+                            }
+                        };
+                    },
+                    template: indexContent,
+                    components: {
+                        ChildComponent
+                    }
+                };
+
+
+
+                const Home = {
+                    template: `
+                                <div>Home Page</div>
+                        ` };
+                const About = { template: '<div>About Page</div>' };
+
+                const routes = [
+                    { path: '/', component: ParentComponent },
+                    { path: '/about', component: About }
+                ];
+
+                const router = VueRouter.createRouter({
+                    history: VueRouter.createWebHistory(),
+                    routes
+                });
+
+                const app = Vue.createApp( );
+                app.use(router);
+                app.mount('#app');
+
+          })
+          .catch(error => {
+            console.error(error);
+          });
+
+
+
+    </script>
+</body>
+</html>

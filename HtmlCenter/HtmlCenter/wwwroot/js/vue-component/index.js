@@ -28,7 +28,7 @@ const baseMixin = {
 
         let $this = this
         setInterval(function () {
-            console.log("baseMixin", $this.connection.users.length)
+            console.log($this.visitId, $this.connection.users.length)
         }, 2000)
     },
     computed: {

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,7 @@ namespace HtmlCenter.Controllers
         protected readonly IWebHostEnvironment _hostingEnvironment;
         protected readonly IConfiguration _configuration;
         protected readonly IViewRenderService _viewRenderService;
+        private readonly IFileProvider _fileProvider;
         protected ILogger _logger;
 
         protected string WebRootPath => _hostingEnvironment.WebRootPath;
@@ -38,6 +40,7 @@ namespace HtmlCenter.Controllers
             _hostingEnvironment = argument.HostingEnvironment;
             _configuration = argument.Configuration;
             _viewRenderService = argument.ViewRenderService;
+            _fileProvider = argument.FileProvider;
         }
 
         /// <summary>
@@ -59,6 +62,29 @@ namespace HtmlCenter.Controllers
             get
             {
                 return ControllerContext.RouteData.Values["action"]?.ToString() ?? "";
+            }
+        }
+
+        public IActionResult Index()
+        {
+            return View(ViewRenderResult());
+        }
+
+        [HttpGet]
+        public IActionResult HtmlContent()
+        {
+            string path = Path.Combine("Views", CurrentController, "Index.cshtml");
+            IFileInfo fileInfo = _fileProvider.GetFileInfo(path);
+
+            if (!fileInfo.Exists)
+            {
+                return NotFound();
+            }
+
+            using (StreamReader reader = new StreamReader(fileInfo.CreateReadStream()))
+            {
+                string content = reader.ReadToEnd();
+                return Json(content);
             }
         }
 
@@ -98,26 +124,7 @@ namespace HtmlCenter.Controllers
             ViewBag.RenderAction = sAction ?? CurrentAction;
 
             return "Views/ViewRender/Index.cshtml";
-        }
-
-        public async Task RenderView(string renderController, string renderAction, ViewDataDictionary viewData)
-        {
-            string renderString = await _viewRenderService.RenderToStringAsync(ViewRenderResult(renderAction, renderController), viewData);
-
-            string renderPath = _configuration.GetValue<string>("RenderPath");
-            if (!string.IsNullOrEmpty(renderController) && renderController != "Home") { renderPath += $@"\{renderController.ToLower()}"; }
-
-            if (!Directory.Exists(renderPath))
-                Directory.CreateDirectory(renderPath);
-
-            string path = $@"{renderPath}\index.htm";
-
-            using (FileStream fs = System.IO.File.Create(path))
-            {
-                byte[] info = new UTF8Encoding(true).GetBytes(renderString);
-                fs.Write(info, 0, info.Length);
-            }
-        }
+        }   
 
         public List<ControllerAction> GetControllerActionList()
         {
@@ -127,14 +134,12 @@ namespace HtmlCenter.Controllers
                     .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public))
                     .Select(x => new ControllerAction
                     {
-                        Controller = x.DeclaringType.Name,
+                        Controller = x.DeclaringType?.Name,
                         Action = x.Name,
                         CustomAttributes = x.CustomAttributes.ToList(),
                     }).ToList();
             return controlleractionlist;
         }
-
-
     }
 
     /// <summary>
@@ -146,15 +151,18 @@ namespace HtmlCenter.Controllers
         public IWebHostEnvironment HostingEnvironment { get; set; }
         public IConfiguration Configuration { get; set; }
         public IViewRenderService ViewRenderService { get; set; }
+        public IFileProvider FileProvider;
 
         public BaseControllerArgument(
             IWebHostEnvironment hostingEnvironment,
             IConfiguration configuration,
-            IViewRenderService viewRenderService)
+            IViewRenderService viewRenderService,
+            IFileProvider fileProvider)
         {
             HostingEnvironment = hostingEnvironment;
             Configuration = configuration;
             ViewRenderService = viewRenderService;
+            FileProvider = fileProvider;
         }
     }
 }

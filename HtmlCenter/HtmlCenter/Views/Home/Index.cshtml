@@ -1,14 +1,13 @@
 ﻿
 <div class="background-video pc-limit">
     <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw;">
-        <source class="" src="~/video/video.mp4" type="video/mp4" />
+        <source class="" src="/video/video.mp4" type="video/mp4" />
     </video>
-    @*    <img src="~/image/bg.jpg" style="width:100vw; height:auto" />*@
 </div>
 
 <div class="background-video mobile-limit">
     <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw">
-        <source src="~/video/pexels-mamunur-rashid-6336968.mp4" type="video/mp4" />
+        <source src="/video/pexels-mamunur-rashid-6336968.mp4" type="video/mp4" />
     </video>
 </div>
 
@@ -33,9 +32,11 @@
     </div>
 </div>
 
+
+
 <div class="card shadow-sm mb-3 placeholder-glow">
 
-    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
+    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳{{connection.ready}}</p></div>
     <div class="card-body"
          :class="{'placeholder': !connection.ready}">
 
@@ -72,9 +73,6 @@
     </div>
 </div>
 
-
-
-
 <div class="card shadow-sm mb-3">
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">最近推出項目</p></div>
     <div class="card-body">
@@ -91,51 +89,3 @@
         <a class="fw-bold fs-5 title-text" asp-controller="unitywebgl" asp-action="Index">遊戲</a>
     </div>
 </div>
-
-<script>
-    component = {
-        mixins: [baseMixin],
-        data() {
-            return {
-                pageTitle: '首頁',
-            }
-        },
-        async created() {
-
-            
-
-            //axios.get(`https://ithelp.ithome.com.tw/questions/10212812`).then(function (res) {
-            //    console.log(res.data)
-            //});
-
-            //let signInData = await thisApp.signIn();
-            //console.log(signInData)
-
-            //let ins = await thisApp.dbInsert("test", {
-            //    first: new Date(),
-            //    last: "Lovelace11",
-            //    born: 44543
-            //})
-
-            //let upd = await thisApp.dbUpdate("test", ins.id, {
-            //    born: 6666
-            //})
-
-            //let { db, query, collection, where } = await thisApp.getDbAssembly();
-            //let list = await thisApp.dbQuery(query(
-            //    collection(db, "test")
-            //    , where("last", "==", 'Lovelace11')
-            //    , where("born", "==", 6666)
-            //))
-            //list.forEach((doc) => {
-            //    console.log(doc.id, " => ", doc.data());
-            //});
-
-
-            //await thisApp.dbDelete("users", ins.id,)
-        },
-        methods: {
-        }
-    }
-    var formComponent = Vue.createApp(component)
-</script>

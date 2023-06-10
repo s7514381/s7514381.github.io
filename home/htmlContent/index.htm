@@ -50,10 +50,11 @@
             <div v-for="v in connection.users" class="col-auto">
                 <div class="card card-shadow p-2 anim-fade-in">
                     <div class="d-flex mb-2">
-                        <div class="flex-center level-tag me-2" style="background-color: #0da7fd; color: white;">
-                            <span>天龍人</span>
+                        <div class="flex-center level-tag me-2" style="">
+                            <span v-if="v.key == 'JvZwbT989vhv8WvA5KycFjn4e3X2'">作者</span>
+                            <span v-else>天龍人</span>
                         </div>
-
+                        
                         <span class="title-text">
                             {{v.displayName}}
                             <span v-if="v.key == visitId || authInfo.user?.uid == v.key">(你)</span>
@@ -76,16 +77,16 @@
 <div class="card shadow-sm mb-3">
     <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">最近推出項目</p></div>
     <div class="card-body">
-        <a class="fw-bold fs-5 title-text" asp-controller="imagecoverframe" asp-action="Index">圖片框選器</a>
+        <router-link to="/imagecoverframe" class="fw-bold fs-5 title-text">圖片框選器</router-link>
     </div>
 </div>
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <a class="fw-bold fs-5 title-text" asp-controller="dynamicform" asp-action="Index">動態表單</a>
+        <router-link to="/dynamicform" class="fw-bold fs-5 title-text">動態表單</router-link>
     </div>
 </div>
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <a class="fw-bold fs-5 title-text" asp-controller="unitywebgl" asp-action="Index">遊戲</a>
+        <router-link to="/unitywebgl" class="fw-bold fs-5 title-text">遊戲</router-link>
     </div>
 </div>

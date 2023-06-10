@@ -157,9 +157,11 @@ header {
 }
 
 .level-tag {
-    border: 1px solid #ccc;
+    border: 1px solid #0da7fd;
     padding: 0.1em 0.3em;
     border-radius: 1em;
+    background-color: #0da7fd;
+    color: white;
 }
     .level-tag span {
         font-size: 0.5em

@@ -153,8 +153,40 @@ const routerMixin = {
     },
 }
 
+const threadMixin = {
+    data() {
+        return {
+        }
+    },
+    methods: {
+        async runThreads(threadList) {
+            let $this = this;
+            return new Promise((resolve, reject) => {
+                for (let i = 0; i < threadList.length; i++) {
+                    let task = threadList[i];
+
+                    task.func().then(async function () {
+                        task.ready = true;
+                        if (await $this.checkInitThread(threadList)) { resolve(true); }
+                    })
+                }
+            });
+        },
+        async checkInitThread(threadList) {
+            return new Promise((resolve, reject) => {
+                let result = true;
+                for (let i = 0; i < threadList.length; i++) {
+                    let task = threadList[i];
+                    if (!task.ready) { result = false; }
+                }
+                resolve(result)
+            });
+        },
+    },
+}
+
 const baseMixin = {
-    mixins: [firestoreMixin, realtimeDbMixin],
+    mixins: [firestoreMixin, realtimeDbMixin, threadMixin],
     data() {
         return {
             pageTitle: '',
@@ -178,9 +210,6 @@ const baseMixin = {
         hasAuth() { return this.authInfo.user != null; },
     },
     methods: {
-        async websiteInit() {
-
-        },
         async getIpClient() {
             let $this = this;
 
@@ -204,14 +233,12 @@ const baseMixin = {
 
             let hasAuth = userInfo != null;
             let uid = hasAuth ? userInfo.uid : this.visitId;
-            //let ipClien = await this.getIpClient();
             let connectModel = {
                 key: uid,
                 displayName: hasAuth ? userInfo.displayName : "訪客",
                 email: hasAuth ? userInfo.email : '',
                 timestamp: serverTimestamp(),
                 createDate: new Date(),
-                //ip: ipClien.ip,
             };
 
             addConnection(this.connection.name, uid, connectModel, async (snapshot) => {
@@ -236,12 +263,14 @@ const baseMixin = {
                 if (connectIndex != -1) { user.connectIds.splice(connectIndex, 1) }
             });
 
-            let ipClien = await this.getIpClient();
+            //ip可能會非常慢，只能另外處理，不然會卡畫面
+            let ipClien = await this.getIpClient(); 
+            connectModel = this.getObject(users, 'key', connectModel.key);
             connectModel["ip"] = ipClien.ip;
             $this.dbInsert("ConnectLog", connectModel);
         },
         signIn: async function () {
-            let { googleSignIn, getAuth } = await this.getDbAssembly();
+            let { googleSignIn } = await this.getDbAssembly();
             result = await googleSignIn();
             this.authInfo.user = result.user;
 
@@ -282,6 +311,4 @@ const baseMixin = {
             return result;
         },
     },
-    watch: {
-    }
 }

@@ -3,11 +3,17 @@ const appComponent = Vue.createApp({
     mixins: [baseMixin, routerMixin],
     data() {
         return {
-            
+            initThreads: [
+                { name: "realtimeDb", func: this.getDbAssembly, ready: false },
+                { name: "firestore", func: this.getRealtimeDb, ready: false },
+                /*{ name: "ipClient", func: this.getIpClient, ready: false },*/
+            ],
         }
     },
     async created() {
         let $this = this;
+
+        await this.runThreads(this.initThreads);
 
         this.visitId = this.newGuid();
         this.setHeadTitle(this.pageTitle)

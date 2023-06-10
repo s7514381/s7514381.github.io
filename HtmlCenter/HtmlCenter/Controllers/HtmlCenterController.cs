@@ -57,7 +57,7 @@ namespace HtmlCenter.Controllers
                 string htmlContent = HtmlContentString(controllerName);
                 await WriteFile(controllerName, htmlContent, "htmlContent");
             }
-            return Content("爽喔成功");
+            return View();
         }
 
         public void CopyDirectory(string fromPath, string toPath) 

@@ -52,11 +52,20 @@ namespace HtmlCenter.Controllers
 
             foreach (ControllerAction controllerAction in renderControllers) {
                 string controllerName = controllerAction.Controller.Replace("Controller", "");
-                await RenderView(controllerName, "Index", ViewData);
+                string renderString = await _viewRenderService.RenderToStringAsync(ViewRenderResult("Index", controllerName), ViewData);
+                await WriteFile(controllerName, renderString);
+                //await RenderView(controllerName, "Index", ViewData);
+
+                if (controllerName == "Home") {
+                    //首頁另外做
+                    await WriteFile("", renderString);
+                }
 
                 string htmlContent = HtmlContentString(controllerName);
                 await WriteFile(controllerName, htmlContent, "htmlContent");
             }
+
+            
             return Content("爽拉成功");
         }
 

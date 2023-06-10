@@ -26,8 +26,8 @@ namespace HtmlCenter.Controllers
         public async Task WriteFile(string renderController, string renderString, string fileName = "")
         {
             string renderPath = RenderPath;
-            
-            if (!string.IsNullOrEmpty(renderController) && renderController != "Home") { renderPath += $@"\{renderController.ToLower()}"; }
+
+            if (!string.IsNullOrEmpty(renderController)) { renderPath += $@"\{renderController.ToLower()}"; }
             if (!string.IsNullOrEmpty(fileName)) { renderPath += $@"\{fileName}"; }
 
             if (!Directory.Exists(renderPath))
@@ -57,7 +57,7 @@ namespace HtmlCenter.Controllers
                 string htmlContent = HtmlContentString(controllerName);
                 await WriteFile(controllerName, htmlContent, "htmlContent");
             }
-            return View();
+            return Content("爽拉成功");
         }
 
         public void CopyDirectory(string fromPath, string toPath) 

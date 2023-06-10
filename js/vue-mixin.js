@@ -147,7 +147,7 @@ const routerMixin = {
     methods: {
         async getHtmlContent(controllerName) {
             let result;
-            result = await axios.get(`/${controllerName}/HtmlContent`);
+            result = await axios.get(`/${controllerName}/htmlContent`);
             return result.data;
         }
     },

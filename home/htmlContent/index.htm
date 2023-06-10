@@ -1,0 +1,91 @@
+
+<div class="background-video pc-limit">
+    <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw;">
+        <source class="" src="/video/video.mp4" type="video/mp4" />
+    </video>
+</div>
+
+<div class="background-video mobile-limit">
+    <video class="bg-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style=" opacity: 0.8; width: 100vw">
+        <source src="/video/pexels-mamunur-rashid-6336968.mp4" type="video/mp4" />
+    </video>
+</div>
+
+<div class="card card-transparent shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <p class="fw-bold fs-5 title-text">網站介紹</p>
+                各位好，我叫Tim<br />
+                <br />
+                網頁內的功能皆為自製，並且使用之套件皆為開放套件(Vue3、vue draggable、Sortable、font-awesome...等)，<br />
+                程式範圍涉略Css(元件外觀)、前端(Vue3、Axios、javascript)、後端(MVC頁面產生器)<br />
+                、資料庫(由前端直接介接cloud firestore，速度比cloud function快了超過10倍)，<br />
+                歡迎有需求者參考學習。<br />
+                <br />
+                本github靜態頁面的產生方法為自製靜態頁面產生器，使用語言為C#、.Net 6 MVC，程式碼以及說明在<a href="https://github.com/s7514381/s7514381.github.io" target="_blank">s7514381.github.io</a>，功能皆為開放使用。<br />
+                使用靜態頁面產生器的好處是，可以沿用MVC的partial概念來產生靜態頁面，減少重複的程式碼。<br />
+                <br />
+                如果有任何想反饋的歡迎寄信至<a href="mailto:s7514381@gmail.com">s7514381@gmail.com</a>，感謝各位!
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="card shadow-sm mb-3 placeholder-glow">
+
+    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">聊天大廳</p></div>
+    <div class="card-body"
+         :class="{'placeholder': !connection.ready}">
+
+        <div class="row">
+            <div v-if="!connection.ready" class="col card-loading flex-center ">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div v-for="v in connection.users" class="col-auto">
+                <div class="card card-shadow p-2 anim-fade-in">
+                    <div class="d-flex mb-2">
+                        <div class="flex-center level-tag me-2" style="background-color: #0da7fd; color: white;">
+                            <span>天龍人</span>
+                        </div>
+
+                        <span class="title-text">
+                            {{v.displayName}}
+                            <span v-if="v.key == visitId || authInfo.user?.uid == v.key">(你)</span>
+                        </span>
+                    </div>
+
+                    <div class="card p-2" style="box-shadow: inset 1px 1px 2px -1px #ccc;">
+                        <div class="d-flex">
+                            連線數: <span class="fw-bold">{{v.connectIds.length}}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header"><p class="fw-bold fs-5 title-text mb-0">最近推出項目</p></div>
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" asp-controller="imagecoverframe" asp-action="Index">圖片框選器</a>
+    </div>
+</div>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" asp-controller="dynamicform" asp-action="Index">動態表單</a>
+    </div>
+</div>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <a class="fw-bold fs-5 title-text" asp-controller="unitywebgl" asp-action="Index">遊戲</a>
+    </div>
+</div>

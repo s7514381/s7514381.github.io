@@ -1,13 +1,29 @@
 ﻿
 const appComponent = Vue.createApp({
-    mixins: [baseMixin, routerMixin],
+    mixins: [baseMixin, firestoreMixin, realtimeDbMixin, threadMixin, routerMixin],
     data() {
         return {
+            pageTitle: '',
+            Layout: {
+                headTitle: document.getElementsByTagName("title")[0].innerHTML,
+            },
+            authInfo: {
+                ready: false,
+                user: null,
+            },
+            visitId: null,
+            connection: {
+                name: 'connections',
+                users: [],
+                ready: false,
+            },
+            IpClient: null,
             initThreads: [
                 { name: "realtimeDb", func: this.getDbAssembly, ready: false },
                 { name: "firestore", func: this.getRealtimeDb, ready: false },
                 /*{ name: "ipClient", func: this.getIpClient, ready: false },*/
             ],
+            
         }
     },
     async created() {
@@ -45,6 +61,9 @@ const appComponent = Vue.createApp({
 
             users.splice(users.indexOf(user), 1);
         })
+    },
+    computed: {
+        hasAuth() { return this.authInfo.user != null; },
     },
     methods: {
 

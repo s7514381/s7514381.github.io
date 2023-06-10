@@ -40,20 +40,10 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/imagecoverframe" class="nav-link text-dark">圖片框選器</router-link>
-                        </li>
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/dynamicform" class="nav-link text-dark">動態表單v1.0</router-link>
-                        </li>
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/interest" class="nav-link text-dark">利息計算機</router-link>
-                        </li>
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/unitywebgl" class="nav-link text-dark">Unity遊戲</router-link>
-                        </li>
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/aboutme" class="nav-link text-dark">關於我</router-link>
+                        <li v-for="v in navbar" class="nav-item me-3 px-2 " style="position: relative">
+                            <router-link :to="v.to" 
+                                        class="nav-link text-dark"
+                                         :class="{'new-tag': v.newTag}">{{v.name}}</router-link>
                         </li>
                     </ul>
                     

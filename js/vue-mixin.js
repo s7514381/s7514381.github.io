@@ -1,4 +1,5 @@
 ﻿
+
 const dragMixin = {
     data() {
         return {
@@ -97,13 +98,33 @@ const routerMixin = {
     data() {
         return {
             pageLoading: false,
+            navbar: [
+                { to: '/chat', name: '聊天室', newTag: false },
+                { to: '/imagecoverframe', name: '圖片框選器', newTag: false },
+                { to: '/dynamicform', name: '動態表單v1.0', newTag: false },
+                { to: '/interest', name: '利息計算機', newTag: false },
+                { to: '/unitywebgl', name: 'Unity遊戲', newTag: false },
+                { to: '/aboutme', name: '關於我', newTag: false },
+            ],
         }
     },
     created() {
         let $this = this;
 
+        $this.navbar.forEach(function (v) {
+            let log = localStorage.getItem(`navbar-${v.to}`);
+            if (!Number(log)) { v.newTag = true; }
+        })
+       
         $this.$router.beforeEach(async to => {
             if (!this.$router.hasRoute(to.name)) {
+
+                let navItem = $this.getObject($this.navbar, 'to', to.path);
+                if (navItem && navItem.newTag) {
+                    localStorage.setItem(`navbar-${to.path}`, 1);
+                    navItem.newTag = false;
+                }
+
                 let pathArray = to.path.split('/');
                 let controllerName = pathArray[1];
                 if (controllerName == '') { controllerName = "home"; }
@@ -154,10 +175,6 @@ const routerMixin = {
 }
 
 const threadMixin = {
-    data() {
-        return {
-        }
-    },
     methods: {
         async runThreads(threadList) {
             let $this = this;
@@ -186,28 +203,10 @@ const threadMixin = {
 }
 
 const baseMixin = {
-    mixins: [firestoreMixin, realtimeDbMixin, threadMixin],
+    mixins: [],
     data() {
         return {
-            pageTitle: '',
-            Layout: {
-                headTitle: document.getElementsByTagName("title")[0].innerHTML,
-            },
-            authInfo: {
-                ready: false,
-                user: null,
-            },
-            visitId: null,
-            connection: {
-                name: 'connections',
-                users: [],
-                ready: false,
-            },
-            IpClient: null,
         }
-    },
-    computed: {
-        hasAuth() { return this.authInfo.user != null; },
     },
     methods: {
         async getIpClient() {

@@ -7,7 +7,7 @@
     <title>自由發揮 園丁Tim</title>
     <link rel="stylesheet" href="/lib/bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.2.3_dist_css_bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="/css/site.css?v=mw7I3GCashm6WUu7ZiQJs0iurBX6C6kAeC0_sP-hq1k" />
+    <link rel="stylesheet" href="/css/site.css?v=X2JJl5Dum08pcQu8t3L9V51amNl2ut9_-Y-BPGeEEpI" />
     <link rel="stylesheet" href="/css/image-cover-frame.css?v=LndOvmdvYvfNGZ_Xby9XErY0d5p_LhPwLQ90eOPSTYg" />
     <link rel="stylesheet" href="/css/dynamic-form.css?v=kHNWcsTiItzqiDc_ryxKuhJWXoUb9-TTxkcO2nCvOSU" />
 
@@ -19,7 +19,7 @@
     <script src="https://unpkg.com/vue-router@4.2.2/dist/vue-router.global.js"></script>
 
     <script src="/js/site.js?v=Muh2GW02FnMi0PppBzamzgcE4rZw00z-fphZP9e142c"></script>
-    <script src="/js/vue-mixin.js?v=nRAPqniMyVeRybOAIeyiBovDJaWgsyj0NTmWq7v8d9Y"></script>
+    <script src="/js/vue-mixin.js?v=xyYGd0m9s0QiFAi4WEuJ_7Y_sLeXur2InfCeJIAi3EE"></script>
 </head>
 
 <body id="app">
@@ -35,20 +35,10 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/imagecoverframe" class="nav-link text-dark">圖片框選器</router-link>
-                        </li>
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/dynamicform" class="nav-link text-dark">動態表單v1.0</router-link>
-                        </li>
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/interest" class="nav-link text-dark">利息計算機</router-link>
-                        </li>
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/unitywebgl" class="nav-link text-dark">Unity遊戲</router-link>
-                        </li>
-                        <li class="nav-item me-3 px-2">
-                            <router-link to="/aboutme" class="nav-link text-dark">關於我</router-link>
+                        <li v-for="v in navbar" class="nav-item me-3 px-2 " style="position: relative">
+                            <router-link :to="v.to" 
+                                        class="nav-link text-dark"
+                                         :class="{'new-tag': v.newTag}">{{v.name}}</router-link>
                         </li>
                     </ul>
                     

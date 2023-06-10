@@ -1,4 +1,6 @@
-﻿export const component = {
+﻿let thisApp;
+
+export const component = {
     mixins: [baseMixin, dragMixin],
     components: {
         'draggable': vuedraggable,
@@ -20,6 +22,9 @@
             currentFieldModel: {},
             FieldList: [],
         }
+    },
+    beforeCreate() {
+        thisApp = this;
     },
     created() {
         let emptyRegionNumber = thisApp.emptyRegionNumber;

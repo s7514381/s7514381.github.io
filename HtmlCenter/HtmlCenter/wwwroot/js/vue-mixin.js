@@ -39,8 +39,8 @@ const realtimeDbMixin = {
             });
         },
         getRealtimeDb: async function () {
-            if (thisApp.realtimeDb == null) { thisApp.realtimeDb = await thisApp.realtimeDbInit(); }
-            return thisApp.realtimeDb;
+            if (this.realtimeDb == null) { this.realtimeDb = await this.realtimeDbInit(); }
+            return this.realtimeDb;
         },
     }
 }
@@ -55,37 +55,39 @@ const firestoreMixin = {
     },
     methods: {
         firestoreInit: function () {
+            let $this = this;
+
             return new Promise((resolve, reject) => {
                 import(`/js/firebase/firestore.js?timestamp=${ Date.now() }`)
                     .then(module => {
-                        thisApp.dbAssembly = module.dbAssembly;
+                        $this.dbAssembly = module.dbAssembly;
                         resolve(true);
                     })
             });
         },
         getDbAssembly: async function () {
-            let { ready } = thisApp.dbAssembly;
+            let { ready } = this.dbAssembly;
 
-            if (!ready) { await thisApp.firestoreInit(); }
-            return thisApp.dbAssembly;
+            if (!ready) { await this.firestoreInit(); }
+            return this.dbAssembly;
         },
         dbInsert: async function (collectionName, data, docId = '') {
-            let { addDoc, collection, db } = await thisApp.getDbAssembly();
+            let { addDoc, collection, db } = await this.getDbAssembly();
 
             if (docId != '') { return await setDoc(doc(db, collectionName, docId), data); }
             return await addDoc(collection(db, collectionName), data);
         },
         dbUpdate: async function (collectionName, docId, data) {
-            let { doc, updateDoc, db } = await thisApp.getDbAssembly();
+            let { doc, updateDoc, db } = await this.getDbAssembly();
             const docRef = doc(db, collectionName, docId);
             return await updateDoc(docRef, data);
         },
         dbDelete: async function (collectionName, docId) {
-            let { doc, deleteDoc, db } = await thisApp.getDbAssembly();
+            let { doc, deleteDoc, db } = await this.getDbAssembly();
             await deleteDoc(doc(db, collectionName, docId));
         },
         dbQuery: async function (queryCondition) {
-            let { getDocs } = await thisApp.getDbAssembly();
+            let { getDocs } = await this.getDbAssembly();
             return await getDocs(queryCondition);
         },
     }
@@ -98,9 +100,9 @@ const routerMixin = {
         }
     },
     created() {
-        thisApp.$router.beforeEach(async to => {
-            console.log(thisApp)
+        let $this = this;
 
+        $this.$router.beforeEach(async to => {
             if (!this.$router.hasRoute(to.name)) {
                 let pathArray = to.path.split('/');
                 let controllerName = pathArray[1];
@@ -117,11 +119,11 @@ const routerMixin = {
                         await import(importPath).then(module => { component = module.component })
                         break;
                     default:
-                        component = { data() { return thisApp.$data; }, template: null };
+                        component = { data() { return $this.$data; }, template: null };
                         break;
                 }
 
-                thisApp.$router.addRoute({
+                $this.$router.addRoute({
                     name: controllerName,
                     path: to.path,
                     component: component,
@@ -130,8 +132,8 @@ const routerMixin = {
             }
         })
 
-        thisApp.$router.beforeResolve(async to => {
-            thisApp.pageLoading = true;
+        $this.$router.beforeResolve(async to => {
+            $this.pageLoading = true;
 
             const routeComponent = to.matched[0]?.components?.default;
 
@@ -139,7 +141,7 @@ const routerMixin = {
                 routeComponent.template = await this.getHtmlContent(to.name);
                 routeComponent.template = routeComponent.template.replaceAll('@@', '@');
             }
-            thisApp.pageLoading = false;
+            $this.pageLoading = false;
         })
     },
     methods: {

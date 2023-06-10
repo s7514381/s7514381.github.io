@@ -18,16 +18,21 @@ namespace HtmlCenter.Controllers
         }
 
         public async Task RenderView(string renderController, string renderAction, ViewDataDictionary viewData)
-        {
+        {          
             string renderString = await _viewRenderService.RenderToStringAsync(ViewRenderResult(renderAction, renderController), viewData);
+            await WriteFile(renderController, renderString);
+        }
 
+        public async Task WriteFile(string renderController, string renderString, string fileName = "")
+        {
             string renderPath = _configuration.GetValue<string>("RenderPath");
             if (!string.IsNullOrEmpty(renderController) && renderController != "Home") { renderPath += $@"\{renderController.ToLower()}"; }
 
             if (!Directory.Exists(renderPath))
                 Directory.CreateDirectory(renderPath);
 
-            string path = $@"{renderPath}\index.htm";
+            if (!string.IsNullOrEmpty(fileName)) { fileName = $@"\{fileName}"; }
+            string path = $@"{renderPath}{fileName}\index.htm";
 
             using (FileStream fs = System.IO.File.Create(path))
             {
@@ -48,6 +53,9 @@ namespace HtmlCenter.Controllers
             foreach (ControllerAction controllerAction in renderControllers) {
                 string controllerName = controllerAction.Controller.Replace("Controller", "");
                 await RenderView(controllerName, "Index", ViewData);
+
+                string htmlContent = HtmlContentString(controllerName);
+                await WriteFile(controllerName, htmlContent, "HtmlCenter");
             }
             return RedirectToAction("Index");
         }

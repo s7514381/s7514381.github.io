@@ -70,21 +70,24 @@ namespace HtmlCenter.Controllers
             return View(ViewRenderResult());
         }
 
-        [HttpGet]
         public IActionResult HtmlContent()
         {
-            string path = Path.Combine("Views", CurrentController, "Index.cshtml");
+            return Json(HtmlContentString());
+        }
+
+        public string HtmlContentString(string controllerName = "")
+        {
+            if (string.IsNullOrEmpty(controllerName)) { controllerName = CurrentController; }
+
+            string path = Path.Combine("Views", controllerName, "Index.cshtml");
             IFileInfo fileInfo = _fileProvider.GetFileInfo(path);
 
-            if (!fileInfo.Exists)
-            {
-                return NotFound();
-            }
+            if (!fileInfo.Exists) { return ""; }
 
             using (StreamReader reader = new StreamReader(fileInfo.CreateReadStream()))
             {
                 string content = reader.ReadToEnd();
-                return Json(content);
+                return content;
             }
         }
 

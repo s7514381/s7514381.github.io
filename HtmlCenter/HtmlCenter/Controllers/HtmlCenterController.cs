@@ -54,19 +54,15 @@ namespace HtmlCenter.Controllers
                 string controllerName = controllerAction.Controller.Replace("Controller", "");
                 string renderString = await _viewRenderService.RenderToStringAsync(ViewRenderResult("Index", controllerName), ViewData);
                 await WriteFile(controllerName, renderString);
-                //await RenderView(controllerName, "Index", ViewData);
 
-                if (controllerName == "Home") {
-                    //首頁另外做
+                //首頁另外做
+                if (controllerName == "Home")
                     await WriteFile("", renderString);
-                }
 
                 string htmlContent = HtmlContentString(controllerName);
                 await WriteFile(controllerName, htmlContent, "htmlContent");
             }
-
-            
-            return Content("爽拉成功");
+            return RedirectToAction("Index", "Home");
         }
 
         public void CopyDirectory(string fromPath, string toPath) 

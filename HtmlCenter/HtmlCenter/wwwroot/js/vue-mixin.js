@@ -152,3 +152,136 @@ const routerMixin = {
         }
     },
 }
+
+const baseMixin = {
+    mixins: [firestoreMixin, realtimeDbMixin],
+    data() {
+        return {
+            pageTitle: '',
+            Layout: {
+                headTitle: document.getElementsByTagName("title")[0].innerHTML,
+            },
+            authInfo: {
+                ready: false,
+                user: null,
+            },
+            visitId: null,
+            connection: {
+                name: 'connections',
+                users: [],
+                ready: false,
+            },
+            IpClient: null,
+        }
+    },
+    computed: {
+        hasAuth() { return this.authInfo.user != null; },
+    },
+    methods: {
+        async websiteInit() {
+
+        },
+        async getIpClient() {
+            let $this = this;
+
+            if (!this.IpClient) {
+                await axios.get(`https://api.ipify.org?format=json`).then(function (res) {
+                    $this.IpClient = res.data
+                });
+            }
+            return this.IpClient;
+        },
+        resetUserConnection: async function (userInfo, removeId) {
+            let { removeConnection } = await this.getRealtimeDb();
+
+            removeConnection(this.connection.name, removeId);
+            this.userConnection(userInfo);
+        },
+        userConnection: async function (userInfo) {
+            let $this = this;
+            let { addConnection, serverTimestamp } = await this.getRealtimeDb();
+            let users = this.connection.users;
+
+            let hasAuth = userInfo != null;
+            let uid = hasAuth ? userInfo.uid : this.visitId;
+            //let ipClien = await this.getIpClient();
+            let connectModel = {
+                key: uid,
+                displayName: hasAuth ? userInfo.displayName : "訪客",
+                email: hasAuth ? userInfo.email : '',
+                timestamp: serverTimestamp(),
+                createDate: new Date(),
+                //ip: ipClien.ip,
+            };
+
+            addConnection(this.connection.name, uid, connectModel, async (snapshot) => {
+                //onChildAdded
+                //這邊只做連線數增減
+                let connectId = snapshot.key;
+                let childData = snapshot.val();
+                let filterArray = users.filter(x => x.key == childData.key);
+                let user = $this.getObject(users, 'key', filterArray[0]?.key);
+                let hasConnectId = user.connectIds.includes(connectId);
+
+                if (!hasConnectId) { user.connectIds.push(connectId); }
+            }, async (snapshot) => {
+                //onChildAdded
+                //這邊只做連線數增減
+                let connectId = snapshot.key;
+                let childData = snapshot.val();
+                let filterArray = users.filter(x => x.key == childData.key);
+                let user = $this.getObject(users, 'key', filterArray[0]?.key);
+                let connectIndex = user.connectIds.indexOf(connectId);
+
+                if (connectIndex != -1) { user.connectIds.splice(connectIndex, 1) }
+            });
+
+            let ipClien = await this.getIpClient();
+            connectModel["ip"] = ipClien.ip;
+            $this.dbInsert("ConnectLog", connectModel);
+        },
+        signIn: async function () {
+            let { googleSignIn, getAuth } = await this.getDbAssembly();
+            result = await googleSignIn();
+            this.authInfo.user = result.user;
+
+            this.resetUserConnection(this.authInfo.user, this.visitId);
+        },
+        signOut: async function () {
+            let $this = this;
+            if (!confirm("是否要登出?")) { return false; }
+
+            let uid = this.authInfo.user.uid;
+
+            let { getAuth, signOut } = await this.getDbAssembly();
+            const auth = getAuth();
+
+            await signOut(auth).then(() => {
+                $this.authInfo.user = null;
+            }).catch((error) => {
+                console.log(error)
+            });
+
+            this.resetUserConnection(null, uid);
+        },
+        newGuid: function () {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        },
+        setHeadTitle(title) {
+            if (!title) { return; }
+            document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + this.Layout.headTitle;
+        },
+        getObject(list, keyField, key) {
+            let result = null;
+            for (let i = 0; i < list.length; i++) {
+                let data = list[i];
+                if (data[keyField] == key) { result = data; break; }
+            }
+            return result;
+        },
+    },
+    watch: {
+    }
+}

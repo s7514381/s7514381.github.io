@@ -14,9 +14,17 @@ namespace HtmlCenter.Controllers
         public UnityWebGLController(BaseControllerArgument argument, ILogger<UnityWebGLController> logger): base(argument)
         {
             _logger = logger;
-
         }
 
+        public IActionResult Index()
+        {
+            return View(ViewRenderResult());
+        }
+
+        public IActionResult HtmlContent()
+        {
+            return Json(HtmlContentString());
+        }
 
     }
 }

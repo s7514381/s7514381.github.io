@@ -25,14 +25,15 @@ namespace HtmlCenter.Controllers
 
         public async Task WriteFile(string renderController, string renderString, string fileName = "")
         {
-            string renderPath = _configuration.GetValue<string>("RenderPath");
+            string renderPath = RenderPath;
+            
             if (!string.IsNullOrEmpty(renderController) && renderController != "Home") { renderPath += $@"\{renderController.ToLower()}"; }
+            if (!string.IsNullOrEmpty(fileName)) { renderPath += $@"\{fileName}"; }
 
             if (!Directory.Exists(renderPath))
                 Directory.CreateDirectory(renderPath);
 
-            if (!string.IsNullOrEmpty(fileName)) { fileName = $@"\{fileName}"; }
-            string path = $@"{renderPath}{fileName}\index.htm";
+            string path = $@"{renderPath}\index.htm";
 
             using (FileStream fs = System.IO.File.Create(path))
             {
@@ -43,9 +44,8 @@ namespace HtmlCenter.Controllers
 
         public async Task<IActionResult> UpdateRenderView() 
         {
-            string formDirectory = @"C:\Users\s7514\source\repos\s7514381.github.io\HtmlCenter\HtmlCenter\wwwroot";
-            string toDirectory = _configuration.GetValue<string>("RenderPath");
-            CopyDirectory(formDirectory, toDirectory);
+            string formDirectory = $@"{RenderPath}\HtmlCenter\HtmlCenter\wwwroot";
+            CopyDirectory(formDirectory, RenderPath);
 
             List<ControllerAction> ControllerActionList = GetControllerActionList();
             var renderControllers = ControllerActionList.Where(x => x.Action == "Index").ToList();
@@ -55,9 +55,9 @@ namespace HtmlCenter.Controllers
                 await RenderView(controllerName, "Index", ViewData);
 
                 string htmlContent = HtmlContentString(controllerName);
-                await WriteFile(controllerName, htmlContent, "HtmlCenter");
+                await WriteFile(controllerName, htmlContent, "htmlContent");
             }
-            return RedirectToAction("Index");
+            return Content("爽喔成功");
         }
 
         public void CopyDirectory(string fromPath, string toPath) 

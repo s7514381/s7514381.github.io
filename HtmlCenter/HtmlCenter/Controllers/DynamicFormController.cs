@@ -15,5 +15,16 @@ namespace HtmlCenter.Controllers
         {
             _logger = logger;
         }
+
+        public IActionResult Index()
+        {
+            return View(ViewRenderResult());
+        }
+
+        public IActionResult HtmlContent()
+        {
+            return Json(HtmlContentString());
+        }
+
     }
 }

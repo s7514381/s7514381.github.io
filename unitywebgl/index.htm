@@ -16,176 +16,19 @@
     <script src="/lib/Sortable/Sortable.min.js"></script>
     <script src="/lib/vue/vuedraggable.umd.min.js"></script>
     <script src="/lib/axios/unpkg.com_axios@1.4.0_dist_axios.min.js"></script>
+    <script src="https://unpkg.com/vue-router@4.2.2/dist/vue-router.global.js"></script>
 
-    <script src="/js/site.js?v=OhHmNc6vPOK-VgWjAenf8kmOoXXoyR2DVYUeYA7Pppo"></script>
-    <script src="/js/vue-mixin.js?v=oGfWI9PcHSdqrbXA3KFuR81xwNZJbZRyKX3N4ouSDo4"></script>
+    <script src="/js/site.js?v=Muh2GW02FnMi0PppBzamzgcE4rZw00z-fphZP9e142c"></script>
+    <script src="/js/vue-mixin.js?v=k6KlUFhAw4VmVBtuRPTVSXTlPJfAuSRv6kQgUPRTWKo"></script>
 </head>
 
 <body id="app">
-    <script>
-        var thisApp;
-        var component;
-
-        const baseMixin = {
-            mixins: [firestoreMixin, realtimeDbMixin],
-            data() {
-                return {
-                    Layout: {
-                        headTitle: document.getElementsByTagName("title")[0].innerHTML,
-                    },
-                    authInfo: {
-                        ready: false,
-                        user: null,
-                    },
-                    visitId: null,
-                    connection: {
-                        name: 'connections',
-                        users: [],
-                        ready: false,
-                    },
-                    IpClient: null,
-                }
-            },
-            beforeCreate() {
-                thisApp = this;
-            },
-            async created() {
-                thisApp.visitId = thisApp.newGuid();
-                thisApp.setHeadTitle(thisApp.pageTitle)
-
-                let { waitForAuthStateChange } = await thisApp.getDbAssembly();
-                thisApp.authInfo.user = await waitForAuthStateChange();
-                thisApp.authInfo.ready = true;
-                await thisApp.getIpClient();
-
-                let { dbConnection } = await thisApp.getRealtimeDb();
-                thisApp.connection.users = [];
-                dbConnection(thisApp.connection.name, async (childData) => {
-                    //onValue(once)
-                    //不知道為甚麼初始讀資料會在add也觸發一次，直接在那邊做
-                    thisApp.userConnection(thisApp.authInfo.user);
-                }, async (childData) => {
-                    //onChildAdded
-                    let keyArray = Object.keys(childData);
-                    let user = childData[keyArray[0]];
-                    user["connectIds"] = keyArray;
-
-                    thisApp.connection.users.push(user)
-                    if (!thisApp.connection.ready) { thisApp.connection.ready = true; }
-                }, async (childData) => {
-                    //onChildRemoved
-                    let users = thisApp.connection.users;
-                    let keyArray = Object.keys(childData);
-                    let user = childData[keyArray[0]];
-                    user = thisApp.getObject(users, 'key', user.key)
-
-                    users.splice(users.indexOf(user), 1);
-                })
-            },
-            computed: {
-                hasAuth() { return thisApp.authInfo.user != null; },
-            },
-            methods: {
-                async getIpClient(){
-                    if (!thisApp.IpClient) { thisApp.IpClient = await axios.get('https://api.ipify.org?format=json'); }
-                    return thisApp.IpClient;
-                },
-                resetUserConnection: async function (userInfo, removeId) {
-                    let { removeConnection } = await thisApp.getRealtimeDb();
-
-                    removeConnection(thisApp.connection.name, removeId);
-                    thisApp.userConnection(userInfo);
-                },
-                userConnection: async function (userInfo) {
-                    let { addConnection, serverTimestamp } = await thisApp.getRealtimeDb();
-                    let users = thisApp.connection.users;
-
-                    let hasAuth = userInfo != null;
-                    let uid = hasAuth ? userInfo.uid : thisApp.visitId;
-                    let ipClien = await thisApp.getIpClient();
-                    let connectModel = {
-                        key: uid,
-                        displayName: hasAuth ? userInfo.displayName : "訪客",
-                        email: hasAuth ? userInfo.email : '',
-                        timestamp: serverTimestamp(),
-                        createDate: new Date(),
-                        ip: ipClien.data.ip,
-                    };
-
-                    addConnection(thisApp.connection.name, uid, connectModel, async (snapshot) => {
-                        //onChildAdded
-                        //這邊只做連線數增減
-                        let connectId = snapshot.key;
-                        let childData = snapshot.val();
-                        let filterArray = users.filter(x => x.key == childData.key);
-                        let user = thisApp.getObject(users, 'key', filterArray[0]?.key);
-                        let hasConnectId = user.connectIds.includes(connectId);
-
-                        if (!hasConnectId) { user.connectIds.push(connectId); }
-                    }, async (snapshot) => {
-                        //onChildAdded
-                        //這邊只做連線數增減
-                        let connectId = snapshot.key;
-                        let childData = snapshot.val();
-                        let filterArray = users.filter(x => x.key == childData.key);
-                        let user = thisApp.getObject(users, 'key', filterArray[0]?.key);
-                        let connectIndex = user.connectIds.indexOf(connectId);
-
-                        if (connectIndex != -1) { user.connectIds.splice(connectIndex, 1) }
-                    });
-                    thisApp.dbInsert("ConnectLog", connectModel);
-                },
-                signIn: async function () {
-                    let { googleSignIn, getAuth } = await thisApp.getDbAssembly();
-                    result = await googleSignIn();
-                    thisApp.authInfo.user = result.user;
-
-                    thisApp.resetUserConnection(thisApp.authInfo.user, thisApp.visitId);
-                },
-                signOut: async function () {
-                    if (!confirm("是否要登出?")) { return false; }
-
-                    let uid = thisApp.authInfo.user.uid;
-
-                    let { getAuth, signOut } = await thisApp.getDbAssembly();
-                    const auth = getAuth();
-
-                    await signOut(auth).then(() => {
-                        thisApp.authInfo.user = null;
-                    }).catch((error) => {
-                        console.log(error)
-                    });
-
-                    thisApp.resetUserConnection(null, uid);
-                },
-                newGuid: function () {
-                    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-                        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-                    );
-                },
-                setHeadTitle(title) {
-                    if (!title) { return; }
-                    document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + thisApp.Layout.headTitle;
-                },
-                getObject(list, keyField, key) {
-                    let result = null;
-                    for (let i = 0; i < list.length; i++) {
-                        let data = list[i];
-                        if (data[keyField] == key) { result = data; break; }
-                    }
-                    return result;
-                },
-            },
-            watch: {
-            }
-        }
-    </script>
-
     <header>
         <div style="display:contents"></div>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold fs-3 logo-text" href="/">Github重劃區</a>
+                <router-link to="/" class="navbar-brand fw-bold fs-3 logo-text">Github重劃區</router-link>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -193,22 +36,22 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item me-3 px-2">
-                            <a class="nav-link text-dark" href="/imagecoverframe">圖片框選器</a>
+                            <router-link to="/imagecoverframe" class="nav-link text-dark">圖片框選器</router-link>
                         </li>
                         <li class="nav-item me-3 px-2">
-                            <a class="nav-link text-dark" href="/dynamicform">動態表單v1.0</a>
+                            <router-link to="/dynamicform" class="nav-link text-dark">動態表單v1.0</router-link>
                         </li>
                         <li class="nav-item me-3 px-2">
-                            <a class="nav-link text-dark" href="/interest">利息計算機</a>
+                            <router-link to="/interest" class="nav-link text-dark">利息計算機</router-link>
                         </li>
                         <li class="nav-item me-3 px-2">
-                            <a class="nav-link text-dark" href="/unitywebgl">Unity遊戲</a>
+                            <router-link to="/unitywebgl" class="nav-link text-dark">Unity遊戲</router-link>
                         </li>
                         <li class="nav-item me-3 px-2">
-                            <a class="nav-link text-dark" href="/aboutme">關於我</a>
+                            <router-link to="/aboutme" class="nav-link text-dark">關於我</router-link>
                         </li>
                     </ul>
-
+                    
                     <ul class="navbar-nav flex-grow-1" style="justify-content: flex-end">
                         <li class="nav-item me-3 px-2">
                             <div v-if="authInfo.ready">
@@ -222,38 +65,18 @@
             </div>
         </nav>
     </header>
+
     <div class="container header-margin">
-        <main role="main" class="pb-3">
-            
-<p class="fw-bold fs-5 title-text">遊戲下載</p>
-<div class="card shadow-sm mb-3">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-12 col-lg-4 d-flex flex-center">
-                <a href="/file/unity.zip">練習編寫unity遊戲(尚在製作中)</a>
-            </div>
-            <div class="col-12 col-lg-8">
-                <img src="/image/wdc.jpg" style="max-width: 100%; height: auto;" />
-            </div>
-        </div>
-        
-    </div>
-</div>
-
-
+        <main role="main" class="pb-3" style="min-height: 75vh;">
+            <router-view v-if="!pageLoading"></router-view>
         </main>
     </div>
-
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2023 - Github - <a style="color: #6c757d" href="/Home/UpdateRenderView">更新</a>
+            &copy; 2023 - Github - <a style="color: #6c757d" href="/HtmlCenter/UpdateRenderView">更新</a>
         </div>
     </footer>
 
-    <script>
-        var vApp = formComponent.mount('#app')
-    </script>
-
-
+    <script src="/js/vue-component/index.js"></script>
 </body>
 </html>

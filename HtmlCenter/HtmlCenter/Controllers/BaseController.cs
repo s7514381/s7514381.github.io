@@ -32,6 +32,7 @@ namespace HtmlCenter.Controllers
         private readonly IFileProvider _fileProvider;
         protected ILogger _logger;
 
+        public string RenderPath;
         protected string WebRootPath => _hostingEnvironment.WebRootPath;
 
         // 請將所以有要注入的參數整合進 BaseControllerArgument
@@ -41,6 +42,7 @@ namespace HtmlCenter.Controllers
             _configuration = argument.Configuration;
             _viewRenderService = argument.ViewRenderService;
             _fileProvider = argument.FileProvider;
+            RenderPath = _configuration.GetValue<string>("RenderPath");
         }
 
         /// <summary>
@@ -63,16 +65,6 @@ namespace HtmlCenter.Controllers
             {
                 return ControllerContext.RouteData.Values["action"]?.ToString() ?? "";
             }
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
         }
 
         public string HtmlContentString(string controllerName = "")

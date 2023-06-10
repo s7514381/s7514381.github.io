@@ -17,5 +17,15 @@ namespace HtmlCenter.Controllers
 
         }
 
+        public IActionResult Index()
+        {
+            return View(ViewRenderResult());
+        }
+
+        public IActionResult HtmlContent()
+        {
+            return Json(HtmlContentString());
+        }
+
     }
 }

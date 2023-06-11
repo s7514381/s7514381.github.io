@@ -27,7 +27,7 @@
     <script src="/js/vue-mixin.js" asp-append-version="true"></script>
 </head>
 
-<body id="app">
+<body id="app" >
     <header>
         <div style="display:contents"></div>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
@@ -61,16 +61,16 @@
         </nav>
     </header>
 
-    <div class="container header-margin">
-        <main role="main" class="pb-3" style="min-height: 75vh;">
+    <div @@mousemove="handleMouseMove" class="container header-margin">
+        <main role="main">
             <router-view v-if="!pageLoading"></router-view>
         </main>
     </div>
-    <footer class="border-top footer text-muted">
+    @*<footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2023 - Github - <a asp-controller="HtmlCenter" asp-action="UpdateRenderView" style="color: #6c757d">更新</a>
         </div>
-    </footer>
+    </footer>*@
 
     <script src="/js/vue-component/index.js"></script>
 </body>

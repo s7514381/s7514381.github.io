@@ -1,5 +1,4 @@
 ﻿
-
 const dragMixin = {
     data() {
         return {
@@ -203,12 +202,25 @@ const threadMixin = {
 }
 
 const baseMixin = {
-    mixins: [],
+    mixins: [firestoreMixin, realtimeDbMixin],
     data() {
         return {
         }
     },
     methods: {
+        async getAuthUser() {
+            let $this = this;
+
+            return new Promise(async (resolve, reject) => {
+                if (!$this.authInfo.ready) {
+                    let { waitForAuthStateChange } = await $this.getDbAssembly();
+                    let authUser = await waitForAuthStateChange();
+                    $this.authInfo.user = authUser;
+                    $this.authInfo.ready = true;
+                }
+                resolve($this.authInfo.user)
+            });
+        },
         async getIpClient() {
             let $this = this;
 
@@ -309,5 +321,65 @@ const baseMixin = {
             }
             return result;
         },
+    },
+}
+
+const mouseSyncMixin = {
+    data() {
+        return {
+            mouseSync: {
+                ready: false,
+                realtimeDb: null,
+                connectName: 'mouseSync',
+                userId: '',
+                ref: null,
+                workable: true,
+                delay: 100,
+                userMouse: [],
+            },
+        }
+    },
+    async created() {
+        let $this = this;
+        let model = this.mouseSync;
+
+        let { dbConnection } = await this.getRealtimeDb();
+        dbConnection(model.connectName, null, null, null, async (snapshot) => {
+            if (snapshot.key == $this.authInfo.user.uid) return;
+
+            let childData = snapshot.val();
+            let user1 = $this.getObject(model.userMouse, 'uid', snapshot.key)
+            if (user1) {
+                user1.x = childData.x;
+                user1.y = childData.y;
+            } else {
+                model.userMouse.push({
+                    uid: snapshot.key,
+                    x: childData.x,
+                    y: childData.y,
+                })
+            }
+        })
+    },
+    methods: {
+        handleMouseMove(event) {
+            let model = this.mouseSync;
+            if (!model.ready) { return; }
+
+            let { setRef } = model.realtimeDb;
+            if (model.workable) {
+                setRef(`${model.connectName}/${model.userId}`, {
+                    x: event.clientX,
+                    y: event.clientY
+                })
+                if (model.delay > 0) {
+                    model.workable = false;
+
+                    setTimeout(function () {
+                        model.workable = true;
+                    }, model.delay)
+                }
+            }
+        }
     },
 }

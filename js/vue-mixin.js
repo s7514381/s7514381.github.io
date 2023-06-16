@@ -366,12 +366,8 @@ const mouseSyncMixin = {
                 user1.x = childData.x;
                 user1.y = childData.y;
             } else {
-                model.userMouse.push({
-                    uid: snapshot.key,
-                    name: model.userName,
-                    x: childData.x,
-                    y: childData.y,
-                })
+                childData["uid"] = snapshot.key;
+                model.userMouse.push(childData)
             }
         })
     },
@@ -384,7 +380,8 @@ const mouseSyncMixin = {
             if (model.workable) {
                 setRef(`${model.connectName}/${model.userId}`, {
                     x: event.clientX,
-                    y: event.clientY
+                    y: event.clientY,
+                    name: model.userName,
                 })
                 
                 if (model.delay > 0) {

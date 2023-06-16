@@ -12,7 +12,6 @@
         $this.mouseSync.ready = true;
         $this.mouseSync.userId = authUser.uid;
         $this.mouseSync.userName = authUser.displayName;
-        console.log($this.mouseSync)
     },
     methods: {
 

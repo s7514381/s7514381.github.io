@@ -1,15 +1,11 @@
 ﻿
 const appComponent = Vue.createApp({
-    mixins: [baseMixin, firestoreMixin, realtimeDbMixin, threadMixin, routerMixin],
+    mixins: [connectMixin, threadMixin, routerMixin],
     data() {
         return {
             pageTitle: '',
             Layout: {
                 headTitle: document.getElementsByTagName("title")[0].innerHTML,
-            },
-            authInfo: {
-                ready: false,
-                user: null,
             },
             visitId: null,
             connection: {
@@ -34,26 +30,28 @@ const appComponent = Vue.createApp({
         this.visitId = this.newGuid();
         this.setHeadTitle(this.pageTitle)
 
-        let { waitForAuthStateChange } = await $this.getDbAssembly();
-        $this.authInfo.user = await waitForAuthStateChange();
+        let authUser = await $this.getAuthUser();
+        $this.authInfo.user = authUser;
         $this.authInfo.ready = true;
-
+        
         let { dbConnection } = await $this.getRealtimeDb();
         $this.connection.users = [];
-        dbConnection($this.connection.name, async (childData) => {
+        dbConnection($this.connection.name, async (snapshot) => {
             //onValue(once)
             //不知道為甚麼初始讀資料會在add也觸發一次，直接在那邊做
             $this.userConnection($this.authInfo.user);
-        }, async (childData) => {
+        }, async (snapshot) => {
             //onChildAdded
+            let childData = snapshot.val();
             let keyArray = Object.keys(childData);
             let user = childData[keyArray[0]];
             user["connectIds"] = keyArray;
 
             $this.connection.users.push(user)
             if (!$this.connection.ready) { $this.connection.ready = true; }
-        }, async (childData) => {
+        }, async (snapshot) => {
             //onChildRemoved
+            let childData = snapshot.val();
             let users = $this.connection.users;
             let keyArray = Object.keys(childData);
             let user = childData[keyArray[0]];
@@ -61,12 +59,13 @@ const appComponent = Vue.createApp({
 
             users.splice(users.indexOf(user), 1);
         })
+
     },
     computed: {
         hasAuth() { return this.authInfo.user != null; },
     },
     methods: {
-
+        
     },
 });
 

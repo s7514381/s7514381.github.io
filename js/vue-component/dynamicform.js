@@ -1,6 +1,6 @@
 ﻿let thisApp;
 
-export const component = {
+export default {
     mixins: [baseMixin, dragMixin],
     components: {
         'draggable': vuedraggable,

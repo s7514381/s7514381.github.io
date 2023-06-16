@@ -20,22 +20,21 @@ function dbConnection(dbName, valueFunc = null, addFunc = null, removeFunc = nul
 
     if (addFunc) {
         onChildAdded(connectionsRef, async (snapshot) => {
-            await addFunc(snapshot.val());
+            await addFunc(snapshot);
         });
     }
 
     if (removeFunc) {
         onChildRemoved(connectionsRef, async (snapshot) => {
-            await removeFunc(snapshot.val())
+            await removeFunc(snapshot)
         });
     }
     
     if (updateFunc) {
         onChildChanged(connectionsRef, async (snapshot) => {
-            await updateFunc(snapshot.val());
+            await updateFunc(snapshot);
         });
     }
- 
 }
 
 // 添加用戶連接
@@ -64,11 +63,21 @@ function addConnection(dbName, userId, data, addFunc = null, removeFunc = null, 
     }
 }
 
+function getRef(connectName) {
+    return ref(db, connectName);
+}
+
+function setRef(connectName, data) {
+    const con = getRef(connectName)
+    onDisconnect(con).remove()
+    set(con, data);
+}
+
 async function removeConnection(dbName, userId) {
     await remove(ref(db, `${dbName}/${userId}`))
 }
 
 
 export const exportModel = {
-    addConnection, dbConnection, serverTimestamp, onDisconnect, removeConnection
+    addConnection, dbConnection, serverTimestamp, onDisconnect, removeConnection, getRef, setRef
 }

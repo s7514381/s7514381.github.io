@@ -7,7 +7,7 @@
     <title>自由發揮 園丁Tim</title>
     <link rel="stylesheet" href="/lib/bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.2.3_dist_css_bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="/css/site.css?v=X2JJl5Dum08pcQu8t3L9V51amNl2ut9_-Y-BPGeEEpI" />
+    <link rel="stylesheet" href="/css/site.css?v=z5Viv5Jv_ylEyRiEYirhKJvmtG_fs0O5hLKW6DFFiio" />
     <link rel="stylesheet" href="/css/image-cover-frame.css?v=LndOvmdvYvfNGZ_Xby9XErY0d5p_LhPwLQ90eOPSTYg" />
     <link rel="stylesheet" href="/css/dynamic-form.css?v=kHNWcsTiItzqiDc_ryxKuhJWXoUb9-TTxkcO2nCvOSU" />
 
@@ -19,7 +19,7 @@
     <script src="https://unpkg.com/vue-router@4.2.2/dist/vue-router.global.js"></script>
 
     <script src="/js/site.js?v=Muh2GW02FnMi0PppBzamzgcE4rZw00z-fphZP9e142c"></script>
-    <script src="/js/vue-mixin.js?v=xyYGd0m9s0QiFAi4WEuJ_7Y_sLeXur2InfCeJIAi3EE"></script>
+    <script src="/js/vue-mixin.js?v=hnRL2egdtxbkDAdikELCYGWAKFBLz1TNlEewwFIKOYQ"></script>
 </head>
 
 <body id="app">
@@ -27,7 +27,7 @@
         <div style="display:contents"></div>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
             <div class="container-fluid">
-                <router-link to="/" class="navbar-brand fw-bold fs-3 logo-text">Github重劃區</router-link>
+                <router-link to="/" class="navbar-brand fw-bold fs-3 logo-text">園丁Tim</router-link>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -56,16 +56,11 @@
         </nav>
     </header>
 
-    <div class="container header-margin">
-        <main role="main" class="pb-3" style="min-height: 75vh;">
+    <div class="container header-margin" >
+        <main role="main">
             <router-view v-if="!pageLoading"></router-view>
         </main>
     </div>
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - Github - <a style="color: #6c757d" href="/HtmlCenter/UpdateRenderView">更新</a>
-        </div>
-    </footer>
 
     <script src="/js/vue-component/index.js"></script>
 </body>

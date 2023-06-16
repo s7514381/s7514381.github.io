@@ -1,4 +1,24 @@
-﻿
+﻿const baseMixin = {
+    methods: {
+        newGuid: function () {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        },
+        setHeadTitle(title) {
+            if (!title) { return; }
+            document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + this.Layout.headTitle;
+        },
+        getObject(list, keyField, key) {
+            let result = null;
+            for (let i = 0; i < list.length; i++) {
+                let data = list[i];
+                if (data[keyField] == key) { result = data; break; }
+            }
+            return result;
+        },
+    },
+}
 
 const dragMixin = {
     data() {
@@ -135,9 +155,10 @@ const routerMixin = {
                     case "imagecoverframe":
                     case "dynamicform":
                     case "interest":
+                    case "chat":
                         //客製化
                         let importPath = `/js/vue-component/${controllerName}.js?timestamp=${Date.now()}`
-                        await import(importPath).then(module => { component = module.component })
+                        await import(importPath).then(module => { component = module.default })
                         break;
                     default:
                         component = { data() { return $this.$data; }, template: null };
@@ -159,8 +180,10 @@ const routerMixin = {
             const routeComponent = to.matched[0]?.components?.default;
 
             if (routeComponent && !routeComponent?.template) {
-                routeComponent.template = await this.getHtmlContent(to.name);
-                routeComponent.template = routeComponent.template.replaceAll('@@', '@');
+                let htmlContent = await this.getHtmlContent(to.name);
+                htmlContent = htmlContent.replaceAll('@@', '@');
+
+                routeComponent.template = htmlContent;
             }
             $this.pageLoading = false;
         })
@@ -202,13 +225,30 @@ const threadMixin = {
     },
 }
 
-const baseMixin = {
-    mixins: [],
+const connectMixin = {
+    mixins: [baseMixin, firestoreMixin, realtimeDbMixin],
     data() {
         return {
+            authInfo: {
+                ready: false,
+                user: null,
+            },
         }
     },
     methods: {
+        async getAuthUser() {
+            let $this = this;
+
+            return new Promise(async (resolve, reject) => {
+                if (!$this.authInfo.ready) {
+                    let { waitForAuthStateChange } = await $this.getDbAssembly();
+                    let authUser = await waitForAuthStateChange();
+                    $this.authInfo.user = authUser;
+                    $this.authInfo.ready = true;
+                }
+                resolve($this.authInfo.user)
+            });
+        },
         async getIpClient() {
             let $this = this;
 
@@ -263,7 +303,7 @@ const baseMixin = {
             });
 
             //ip可能會非常慢，只能另外處理，不然會卡畫面
-            let ipClien = await this.getIpClient(); 
+            let ipClien = await this.getIpClient();
             connectModel = this.getObject(users, 'key', connectModel.key);
             connectModel["ip"] = ipClien.ip;
             $this.dbInsert("ConnectLog", connectModel);
@@ -292,22 +332,69 @@ const baseMixin = {
 
             this.resetUserConnection(null, uid);
         },
-        newGuid: function () {
-            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-            );
-        },
-        setHeadTitle(title) {
-            if (!title) { return; }
-            document.getElementsByTagName("title")[0].innerHTML = title + ' - ' + this.Layout.headTitle;
-        },
-        getObject(list, keyField, key) {
-            let result = null;
-            for (let i = 0; i < list.length; i++) {
-                let data = list[i];
-                if (data[keyField] == key) { result = data; break; }
+    },
+}
+
+const mouseSyncMixin = {
+    mixins: [realtimeDbMixin],
+    data() {
+        return {
+            mouseSync: {
+                ready: false,
+                realtimeDb: null,
+                connectName: 'mouseSync',
+                userId: '',
+                userName: '', 
+                ref: null,
+                workable: true,
+                delay: 100,
+                userMouse: [],
+            },
+        }
+    },
+    async created() {
+        let $this = this;
+        let model = this.mouseSync;
+
+        let { dbConnection } = await this.getRealtimeDb();
+        dbConnection(model.connectName, null, null, null, async (snapshot) => {
+            if (snapshot.key == model.userId) return;
+
+            let childData = snapshot.val();
+            let user1 = $this.getObject(model.userMouse, 'uid', snapshot.key)
+            if (user1) {
+                user1.x = childData.x;
+                user1.y = childData.y;
+            } else {
+                model.userMouse.push({
+                    uid: snapshot.key,
+                    name: model.userName,
+                    x: childData.x,
+                    y: childData.y,
+                })
             }
-            return result;
-        },
+        })
+    },
+    methods: {
+        mouseMove(event) {
+            let model = this.mouseSync;
+            if (!model.ready) { return; }
+
+            let { setRef } = model.realtimeDb;
+            if (model.workable) {
+                setRef(`${model.connectName}/${model.userId}`, {
+                    x: event.clientX,
+                    y: event.clientY
+                })
+                
+                if (model.delay > 0) {
+                    model.workable = false;
+
+                    setTimeout(function () {
+                        model.workable = true;
+                    }, model.delay)
+                }
+            }
+        }
     },
 }

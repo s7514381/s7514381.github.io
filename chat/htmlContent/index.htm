@@ -1,1 +1,11 @@
-努力製作中
+
+<div class="fill-parent card" @@mousemove="mouseMove">
+
+    <span v-for="v in mouseSync.userMouse"
+          class="user-mouse"
+          style="position:fixed; z-index:1"
+          :style="{top: v.y + 'px', left: v.x + 'px'}">
+        {{v.name}}
+    </span>
+
+</div>

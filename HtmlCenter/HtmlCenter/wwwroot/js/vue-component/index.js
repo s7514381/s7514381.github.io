@@ -1,6 +1,12 @@
 ﻿
+import {
+    baseMixin, dragMixin, realtimeDbMixin, firestoreMixin, routerMixin, threadMixin
+    , connectMixin, mouseSyncMixin, publicComponents
+} from '../vue-mixin.js'
+
 const appComponent = Vue.createApp({
     mixins: [connectMixin, threadMixin, routerMixin],
+    components: publicComponents,
     data() {
         return {
             pageTitle: '',

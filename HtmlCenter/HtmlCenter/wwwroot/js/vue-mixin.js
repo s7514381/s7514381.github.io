@@ -1,4 +1,26 @@
-﻿const baseMixin = {
+﻿
+import chat from '../js/vue-component/chat.js'
+
+export const publicComponents = {
+    'v-chat': chat
+}
+
+//套用此Mixin之後可以直接使用v-model="value"
+export const bindModelMixin = {
+    emits: ['update:modelValue'],
+    computed: {
+        value: {
+            get() {
+                return this.modelValue
+            },
+            set(value) {
+                this.$emit('update:modelValue', value)
+            }
+        }
+    },
+}
+
+export const baseMixin = {
     methods: {
         newGuid: function () {
             return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -20,7 +42,7 @@
     },
 }
 
-const dragMixin = {
+export const dragMixin = {
     data() {
         return {
         }
@@ -44,7 +66,7 @@ const dragMixin = {
     }
 }
 
-const realtimeDbMixin = {
+export const realtimeDbMixin = {
     data() {
         return {
             realtimeDb: null,
@@ -66,7 +88,7 @@ const realtimeDbMixin = {
     }
 }
 
-const firestoreMixin = {
+export const firestoreMixin = {
     data() {
         return {
             dbAssembly: {
@@ -114,7 +136,7 @@ const firestoreMixin = {
     }
 }
 
-const routerMixin = {
+export const routerMixin = {
     data() {
         return {
             pageLoading: false,
@@ -155,13 +177,14 @@ const routerMixin = {
                     case "imagecoverframe":
                     case "dynamicform":
                     case "interest":
-                    case "chat":
                         //客製化
                         let importPath = `/js/vue-component/${controllerName}.js?timestamp=${Date.now()}`
                         await import(importPath).then(module => { component = module.default })
                         break;
                     default:
-                        component = { data() { return $this.$data; }, template: null };
+                        component = {
+                            data() { return $this.$data; }, components: publicComponents, template: null
+                        };
                         break;
                 }
 
@@ -197,7 +220,7 @@ const routerMixin = {
     },
 }
 
-const threadMixin = {
+export const threadMixin = {
     methods: {
         async runThreads(threadList) {
             let $this = this;
@@ -225,7 +248,7 @@ const threadMixin = {
     },
 }
 
-const connectMixin = {
+export const connectMixin = {
     mixins: [baseMixin, firestoreMixin, realtimeDbMixin],
     data() {
         return {
@@ -304,7 +327,7 @@ const connectMixin = {
 
             //ip可能會非常慢，只能另外處理，不然會卡畫面
             let ipClien = await this.getIpClient();
-            connectModel = this.getObject(users, 'key', connectModel.key);
+            //connectModel = this.getObject(users, 'key', connectModel.key);
             connectModel["ip"] = ipClien.ip;
             $this.dbInsert("ConnectLog", connectModel);
         },
@@ -335,7 +358,7 @@ const connectMixin = {
     },
 }
 
-const mouseSyncMixin = {
+export const mouseSyncMixin = {
     mixins: [realtimeDbMixin],
     data() {
         return {
@@ -347,7 +370,7 @@ const mouseSyncMixin = {
                 userName: '', 
                 ref: null,
                 workable: true,
-                delay: 100,
+                delay: 50,
                 userMouse: [],
             },
         }

@@ -1,17 +1,17 @@
 ﻿export default {
-    mixins: [connectMixin, mouseSyncMixin],
+    template: '33ww22',
     data() {
         return {
         }
     },
-    async created() {
-        let $this = this;
+    created() {
+        //let $this = this;
 
-        let authUser = await $this.getAuthUser();
-        $this.mouseSync.realtimeDb = await this.getRealtimeDb();
-        $this.mouseSync.ready = true;
-        $this.mouseSync.userId = authUser.uid;
-        $this.mouseSync.userName = authUser.displayName;
+        //let authUser = await $this.getAuthUser();
+        //$this.mouseSync.realtimeDb = await this.getRealtimeDb();
+        //$this.mouseSync.ready = true;
+        //$this.mouseSync.userId = authUser.uid;
+        //$this.mouseSync.userName = authUser.displayName;
     },
     methods: {
 

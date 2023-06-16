@@ -1,15 +1,11 @@
 ﻿
 const appComponent = Vue.createApp({
-    mixins: [baseMixin, threadMixin, routerMixin, mouseSyncMixin],
+    mixins: [connectMixin, threadMixin, routerMixin],
     data() {
         return {
             pageTitle: '',
             Layout: {
                 headTitle: document.getElementsByTagName("title")[0].innerHTML,
-            },
-            authInfo: {
-                ready: false,
-                user: null,
             },
             visitId: null,
             connection: {
@@ -34,16 +30,9 @@ const appComponent = Vue.createApp({
         this.visitId = this.newGuid();
         this.setHeadTitle(this.pageTitle)
 
-        let { waitForAuthStateChange } = await $this.getDbAssembly();
-        let authUser = await waitForAuthStateChange();
+        let authUser = await $this.getAuthUser();
         $this.authInfo.user = authUser;
         $this.authInfo.ready = true;
-
-        if (authUser) {
-            $this.mouseSync.realtimeDb = await this.getRealtimeDb();
-            $this.mouseSync.ready = true;
-            $this.mouseSync.userId = authUser.uid;
-        }
         
         let { dbConnection } = await $this.getRealtimeDb();
         $this.connection.users = [];

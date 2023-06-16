@@ -200,3 +200,12 @@ header {
     width: 100%;
     height: calc(100% - 1em);
 }
+
+.user-mouse {
+    border: 1px solid #0da7fd;
+    padding: 0.1em 0.3em;
+    border-radius: 1em;
+    background-color: #0da7fd;
+    color: white;
+}
+

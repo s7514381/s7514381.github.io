@@ -119,7 +119,7 @@ const routerMixin = {
         return {
             pageLoading: false,
             navbar: [
-                { to: '/chat', name: '聊天室', newTag: false },
+                { to: '/chat', name: '互動大廳', newTag: false },
                 { to: '/imagecoverframe', name: '圖片框選器', newTag: false },
                 { to: '/dynamicform', name: '動態表單v1.0', newTag: false },
                 { to: '/interest', name: '利息計算機', newTag: false },

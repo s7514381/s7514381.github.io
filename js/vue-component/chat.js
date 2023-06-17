@@ -20,8 +20,8 @@ export default {
     async created() {
         await this.mouseSyncInit(this.authInfo?.user);
 
-        let users = this.connection.users;
-        if (users.length > 0) 
+        let users = this.connection?.users;
+        if (users && users.length > 0) 
             this.mouseSync.connectUsers = users;
         
     },

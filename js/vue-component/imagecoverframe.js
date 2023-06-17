@@ -1,4 +1,6 @@
-﻿export default {
+﻿import { baseMixin } from '../vue-mixin.js'
+
+export default {
     mixins: [baseMixin],
     data() {
         return {

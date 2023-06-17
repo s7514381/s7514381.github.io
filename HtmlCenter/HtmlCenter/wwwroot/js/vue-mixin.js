@@ -280,7 +280,7 @@ export const mouseSyncMixin = {
                 userName: '',
                 ref: null,
                 workable: true,
-                delay: 70,
+                delay: 10,
                 userMouse: [],
                 connectUsers: [],
             },

@@ -1,4 +1,20 @@
-﻿const baseMixin = {
+﻿
+//套用此Mixin之後可以直接使用v-model="value"
+export const bindModelMixin = {
+    emits: ['update:modelValue'],
+    computed: {
+        value: {
+            get() {
+                return this.modelValue
+            },
+            set(value) {
+                this.$emit('update:modelValue', value)
+            }
+        }
+    },
+}
+
+export const baseMixin = {
     methods: {
         newGuid: function () {
             return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -20,7 +36,7 @@
     },
 }
 
-const dragMixin = {
+export const dragMixin = {
     data() {
         return {
         }
@@ -44,7 +60,7 @@ const dragMixin = {
     }
 }
 
-const realtimeDbMixin = {
+export const realtimeDbMixin = {
     data() {
         return {
             realtimeDb: null,
@@ -66,7 +82,7 @@ const realtimeDbMixin = {
     }
 }
 
-const firestoreMixin = {
+export const firestoreMixin = {
     data() {
         return {
             dbAssembly: {
@@ -79,7 +95,7 @@ const firestoreMixin = {
             let $this = this;
 
             return new Promise((resolve, reject) => {
-                import(`/js/firebase/firestore.js?timestamp=${ Date.now() }`)
+                import(`/js/firebase/firestore.js?timestamp=${Date.now()}`)
                     .then(module => {
                         $this.dbAssembly = module.dbAssembly;
                         resolve(true);
@@ -114,90 +130,7 @@ const firestoreMixin = {
     }
 }
 
-const routerMixin = {
-    data() {
-        return {
-            pageLoading: false,
-            navbar: [
-                { to: '/chat', name: '互動大廳', newTag: false },
-                { to: '/imagecoverframe', name: '圖片框選器', newTag: false },
-                { to: '/dynamicform', name: '動態表單v1.0', newTag: false },
-                { to: '/interest', name: '利息計算機', newTag: false },
-                { to: '/unitywebgl', name: 'Unity遊戲', newTag: false },
-                { to: '/aboutme', name: '關於我', newTag: false },
-            ],
-        }
-    },
-    created() {
-        let $this = this;
-
-        $this.navbar.forEach(function (v) {
-            let log = localStorage.getItem(`navbar-${v.to}`);
-            if (!Number(log)) { v.newTag = true; }
-        })
-       
-        $this.$router.beforeEach(async to => {
-            if (!this.$router.hasRoute(to.name)) {
-
-                let navItem = $this.getObject($this.navbar, 'to', to.path);
-                if (navItem && navItem.newTag) {
-                    localStorage.setItem(`navbar-${to.path}`, 1);
-                    navItem.newTag = false;
-                }
-
-                let pathArray = to.path.split('/');
-                let controllerName = pathArray[1];
-                if (controllerName == '') { controllerName = "home"; }
-
-                let component;
-
-                switch (controllerName) {
-                    case "imagecoverframe":
-                    case "dynamicform":
-                    case "interest":
-                    case "chat":
-                        //客製化
-                        let importPath = `/js/vue-component/${controllerName}.js?timestamp=${Date.now()}`
-                        await import(importPath).then(module => { component = module.default })
-                        break;
-                    default:
-                        component = { data() { return $this.$data; }, template: null };
-                        break;
-                }
-
-                $this.$router.addRoute({
-                    name: controllerName,
-                    path: to.path,
-                    component: component,
-                })
-                return to.fullPath;
-            }
-        })
-
-        $this.$router.beforeResolve(async to => {
-            $this.pageLoading = true;
-
-            const routeComponent = to.matched[0]?.components?.default;
-
-            if (routeComponent && !routeComponent?.template) {
-                let htmlContent = await this.getHtmlContent(to.name);
-                htmlContent = htmlContent.replaceAll('@@', '@');
-
-                routeComponent.template = htmlContent;
-            }
-            $this.pageLoading = false;
-        })
-    },
-    methods: {
-        async getHtmlContent(controllerName) {
-            let result;
-            result = await axios.get(`/${controllerName}/htmlContent`);
-            return result.data;
-        }
-    },
-}
-
-const threadMixin = {
+export const threadMixin = {
     methods: {
         async runThreads(threadList) {
             let $this = this;
@@ -225,7 +158,7 @@ const threadMixin = {
     },
 }
 
-const connectMixin = {
+export const connectMixin = {
     mixins: [baseMixin, firestoreMixin, realtimeDbMixin],
     data() {
         return {
@@ -304,7 +237,7 @@ const connectMixin = {
 
             //ip可能會非常慢，只能另外處理，不然會卡畫面
             let ipClien = await this.getIpClient();
-            connectModel = this.getObject(users, 'key', connectModel.key);
+            //connectModel = this.getObject(users, 'key', connectModel.key);
             connectModel["ip"] = ipClien.ip;
             $this.dbInsert("ConnectLog", connectModel);
         },
@@ -335,7 +268,7 @@ const connectMixin = {
     },
 }
 
-const mouseSyncMixin = {
+export const mouseSyncMixin = {
     mixins: [realtimeDbMixin],
     data() {
         return {
@@ -344,11 +277,12 @@ const mouseSyncMixin = {
                 realtimeDb: null,
                 connectName: 'mouseSync',
                 userId: '',
-                userName: '', 
+                userName: '',
                 ref: null,
                 workable: true,
-                delay: 100,
+                delay: 10,
                 userMouse: [],
+                connectUsers: [],
             },
         }
     },
@@ -357,17 +291,22 @@ const mouseSyncMixin = {
         let model = this.mouseSync;
 
         let { dbConnection } = await this.getRealtimeDb();
-        dbConnection(model.connectName, null, null, null, async (snapshot) => {
-            if (snapshot.key == model.userId) return;
+        dbConnection(model.connectName, null, async (snapshot) => {
+            //onChildAdded 新增時觸發
+            let childData = snapshot.val();
+            childData["uid"] = snapshot.key;
+            model.userMouse.push(childData)
+
+            this.updateUserName()
+        }, null, async (snapshot) => {
+            //onChildChanged 更新時觸發
+            //if (snapshot.key == model.userId) return;
 
             let childData = snapshot.val();
             let user1 = $this.getObject(model.userMouse, 'uid', snapshot.key)
             if (user1) {
                 user1.x = childData.x;
                 user1.y = childData.y;
-            } else {
-                childData["uid"] = snapshot.key;
-                model.userMouse.push(childData)
             }
         })
     },
@@ -381,9 +320,8 @@ const mouseSyncMixin = {
                 setRef(`${model.connectName}/${model.userId}`, {
                     x: event.clientX,
                     y: event.clientY,
-                    name: model.userName,
                 })
-                
+
                 if (model.delay > 0) {
                     model.workable = false;
 
@@ -392,6 +330,30 @@ const mouseSyncMixin = {
                     }, model.delay)
                 }
             }
-        }
+        },
+        async mouseSyncInit(authUser) {
+            let $this = this;
+            if (!authUser) return;
+
+            $this.mouseSync.realtimeDb = await this.getRealtimeDb();
+            $this.mouseSync.ready = true;
+            $this.mouseSync.userId = authUser.uid;
+            $this.mouseSync.userName = authUser.displayName;
+        },
+        updateUserName() {
+            let connectUsers = this.mouseSync.connectUsers;
+
+            this.mouseSync.userMouse.forEach(function (v) {
+                let filter = connectUsers.filter(x => x.key == v.uid);
+                if (filter.length > 0) { v["name"] = filter[0].displayName; }
+            })
+        },
     },
+    watch: {
+        "mouseSync.connectUsers": {
+            handler: function (nv, ov) {
+                this.updateUserName()
+            },
+        },
+    }
 }

@@ -7,7 +7,7 @@
     <title>自由發揮 園丁Tim</title>
     <link rel="stylesheet" href="/lib/bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.2.3_dist_css_bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="/css/site.css?v=z5Viv5Jv_ylEyRiEYirhKJvmtG_fs0O5hLKW6DFFiio" />
+    <link rel="stylesheet" href="/css/site.css?v=4W3qyrArkjY6vOcVYZIgcrQG7tittB5f8ZnegbiISgk" />
     <link rel="stylesheet" href="/css/image-cover-frame.css?v=LndOvmdvYvfNGZ_Xby9XErY0d5p_LhPwLQ90eOPSTYg" />
     <link rel="stylesheet" href="/css/dynamic-form.css?v=kHNWcsTiItzqiDc_ryxKuhJWXoUb9-TTxkcO2nCvOSU" />
 
@@ -17,9 +17,7 @@
     <script src="/lib/vue/vuedraggable.umd.min.js"></script>
     <script src="/lib/axios/unpkg.com_axios@1.4.0_dist_axios.min.js"></script>
     <script src="https://unpkg.com/vue-router@4.2.2/dist/vue-router.global.js"></script>
-
-    <script src="/js/site.js?v=Muh2GW02FnMi0PppBzamzgcE4rZw00z-fphZP9e142c"></script>
-    <script src="/js/vue-mixin.js?v=J8dO4FbwUlbwQ-LHZb-6phynuITSmKcyL4-0wvqO3ps"></script>
+    <script src="/js/site.js?v=Muh2GW02FnMi0PppBzamzgcE4rZw00z-fphZP9e142c"></script> 
 </head>
 
 <body id="app">
@@ -57,11 +55,12 @@
     </header>
 
     <div class="container header-margin" >
+        
         <main role="main">
             <router-view v-if="!pageLoading"></router-view>
         </main>
     </div>
 
-    <script src="/js/vue-component/index.js"></script>
+    <script src="/js/vue-component/index.js" type="module"></script>
 </body>
 </html>

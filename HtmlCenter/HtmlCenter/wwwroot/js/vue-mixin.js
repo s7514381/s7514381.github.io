@@ -1,10 +1,4 @@
 ﻿
-import chat from '../js/vue-component/chat.js'
-
-export const publicComponents = {
-    'v-chat': chat
-}
-
 //套用此Mixin之後可以直接使用v-model="value"
 export const bindModelMixin = {
     emits: ['update:modelValue'],
@@ -101,7 +95,7 @@ export const firestoreMixin = {
             let $this = this;
 
             return new Promise((resolve, reject) => {
-                import(`/js/firebase/firestore.js?timestamp=${ Date.now() }`)
+                import(`/js/firebase/firestore.js?timestamp=${Date.now()}`)
                     .then(module => {
                         $this.dbAssembly = module.dbAssembly;
                         resolve(true);
@@ -134,90 +128,6 @@ export const firestoreMixin = {
             return await getDocs(queryCondition);
         },
     }
-}
-
-export const routerMixin = {
-    data() {
-        return {
-            pageLoading: false,
-            navbar: [
-                { to: '/chat', name: '互動大廳', newTag: false },
-                { to: '/imagecoverframe', name: '圖片框選器', newTag: false },
-                { to: '/dynamicform', name: '動態表單v1.0', newTag: false },
-                { to: '/interest', name: '利息計算機', newTag: false },
-                { to: '/unitywebgl', name: 'Unity遊戲', newTag: false },
-                { to: '/aboutme', name: '關於我', newTag: false },
-            ],
-        }
-    },
-    created() {
-        let $this = this;
-
-        $this.navbar.forEach(function (v) {
-            let log = localStorage.getItem(`navbar-${v.to}`);
-            if (!Number(log)) { v.newTag = true; }
-        })
-       
-        $this.$router.beforeEach(async to => {
-            if (!this.$router.hasRoute(to.name)) {
-
-                let navItem = $this.getObject($this.navbar, 'to', to.path);
-                if (navItem && navItem.newTag) {
-                    localStorage.setItem(`navbar-${to.path}`, 1);
-                    navItem.newTag = false;
-                }
-
-                let pathArray = to.path.split('/');
-                let controllerName = pathArray[1];
-                if (controllerName == '') { controllerName = "home"; }
-
-                let component;
-
-                switch (controllerName) {
-                    case "imagecoverframe":
-                    case "dynamicform":
-                    case "interest":
-                        //客製化
-                        let importPath = `/js/vue-component/${controllerName}.js?timestamp=${Date.now()}`
-                        await import(importPath).then(module => { component = module.default })
-                        break;
-                    default:
-                        component = {
-                            data() { return $this.$data; }, components: publicComponents, template: null
-                        };
-                        break;
-                }
-
-                $this.$router.addRoute({
-                    name: controllerName,
-                    path: to.path,
-                    component: component,
-                })
-                return to.fullPath;
-            }
-        })
-
-        $this.$router.beforeResolve(async to => {
-            $this.pageLoading = true;
-
-            const routeComponent = to.matched[0]?.components?.default;
-
-            if (routeComponent && !routeComponent?.template) {
-                let htmlContent = await this.getHtmlContent(to.name);
-                htmlContent = htmlContent.replaceAll('@@', '@');
-
-                routeComponent.template = htmlContent;
-            }
-            $this.pageLoading = false;
-        })
-    },
-    methods: {
-        async getHtmlContent(controllerName) {
-            let result;
-            result = await axios.get(`/${controllerName}/htmlContent`);
-            return result.data;
-        }
-    },
 }
 
 export const threadMixin = {
@@ -367,11 +277,12 @@ export const mouseSyncMixin = {
                 realtimeDb: null,
                 connectName: 'mouseSync',
                 userId: '',
-                userName: '', 
+                userName: '',
                 ref: null,
                 workable: true,
-                delay: 50,
+                delay: 70,
                 userMouse: [],
+                connectUsers: [],
             },
         }
     },
@@ -380,17 +291,22 @@ export const mouseSyncMixin = {
         let model = this.mouseSync;
 
         let { dbConnection } = await this.getRealtimeDb();
-        dbConnection(model.connectName, null, null, null, async (snapshot) => {
-            if (snapshot.key == model.userId) return;
+        dbConnection(model.connectName, null, async (snapshot) => {
+            //onChildAdded 新增時觸發
+            let childData = snapshot.val();
+            childData["uid"] = snapshot.key;
+            model.userMouse.push(childData)
+
+            this.updateUserName()
+        }, null, async (snapshot) => {
+            //onChildChanged 更新時觸發
+            //if (snapshot.key == model.userId) return;
 
             let childData = snapshot.val();
             let user1 = $this.getObject(model.userMouse, 'uid', snapshot.key)
             if (user1) {
                 user1.x = childData.x;
                 user1.y = childData.y;
-            } else {
-                childData["uid"] = snapshot.key;
-                model.userMouse.push(childData)
             }
         })
     },
@@ -404,9 +320,8 @@ export const mouseSyncMixin = {
                 setRef(`${model.connectName}/${model.userId}`, {
                     x: event.clientX,
                     y: event.clientY,
-                    name: model.userName,
                 })
-                
+
                 if (model.delay > 0) {
                     model.workable = false;
 
@@ -415,6 +330,30 @@ export const mouseSyncMixin = {
                     }, model.delay)
                 }
             }
-        }
+        },
+        async mouseSyncInit(authUser) {
+            let $this = this;
+            if (!authUser) return;
+
+            $this.mouseSync.realtimeDb = await this.getRealtimeDb();
+            $this.mouseSync.ready = true;
+            $this.mouseSync.userId = authUser.uid;
+            $this.mouseSync.userName = authUser.displayName;
+        },
+        updateUserName() {
+            let connectUsers = this.mouseSync.connectUsers;
+
+            this.mouseSync.userMouse.forEach(function (v) {
+                let filter = connectUsers.filter(x => x.key == v.uid);
+                if (filter.length > 0) { v["name"] = filter[0].displayName; }
+            })
+        },
     },
+    watch: {
+        "mouseSync.connectUsers": {
+            handler: function (nv, ov) {
+                this.updateUserName()
+            },
+        },
+    }
 }

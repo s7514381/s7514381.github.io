@@ -1,4 +1,5 @@
-﻿let thisApp;
+﻿import { baseMixin, dragMixin } from '../vue-mixin.js'
+let thisApp;
 
 export default {
     mixins: [baseMixin, dragMixin],

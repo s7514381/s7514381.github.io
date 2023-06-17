@@ -207,5 +207,7 @@ header {
     border-radius: 1em;
     background-color: #0da7fd;
     color: white;
+    min-width:2em;
+    min-height:1em;
 }
 

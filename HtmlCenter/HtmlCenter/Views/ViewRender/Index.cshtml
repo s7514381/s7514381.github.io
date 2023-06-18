@@ -22,10 +22,11 @@
     <script src="/lib/vue/vuedraggable.umd.min.js"></script>
     <script src="/lib/axios/unpkg.com_axios@1.4.0_dist_axios.min.js"></script>
     <script src="https://unpkg.com/vue-router@4.2.2/dist/vue-router.global.js"></script>
-    <script src="/js/site.js" asp-append-version="true"></script> 
+    <script src="/lib/lottie/lottie.min.js"></script>
+    <script src="/js/site.js" asp-append-version="true"></script>
 </head>
 
-<body id="app" >
+<body id="app">
     <header>
         <div style="display:contents"></div>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
@@ -39,12 +40,12 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li v-for="v in navbar" class="nav-item me-3 px-2 " style="position: relative">
-                            <router-link :to="v.to" 
-                                        class="nav-link text-dark"
+                            <router-link :to="v.to"
+                                         class="nav-link text-dark"
                                          :class="{'new-tag': v.newTag}">{{v.name}}</router-link>
                         </li>
                     </ul>
-                    
+
                     <ul class="navbar-nav flex-grow-1" style="justify-content: flex-end">
                         <li class="nav-item me-3 px-2">
                             <div v-if="authInfo.ready">
@@ -59,18 +60,25 @@
         </nav>
     </header>
 
-    <div class="container header-margin" >
-        
+    <div class="container header-margin">
         <main role="main">
+            <div v-show="pageLoading" class="fill-parent flex-item-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                @*loading美術圖 => 研究中*@
+                @*<div class="lottie mx-auto" style="width: 120px; height: 120px" data-options='{"path":"../animation/assets3.lottiefiles.com_private_files_lf30_pguaf3lh.json"}'></div>*@
+            </div>
             <router-view v-if="!pageLoading"></router-view>
         </main>
     </div>
     @*<footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - Github - <a asp-controller="HtmlCenter" asp-action="UpdateRenderView" style="color: #6c757d">更新</a>
-        </div>
+    <div class="container">
+    &copy; 2023 - Github - <a asp-controller="HtmlCenter" asp-action="UpdateRenderView" style="color: #6c757d">更新</a>
+    </div>
     </footer>*@
 
+    
     <script src="/js/vue-component/index.js" type="module" asp-append-version="true"></script>
 </body>
 </html>

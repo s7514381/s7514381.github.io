@@ -26,11 +26,6 @@ header {
     z-index: 1
 }
 
-.flex-center {
-    justify-content: center !important;
-    align-self: center !important;
-}
-
 ::-webkit-scrollbar {
     width: 16px;
 }
@@ -158,6 +153,13 @@ header {
     display: flex;
     align-self: center;
     justify-content: center;
+}
+
+.flex-item-center {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
 }
 
 .level-tag {

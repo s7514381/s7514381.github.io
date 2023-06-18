@@ -26,11 +26,6 @@ header {
     z-index: 1
 }
 
-.flex-center {
-    justify-content: center !important;
-    align-self: center !important;
-}
-
 ::-webkit-scrollbar {
     width: 16px;
 }
@@ -160,6 +155,13 @@ header {
     justify-content: center;
 }
 
+.flex-item-center {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+}
+
 .level-tag {
     border: 1px solid #0da7fd;
     padding: 0.1em 0.3em;
@@ -207,5 +209,7 @@ header {
     border-radius: 1em;
     background-color: #0da7fd;
     color: white;
+    min-width:2em;
+    min-height:1em;
 }
 

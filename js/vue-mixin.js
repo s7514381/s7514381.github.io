@@ -294,14 +294,13 @@ export const mouseSyncMixin = {
         dbConnection(model.connectName, null, async (snapshot) => {
             //onChildAdded 新增時觸發
             let childData = snapshot.val();
-            childData["uid"] = snapshot.key;
-            model.userMouse.push(childData)
-
+            if (model.userMouse.filter(x => x.uid == snapshot.key).length == 0) {
+                childData["uid"] = snapshot.key;
+                model.userMouse.push(childData)
+            }
             this.updateUserName()
         }, null, async (snapshot) => {
             //onChildChanged 更新時觸發
-            //if (snapshot.key == model.userId) return;
-
             let childData = snapshot.val();
             let user1 = $this.getObject(model.userMouse, 'uid', snapshot.key)
             if (user1) {

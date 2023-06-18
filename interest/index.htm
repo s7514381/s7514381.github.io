@@ -7,7 +7,7 @@
     <title>自由發揮 園丁Tim</title>
     <link rel="stylesheet" href="/lib/bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.2.3_dist_css_bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="/css/site.css?v=4W3qyrArkjY6vOcVYZIgcrQG7tittB5f8ZnegbiISgk" />
+    <link rel="stylesheet" href="/css/site.css?v=eLIIIHHxedJ7p6aTS0Ecdw0uZLTEnrOmplVzyqeCCMY" />
     <link rel="stylesheet" href="/css/image-cover-frame.css?v=LndOvmdvYvfNGZ_Xby9XErY0d5p_LhPwLQ90eOPSTYg" />
     <link rel="stylesheet" href="/css/dynamic-form.css?v=kHNWcsTiItzqiDc_ryxKuhJWXoUb9-TTxkcO2nCvOSU" />
 
@@ -17,7 +17,8 @@
     <script src="/lib/vue/vuedraggable.umd.min.js"></script>
     <script src="/lib/axios/unpkg.com_axios@1.4.0_dist_axios.min.js"></script>
     <script src="https://unpkg.com/vue-router@4.2.2/dist/vue-router.global.js"></script>
-    <script src="/js/site.js?v=Muh2GW02FnMi0PppBzamzgcE4rZw00z-fphZP9e142c"></script> 
+    <script src="/lib/lottie/lottie.min.js"></script>
+    <script src="/js/site.js?v=Muh2GW02FnMi0PppBzamzgcE4rZw00z-fphZP9e142c"></script>
 </head>
 
 <body id="app">
@@ -34,12 +35,12 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li v-for="v in navbar" class="nav-item me-3 px-2 " style="position: relative">
-                            <router-link :to="v.to" 
-                                        class="nav-link text-dark"
+                            <router-link :to="v.to"
+                                         class="nav-link text-dark"
                                          :class="{'new-tag': v.newTag}">{{v.name}}</router-link>
                         </li>
                     </ul>
-                    
+
                     <ul class="navbar-nav flex-grow-1" style="justify-content: flex-end">
                         <li class="nav-item me-3 px-2">
                             <div v-if="authInfo.ready">
@@ -54,13 +55,18 @@
         </nav>
     </header>
 
-    <div class="container header-margin" >
-        
+    <div class="container header-margin">
         <main role="main">
+            <div v-show="pageLoading" class="fill-parent flex-item-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
             <router-view v-if="!pageLoading"></router-view>
         </main>
     </div>
 
-    <script src="/js/vue-component/index.js?v=4lgYSQ-HoLKlqgtNNqVKLAEj7ZMvdmM5PGdwRGnscRA" type="module"></script>
+    
+    <script src="/js/vue-component/index.js?v=Hh3emUU3IQkoL4_X_M7Jz_qakf1XQs2rZPTxfm_aF0g" type="module"></script>
 </body>
 </html>

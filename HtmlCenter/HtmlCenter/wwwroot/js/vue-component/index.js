@@ -6,7 +6,7 @@
 import chat from './chat.js'
 
 const publicComponents = {
-    'v-chat': chat
+    'v-chat': chat,
 }
 
 const routerMixin = {
@@ -33,6 +33,7 @@ const routerMixin = {
 
         $this.$router.beforeEach(async to => {
             if (!this.$router.hasRoute(to.name)) {
+                $this.pageLoading = true;
 
                 let navItem = $this.getObject($this.navbar, 'to', to.path);
                 if (navItem && navItem.newTag) {
@@ -71,8 +72,6 @@ const routerMixin = {
         })
 
         $this.$router.beforeResolve(async to => {
-            $this.pageLoading = true;
-
             const routeComponent = to.matched[0]?.components?.default;
 
             if (routeComponent && !routeComponent?.template) {

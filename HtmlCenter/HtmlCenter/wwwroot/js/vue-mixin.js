@@ -166,9 +166,51 @@ export const connectMixin = {
                 ready: false,
                 user: null,
             },
+            connection: {
+                name: 'connections',
+                users: [],
+                ready: false,
+            },
+            ipClient: null,
         }
     },
     methods: {
+        async connectInit() {
+            let $this = this;
+            let { dbConnection } = await $this.getRealtimeDb();
+
+            $this.connection.users = [];
+            dbConnection($this.connection.name, async (snapshot) => {
+                //onValue(once)
+                //不知道為甚麼初始讀資料會在add也觸發一次，直接在那邊做
+                $this.userConnection($this.authInfo.user);
+            }, async (snapshot) => {
+                //onChildAdded
+                let childData = snapshot.val();
+                let keyArray = Object.keys(childData);
+                let user = childData[keyArray[0]];
+                user["connectIds"] = keyArray;
+
+                $this.connection.users.push(user)
+                if (!$this.connection.ready) { $this.connection.ready = true; }
+            }, async (snapshot) => {
+                //onChildRemoved
+                let childData = snapshot.val();
+                let users = $this.connection.users;
+                let keyArray = Object.keys(childData);
+                let user = childData[keyArray[0]];
+                user = $this.getObject(users, 'key', user.key)
+
+                users.splice(users.indexOf(user), 1);
+            })
+        },
+        async authUserInit() {
+            let $this = this;
+
+            let authUser = await $this.getAuthUser();
+            $this.authInfo.user = authUser;
+            $this.authInfo.ready = true;
+        },
         async getAuthUser() {
             let $this = this;
 
@@ -185,12 +227,12 @@ export const connectMixin = {
         async getIpClient() {
             let $this = this;
 
-            if (!this.IpClient) {
+            if (!this.ipClient) {
                 await axios.get(`https://api.ipify.org?format=json`).then(function (res) {
-                    $this.IpClient = res.data
+                    $this.ipClient = res.data
                 });
             }
-            return this.IpClient;
+            return this.ipClient;
         },
         resetUserConnection: async function (userInfo, removeId) {
             let { removeConnection } = await this.getRealtimeDb();
@@ -266,10 +308,12 @@ export const connectMixin = {
             this.resetUserConnection(null, uid);
         },
     },
+    computed: {
+        hasAuth() { return this.authInfo.user != null; },
+    },
 }
 
 export const mouseSyncMixin = {
-    mixins: [realtimeDbMixin],
     data() {
         return {
             mouseSync: {
@@ -286,30 +330,46 @@ export const mouseSyncMixin = {
             },
         }
     },
-    async created() {
-        let $this = this;
-        let model = this.mouseSync;
-
-        let { dbConnection } = await this.getRealtimeDb();
-        dbConnection(model.connectName, null, async (snapshot) => {
-            //onChildAdded 新增時觸發
-            let childData = snapshot.val();
-            if (model.userMouse.filter(x => x.uid == snapshot.key).length == 0) {
-                childData["uid"] = snapshot.key;
-                model.userMouse.push(childData)
-            }
-            this.updateUserName()
-        }, null, async (snapshot) => {
-            //onChildChanged 更新時觸發
-            let childData = snapshot.val();
-            let user1 = $this.getObject(model.userMouse, 'uid', snapshot.key)
-            if (user1) {
-                user1.x = childData.x;
-                user1.y = childData.y;
-            }
-        })
-    },
     methods: {
+        mouseSyncInit(authUser, realtimeDb) {
+            let $this = this;
+            let model = this.mouseSync;
+
+            if (authUser && this.mouseSync.userId == '') {
+                this.mouseSync.userId = authUser.uid;
+                this.mouseSync.userName = authUser.displayName;
+            }
+            if (realtimeDb && !this.mouseSync.realtimeDb) { this.mouseSync.realtimeDb = realtimeDb; }
+
+            if (!model.ready && this.mouseSync.userId != '' && this.mouseSync.realtimeDb) {
+                this.mouseSyncConnection();
+            }
+        },
+        mouseSyncConnection() {
+            let $this = this;
+            let model = this.mouseSync;
+            if (!model.realtimeDb) return;
+            let { dbConnection } = model.realtimeDb;
+
+            dbConnection(model.connectName, null, (snapshot) => {
+                //onChildAdded 新增時觸發
+                let childData = snapshot.val();
+                if (model.userMouse.filter(x => x.uid == snapshot.key).length == 0) {
+                    childData["uid"] = snapshot.key;
+                    model.userMouse.push(childData)
+                }
+                this.updateUserName()
+            }, null, (snapshot) => {
+                //onChildChanged 更新時觸發
+                let childData = snapshot.val();
+                let user = $this.getObject(model.userMouse, 'uid', snapshot.key)
+                if (user) {
+                    user.x = childData.x;
+                    user.y = childData.y;
+                }
+            })
+            model.ready = true;
+        },
         mouseMove(event) {
             let model = this.mouseSync;
             if (!model.ready) { return; }
@@ -330,15 +390,6 @@ export const mouseSyncMixin = {
                 }
             }
         },
-        async mouseSyncInit(authUser) {
-            let $this = this;
-            if (!authUser) return;
-
-            $this.mouseSync.realtimeDb = await this.getRealtimeDb();
-            $this.mouseSync.ready = true;
-            $this.mouseSync.userId = authUser.uid;
-            $this.mouseSync.userName = authUser.displayName;
-        },
         updateUserName() {
             let connectUsers = this.mouseSync.connectUsers;
 
@@ -352,6 +403,11 @@ export const mouseSyncMixin = {
         "mouseSync.connectUsers": {
             handler: function (nv, ov) {
                 this.updateUserName()
+            },
+        },
+        "mouseSync.realtimeDb": {
+            handler: function (nv, ov) {
+               
             },
         },
     }

@@ -204,13 +204,15 @@ header {
 }
 
 .user-mouse {
+    position: fixed;
     border: 1px solid #0da7fd;
     padding: 0.1em 0.3em;
     border-radius: 1em;
     background-color: #0da7fd;
     color: white;
-    min-width:2em;
-    min-height:1em;
+    min-width: 2em;
+    min-height: 1em;
+    z-index: 10;
 }
 
 .bg-hover {
@@ -221,3 +223,20 @@ header {
         background-color: #eee !important;
     }
 
+.chat {
+}
+    .chat .chat-body {
+        padding: 1em;
+    }
+    .chat .message-input {
+        box-shadow: rgb(221, 221, 221) 1px 1px 2px 0px inset;
+    }
+    .chat .message {
+        background-color: #eee;
+        border-radius: 0.5em;
+        box-shadow: 1px 1px 3px 0px #aaa;
+        padding: 0.4em 0.7em;
+    }
+        .chat .message.message-green {
+            background-color: #5aff1670;
+        }

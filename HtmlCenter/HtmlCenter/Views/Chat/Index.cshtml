@@ -1,2 +1,28 @@
 ﻿
-<v-chat :authInfo="authInfo" :connection="connection" :realtimeDb="realtimeDb"></v-chat>
+<v-mouse-sync :authInfo="authInfo" :connection="connection" :realtimeDb="realtimeDb">
+
+    <div class="chat card fill-parent">
+
+        <div class="row" style="height: 100%;">
+            <div class="col-auto pe-0 border">
+                <div class="p-2">這邊放好友名單</div>
+                </div>
+            <div class="col ps-0">
+                <div class="" style="height: 100%;display: flex; flex-direction: column-reverse;">
+                    <input class="form-control message-input" placeholder="能不能講一下話阿" />
+                    <div class="chat-body">
+                        <div class="d-flex">
+                            <div class="message">安安</div>
+                        </div>
+
+                        <div class="d-flex" style="flex-direction: row-reverse; ">
+                            <div class="message message-green">安三小</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</v-mouse-sync>

@@ -313,102 +313,68 @@ export const connectMixin = {
     },
 }
 
-export const mouseSyncMixin = {
+export const connectTransferMixin = {
+    props: ['authInfo', 'connection', 'realtimeDb'],
     data() {
         return {
-            mouseSync: {
+            connectTransfer: {
                 ready: false,
+                authInfo: null,
+                connection: null,
                 realtimeDb: null,
-                connectName: 'mouseSync',
-                userId: '',
-                userName: '',
-                ref: null,
-                workable: true,
-                delay: 10,
-                userMouse: [],
-                connectUsers: [],
             },
         }
     },
     methods: {
-        mouseSyncInit(authUser, realtimeDb) {
-            let $this = this;
-            let model = this.mouseSync;
-
-            if (authUser && this.mouseSync.userId == '') {
-                this.mouseSync.userId = authUser.uid;
-                this.mouseSync.userName = authUser.displayName;
-            }
-            if (realtimeDb && !this.mouseSync.realtimeDb) { this.mouseSync.realtimeDb = realtimeDb; }
-
-            if (!model.ready && this.mouseSync.userId != '' && this.mouseSync.realtimeDb) {
-                this.mouseSyncConnection();
-            }
-        },
-        mouseSyncConnection() {
-            let $this = this;
-            let model = this.mouseSync;
-            if (!model.realtimeDb) return;
-            let { dbConnection } = model.realtimeDb;
-
-            dbConnection(model.connectName, null, (snapshot) => {
-                //onChildAdded 新增時觸發
-                let childData = snapshot.val();
-                if (model.userMouse.filter(x => x.uid == snapshot.key).length == 0) {
-                    childData["uid"] = snapshot.key;
-                    model.userMouse.push(childData)
-                }
-                this.updateUserName()
-            }, null, (snapshot) => {
-                //onChildChanged 更新時觸發
-                let childData = snapshot.val();
-                let user = $this.getObject(model.userMouse, 'uid', snapshot.key)
-                if (user) {
-                    user.x = childData.x;
-                    user.y = childData.y;
-                }
-            })
-            model.ready = true;
-        },
-        mouseMove(event) {
-            let model = this.mouseSync;
-            if (!model.ready) { return; }
-
-            let { setRef } = model.realtimeDb;
-            if (model.workable) {
-                setRef(`${model.connectName}/${model.userId}`, {
-                    x: event.clientX,
-                    y: event.clientY,
-                })
-
-                if (model.delay > 0) {
-                    model.workable = false;
-
-                    setTimeout(function () {
-                        model.workable = true;
-                    }, model.delay)
-                }
-            }
-        },
-        updateUserName() {
-            let connectUsers = this.mouseSync.connectUsers;
-
-            this.mouseSync.userMouse.forEach(function (v) {
-                let filter = connectUsers.filter(x => x.key == v.uid);
-                if (filter.length > 0) { v["name"] = filter[0].displayName; }
-            })
-        },
+        //提供介面覆寫
+        async onConnectTransferReady(data) { }, //全部loading完觸發
+        async onAuthInfoChanged(data) { }, 
+        async onConnectionChanged(data) { }, 
+        async onRealtimeDbChanged(data) { }, 
     },
     watch: {
-        "mouseSync.connectUsers": {
-            handler: function (nv, ov) {
-                this.updateUserName()
+        "authInfo.ready": {
+            handler: async function (nv, ov) {
+                if (nv) {
+                    this.connectTransfer.authInfo = this.authInfo;
+                    await this.onAuthInfoChanged(nv);
+                }
             },
+            immediate: true,
         },
-        "mouseSync.realtimeDb": {
-            handler: function (nv, ov) {
-               
+        "connection": {
+            handler: async function (nv, ov) {
+                if (nv) {
+                    this.connectTransfer.connection = this.connection;
+                    await this.onConnectionChanged(nv);
+                }
             },
+            deep: true, immediate: true,
+        },
+        "realtimeDb": {
+            handler: async function (nv, ov) {
+                if (nv) {
+                    this.connectTransfer.realtimeDb = this.realtimeDb;
+                    await this.onRealtimeDbChanged(nv);
+                }
+            },
+            immediate: true,
+        },
+        "connectTransfer": {
+            handler: async function (nv, ov) {
+                if (!nv.ready) {
+                    let bool = true;
+                    Object.keys(nv).forEach(function (v) {
+                        if (nv[v] == null) { bool = false; }
+                    })
+                    
+                    if (bool) {
+                        nv.ready = true;
+                        await this.onConnectTransferReady(this.connectTransfer);
+                    }
+                }
+            },
+            deep: true, immediate: true,
         },
     }
 }

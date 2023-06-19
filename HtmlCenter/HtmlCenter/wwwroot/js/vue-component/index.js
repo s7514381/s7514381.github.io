@@ -1,12 +1,13 @@
 ﻿import {
-    baseMixin, dragMixin, realtimeDbMixin, firestoreMixin, threadMixin
-    , connectMixin, mouseSyncMixin
+    baseMixin, dragMixin, realtimeDbMixin, firestoreMixin, threadMixin, connectMixin
 } from '../vue-mixin.js'
 
-import chat from './chat.js'
+import jsMouseSync from './mouse-sync.js'
+import jsChat from './chat.js'
 
 const publicComponents = {
-    'v-chat': chat,
+    'v-mouse-sync': jsMouseSync,
+    'v-chat': jsChat,
 }
 
 const routerMixin = {

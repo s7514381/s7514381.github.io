@@ -1,3 +1,5 @@
+@import "chat.css";
+
 html {
     font-size: 14px;
     position: relative;
@@ -223,20 +225,18 @@ header {
         background-color: #eee !important;
     }
 
-.chat {
+
+@keyframes RGB {
+    0%, 100% {
+        background-color: #ff919b;
+    }
+
+    33% {
+        background-color: #ceff6e;
+    }
+
+    66% {
+        background-color: #79e9ff;
+    }
 }
-    .chat .chat-body {
-        padding: 1em;
-    }
-    .chat .message-input {
-        box-shadow: rgb(221, 221, 221) 1px 1px 2px 0px inset;
-    }
-    .chat .message {
-        background-color: #eee;
-        border-radius: 0.5em;
-        box-shadow: 1px 1px 3px 0px #aaa;
-        padding: 0.4em 0.7em;
-    }
-        .chat .message.message-green {
-            background-color: #5aff1670;
-        }
+

@@ -57,8 +57,12 @@ const routerMixin = {
                         await import(importPath).then(module => { component = module.default })
                         break;
                     default:
+                        //console.log($this.$options)
                         component = {
-                            data() { return $this.$data; }, components: publicComponents, template: null
+                            data() { return $this.$data; },
+                            components: publicComponents,
+                            template: null,
+                            methods: $this.$options.methods
                         };
                         break;
                 }
@@ -107,7 +111,12 @@ const appComponent = Vue.createApp({
                 { name: "realtimeDb", func: this.getDbAssembly, ready: false },
                 { name: "firestore", func: this.getRealtimeDb, ready: false },
             ],
-            
+            chat: {
+                content: [
+                    { message: '安安', self: false, },
+                    { message: '安三小', self: true, }
+                ]
+            },
         }
     },
     async created() {
@@ -125,7 +134,7 @@ const appComponent = Vue.createApp({
         await this.connectInit();
     },
     methods: {
-        
+        qqw() { this.chat.content.push({ message: '安三小三小', self: false, }) },
     },
 });
 

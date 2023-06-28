@@ -4,19 +4,21 @@
     <div class="chat card fill-parent">
 
         <div class="row" style="height: 100%;">
-            <div class="col-auto pe-0 border">
+            <div class="col-auto pe-0 border-end">
                 <div class="p-2">這邊放好友名單</div>
                 </div>
             <div class="col ps-0">
                 <div class="" style="height: 100%;display: flex; flex-direction: column-reverse;">
-                    <input class="form-control message-input" placeholder="能不能講一下話阿" />
+                    <input class="form-control message-input" placeholder="能不能講一下話阿" @@change="qqw" />
+                    
                     <div class="chat-body">
-                        <div class="d-flex">
-                            <div class="message">安安</div>
-                        </div>
 
-                        <div class="d-flex" style="flex-direction: row-reverse; ">
-                            <div class="message message-green">安三小</div>
+                        <div v-for="v in chat.content" 
+                             class="d-flex pt-3 message push-up"
+                             :class="{ 'self': v.self }">
+                            <div class="message-body">
+                                {{v.message}}
+                            </div>
                         </div>
 
                     </div>

@@ -1,0 +1,36 @@
+.chat {
+}
+
+    .chat .chat-body {
+        padding: 1em;
+    }
+
+    .chat .message-input {
+        box-shadow: rgb(221, 221, 221) 1px 1px 2px 0px inset;
+    }
+
+    .chat .message {
+        animation: growing .4s ease both;
+    }
+
+    .chat .message-body {
+        background-color: #eee;
+        border-radius: 0.5em;
+        box-shadow: 1px 1px 3px 0px #aaa;
+        padding: 0.4em 0.7em;
+    }
+
+    .chat .self.message {
+        flex-direction: row-reverse;
+    }
+
+        .chat .self.message .message-body {
+            background-color: #5aff1670;
+        }
+
+@keyframes growing {
+    0% {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+}

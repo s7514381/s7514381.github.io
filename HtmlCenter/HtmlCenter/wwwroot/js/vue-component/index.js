@@ -33,8 +33,12 @@ const routerMixin = {
         })
 
         $this.$router.beforeEach(async to => {
+            $this.$refs.navbarToggle.click();
+
             if (!this.$router.hasRoute(to.name)) {
                 $this.pageLoading = true;
+
+                
 
                 let navItem = $this.getObject($this.navbar, 'to', to.path);
                 if (navItem && navItem.newTag) {

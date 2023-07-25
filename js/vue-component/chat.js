@@ -1,46 +1,46 @@
-﻿import { baseMixin, mouseSyncMixin } from '../vue-mixin.js'
+﻿import { baseMixin, connectTransferMixin } from '../vue-mixin.js'
+import jsMouseSync from './mouse-sync.js'
 
 export default {
-    mixins: [baseMixin, mouseSyncMixin],
-    props: ['authInfo','connection'],
+    mixins: [baseMixin, connectTransferMixin],
+    components: {
+        'v-mouse-sync': jsMouseSync,
+    },
     template: `
-<div class="fill-parent card" @mousemove="mouseMove">
-    <span v-for="v in mouseSync.userMouse"
-          class="user-mouse"
-          style="position:fixed; z-index:1"
-          :style="{top: v.y + 'px', left: v.x + 'px'}">
-        {{v.name}}
-    </span>
-</div>
+<v-mouse-sync :authInfo="authInfo" :connection="connection" :realtimeDb="realtimeDb">
+
+    <div class="chat card fill-parent">
+
+        <div class="row" style="height: 100%;">
+            <div class="col-auto pe-0 border-end">
+                <div class="p-2">這邊放好友名單</div>
+                </div>
+            <div class="col ps-0">
+                <div class="" style="height: 100%;display: flex; flex-direction: column-reverse;">
+                    <input class="form-control message-input" placeholder="能不能講一下話阿" @change="qq2" />
+                    
+                    <div class="chat-body">
+
+                        
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</v-mouse-sync>
 `,
     data() {
         return {
         }
     },
     async created() {
-        await this.mouseSyncInit(this.authInfo?.user);
-
-        let users = this.connection?.users;
-        if (users && users.length > 0) 
-            this.mouseSync.connectUsers = users;
-        
     },
-    methods: { },
-    watch: {
-        "authInfo.ready": async function (nv, ov) {
-            if (nv) {
-                await this.mouseSyncInit(this.authInfo?.user);
-            }
-        },
-        "connection": {
-            handler: function (nv, ov) {
-                let $this = this;
-
-                if (nv.users.length > 0) {
-                    $this.mouseSync.connectUsers = nv.users;
-                }
-            },
-            deep: true
-        },
-    }
+    methods: {
+        qq2: function (event) {
+            console.log(1)
+        }
+    },
 }
+

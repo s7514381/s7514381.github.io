@@ -1,12 +1,13 @@
 ﻿import {
-    baseMixin, dragMixin, realtimeDbMixin, firestoreMixin, threadMixin
-    , connectMixin, mouseSyncMixin
+    baseMixin, dragMixin, realtimeDbMixin, firestoreMixin, threadMixin, connectMixin
 } from '../vue-mixin.js'
 
-import chat from './chat.js'
+import jsMouseSync from './mouse-sync.js'
+import jsChat from './chat.js'
 
 const publicComponents = {
-    'v-chat': chat,
+    'v-mouse-sync': jsMouseSync,
+    'v-chat': jsChat,
 }
 
 const routerMixin = {
@@ -32,8 +33,12 @@ const routerMixin = {
         })
 
         $this.$router.beforeEach(async to => {
+            $this.$refs.navbarToggle.click();
+
             if (!this.$router.hasRoute(to.name)) {
                 $this.pageLoading = true;
+
+                
 
                 let navItem = $this.getObject($this.navbar, 'to', to.path);
                 if (navItem && navItem.newTag) {
@@ -51,13 +56,17 @@ const routerMixin = {
                     case "imagecoverframe":
                     case "dynamicform":
                     case "interest":
-                        //客製化
+                        //客製化 => 舊式頁面，不再追加
                         let importPath = `/js/vue-component/${controllerName}.js?timestamp=${Date.now()}`
                         await import(importPath).then(module => { component = module.default })
                         break;
                     default:
+                        //console.log($this.$options)
                         component = {
-                            data() { return $this.$data; }, components: publicComponents, template: null
+                            data() { return $this.$data; },
+                            components: publicComponents,
+                            template: null,
+                            methods: $this.$options.methods
                         };
                         break;
                 }
@@ -101,19 +110,17 @@ const appComponent = Vue.createApp({
             Layout: {
                 headTitle: document.getElementsByTagName("title")[0].innerHTML,
             },
-            visitId: null,
-            connection: {
-                name: 'connections',
-                users: [],
-                ready: false,
-            },
-            IpClient: null,
+            visitId: null,            
             initThreads: [
                 { name: "realtimeDb", func: this.getDbAssembly, ready: false },
                 { name: "firestore", func: this.getRealtimeDb, ready: false },
-                /*{ name: "ipClient", func: this.getIpClient, ready: false },*/
             ],
-            
+            chat: {
+                content: [
+                    { message: '安安', self: false, },
+                    { message: '安三小', self: true, }
+                ]
+            },
         }
     },
     async created() {
@@ -124,42 +131,14 @@ const appComponent = Vue.createApp({
         this.visitId = this.newGuid();
         this.setHeadTitle(this.pageTitle)
 
-        let authUser = await $this.getAuthUser();
-        $this.authInfo.user = authUser;
-        $this.authInfo.ready = true;
-        
-        let { dbConnection } = await $this.getRealtimeDb();
-        $this.connection.users = [];
-        dbConnection($this.connection.name, async (snapshot) => {
-            //onValue(once)
-            //不知道為甚麼初始讀資料會在add也觸發一次，直接在那邊做
-            $this.userConnection($this.authInfo.user);
-        }, async (snapshot) => {
-            //onChildAdded
-            let childData = snapshot.val();
-            let keyArray = Object.keys(childData);
-            let user = childData[keyArray[0]];
-            user["connectIds"] = keyArray;
+        //登入帳號
+        await this.authUserInit();
 
-            $this.connection.users.push(user)
-            if (!$this.connection.ready) { $this.connection.ready = true; }
-        }, async (snapshot) => {
-            //onChildRemoved
-            let childData = snapshot.val();
-            let users = $this.connection.users;
-            let keyArray = Object.keys(childData);
-            let user = childData[keyArray[0]];
-            user = $this.getObject(users, 'key', user.key)
-
-            users.splice(users.indexOf(user), 1);
-        })
-
-    },
-    computed: {
-        hasAuth() { return this.authInfo.user != null; },
+        //大廳登入
+        await this.connectInit();
     },
     methods: {
-        
+        qqw() { this.chat.content.push({ message: '安三小三小', self: false, }) },
     },
 });
 

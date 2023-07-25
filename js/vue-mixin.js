@@ -166,9 +166,51 @@ export const connectMixin = {
                 ready: false,
                 user: null,
             },
+            connection: {
+                name: 'connections',
+                users: [],
+                ready: false,
+            },
+            ipClient: null,
         }
     },
     methods: {
+        async connectInit() {
+            let $this = this;
+            let { dbConnection } = await $this.getRealtimeDb();
+
+            $this.connection.users = [];
+            dbConnection($this.connection.name, async (snapshot) => {
+                //onValue(once)
+                //不知道為甚麼初始讀資料會在add也觸發一次，直接在那邊做
+                $this.userConnection($this.authInfo.user);
+            }, async (snapshot) => {
+                //onChildAdded
+                let childData = snapshot.val();
+                let keyArray = Object.keys(childData);
+                let user = childData[keyArray[0]];
+                user["connectIds"] = keyArray;
+
+                $this.connection.users.push(user)
+                if (!$this.connection.ready) { $this.connection.ready = true; }
+            }, async (snapshot) => {
+                //onChildRemoved
+                let childData = snapshot.val();
+                let users = $this.connection.users;
+                let keyArray = Object.keys(childData);
+                let user = childData[keyArray[0]];
+                user = $this.getObject(users, 'key', user.key)
+
+                users.splice(users.indexOf(user), 1);
+            })
+        },
+        async authUserInit() {
+            let $this = this;
+
+            let authUser = await $this.getAuthUser();
+            $this.authInfo.user = authUser;
+            $this.authInfo.ready = true;
+        },
         async getAuthUser() {
             let $this = this;
 
@@ -185,12 +227,12 @@ export const connectMixin = {
         async getIpClient() {
             let $this = this;
 
-            if (!this.IpClient) {
+            if (!this.ipClient) {
                 await axios.get(`https://api.ipify.org?format=json`).then(function (res) {
-                    $this.IpClient = res.data
+                    $this.ipClient = res.data
                 });
             }
-            return this.IpClient;
+            return this.ipClient;
         },
         resetUserConnection: async function (userInfo, removeId) {
             let { removeConnection } = await this.getRealtimeDb();
@@ -266,93 +308,73 @@ export const connectMixin = {
             this.resetUserConnection(null, uid);
         },
     },
+    computed: {
+        hasAuth() { return this.authInfo.user != null; },
+    },
 }
 
-export const mouseSyncMixin = {
-    mixins: [realtimeDbMixin],
+export const connectTransferMixin = {
+    props: ['authInfo', 'connection', 'realtimeDb'],
     data() {
         return {
-            mouseSync: {
+            connectTransfer: {
                 ready: false,
+                authInfo: null,
+                connection: null,
                 realtimeDb: null,
-                connectName: 'mouseSync',
-                userId: '',
-                userName: '',
-                ref: null,
-                workable: true,
-                delay: 10,
-                userMouse: [],
-                connectUsers: [],
             },
         }
     },
-    async created() {
-        let $this = this;
-        let model = this.mouseSync;
-
-        let { dbConnection } = await this.getRealtimeDb();
-        dbConnection(model.connectName, null, async (snapshot) => {
-            //onChildAdded 新增時觸發
-            let childData = snapshot.val();
-            if (model.userMouse.filter(x => x.uid == snapshot.key).length == 0) {
-                childData["uid"] = snapshot.key;
-                model.userMouse.push(childData)
-            }
-            this.updateUserName()
-        }, null, async (snapshot) => {
-            //onChildChanged 更新時觸發
-            let childData = snapshot.val();
-            let user1 = $this.getObject(model.userMouse, 'uid', snapshot.key)
-            if (user1) {
-                user1.x = childData.x;
-                user1.y = childData.y;
-            }
-        })
-    },
     methods: {
-        mouseMove(event) {
-            let model = this.mouseSync;
-            if (!model.ready) { return; }
-
-            let { setRef } = model.realtimeDb;
-            if (model.workable) {
-                setRef(`${model.connectName}/${model.userId}`, {
-                    x: event.clientX,
-                    y: event.clientY,
-                })
-
-                if (model.delay > 0) {
-                    model.workable = false;
-
-                    setTimeout(function () {
-                        model.workable = true;
-                    }, model.delay)
-                }
-            }
-        },
-        async mouseSyncInit(authUser) {
-            let $this = this;
-            if (!authUser) return;
-
-            $this.mouseSync.realtimeDb = await this.getRealtimeDb();
-            $this.mouseSync.ready = true;
-            $this.mouseSync.userId = authUser.uid;
-            $this.mouseSync.userName = authUser.displayName;
-        },
-        updateUserName() {
-            let connectUsers = this.mouseSync.connectUsers;
-
-            this.mouseSync.userMouse.forEach(function (v) {
-                let filter = connectUsers.filter(x => x.key == v.uid);
-                if (filter.length > 0) { v["name"] = filter[0].displayName; }
-            })
-        },
+        //提供介面覆寫
+        async onConnectTransferReady(data) { }, //全部loading完觸發
+        async onAuthInfoChanged(data) { }, 
+        async onConnectionChanged(data) { }, 
+        async onRealtimeDbChanged(data) { }, 
     },
     watch: {
-        "mouseSync.connectUsers": {
-            handler: function (nv, ov) {
-                this.updateUserName()
+        "authInfo.ready": {
+            handler: async function (nv, ov) {
+                if (nv) {
+                    this.connectTransfer.authInfo = this.authInfo;
+                    await this.onAuthInfoChanged(nv);
+                }
             },
+            immediate: true,
+        },
+        "connection": {
+            handler: async function (nv, ov) {
+                if (nv) {
+                    this.connectTransfer.connection = this.connection;
+                    await this.onConnectionChanged(nv);
+                }
+            },
+            deep: true, immediate: true,
+        },
+        "realtimeDb": {
+            handler: async function (nv, ov) {
+                if (nv) {
+                    this.connectTransfer.realtimeDb = this.realtimeDb;
+                    await this.onRealtimeDbChanged(nv);
+                }
+            },
+            immediate: true,
+        },
+        "connectTransfer": {
+            handler: async function (nv, ov) {
+                if (!nv.ready) {
+                    let bool = true;
+                    Object.keys(nv).forEach(function (v) {
+                        if (nv[v] == null) { bool = false; }
+                    })
+                    
+                    if (bool) {
+                        nv.ready = true;
+                        await this.onConnectTransferReady(this.connectTransfer);
+                    }
+                }
+            },
+            deep: true, immediate: true,
         },
     }
 }

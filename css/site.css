@@ -1,3 +1,5 @@
+@import "chat.css";
+
 html {
     font-size: 14px;
     position: relative;
@@ -204,12 +206,37 @@ header {
 }
 
 .user-mouse {
+    position: fixed;
     border: 1px solid #0da7fd;
     padding: 0.1em 0.3em;
     border-radius: 1em;
     background-color: #0da7fd;
     color: white;
-    min-width:2em;
-    min-height:1em;
+    min-width: 2em;
+    min-height: 1em;
+    z-index: 10;
+}
+
+.bg-hover {
+    transition: 0.2s;
+}
+    .bg-hover:hover {
+        border-radius: 0.3em;
+        background-color: #eee !important;
+    }
+
+
+@keyframes RGB {
+    0%, 100% {
+        background-color: #ff919b;
+    }
+
+    33% {
+        background-color: #ceff6e;
+    }
+
+    66% {
+        background-color: #79e9ff;
+    }
 }
 

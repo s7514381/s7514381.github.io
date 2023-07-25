@@ -138,8 +138,7 @@ const appComponent = Vue.createApp({
     },
     methods: {
         async chatInput(e) {
-            this.dbInsert("Chat", { content: e.target.value, createDate: new Date() });
-            this.chat.content.push({ message: e.target.value, self: true, })
+            this.dbInsert("Chat", { uid: this.authInfo.user.uid, content: e.target.value, createDate: new Date() });
             e.target.value = '';
         },
     },

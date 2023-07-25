@@ -4,12 +4,14 @@
     <div class="chat card fill-parent">
 
         <div class="row" style="height: 100%;">
-            <div class="col-auto pe-0 border-end">
-                <div class="p-2">這邊放好友名單</div>
+            <div class="col-3 pe-0 border-end">
+                <div class="p-2" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                    這邊放好友名單
+                </div>
                 </div>
             <div class="col ps-0">
                 <div class="" style="height: 100%;display: flex; flex-direction: column-reverse;">
-                    <input class="form-control message-input" placeholder="能不能講一下話阿" @@change="qqw" />
+                    <input class="form-control message-input" placeholder="能不能講一下話阿" @@keyup.enter="chatInput" />
                     
                     <div class="chat-body">
 

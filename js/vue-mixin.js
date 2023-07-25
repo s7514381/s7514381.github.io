@@ -307,6 +307,14 @@ export const connectMixin = {
 
             this.resetUserConnection(null, uid);
         },
+        async chatInit() {
+            let $this = this;
+            let { dbSnapshot } = await $this.getDbAssembly();
+            dbSnapshot('Chat', async (doc) => {
+                let isSelf = doc.uid == $this.authInfo.user.uid;
+                $this.chat.content.push({ message: doc.content, self: isSelf, })
+            })
+        },
     },
     computed: {
         hasAuth() { return this.authInfo.user != null; },

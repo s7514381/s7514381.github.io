@@ -115,10 +115,7 @@ const appComponent = Vue.createApp({
                 { name: "firestore", func: this.getRealtimeDb, ready: false },
             ],
             chat: {
-                content: [
-                    { message: '安安', self: false, },
-                    { message: '安三小', self: true, }
-                ]
+                content: []
             },
         }
     },
@@ -135,9 +132,16 @@ const appComponent = Vue.createApp({
 
         //大廳登入
         await this.connectInit();
+
+        //聊天室登入
+        await this.chatInit();
     },
     methods: {
-        qqw() { this.chat.content.push({ message: '安三小三小', self: false, }) },
+        async chatInput(e) {
+            this.dbInsert("Chat", { content: e.target.value, createDate: new Date() });
+            this.chat.content.push({ message: e.target.value, self: true, })
+            e.target.value = '';
+        },
     },
 });
 

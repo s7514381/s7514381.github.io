@@ -307,6 +307,13 @@ export const connectMixin = {
 
             this.resetUserConnection(null, uid);
         },
+        async chatInit() {
+            let $this = this;
+            let { dbSnapshot } = await $this.getDbAssembly();
+            dbSnapshot('Chat', async (doc) => {
+
+            })
+        },
     },
     computed: {
         hasAuth() { return this.authInfo.user != null; },

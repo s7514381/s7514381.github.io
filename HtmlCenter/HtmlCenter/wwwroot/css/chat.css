@@ -10,7 +10,7 @@
     }
 
     .chat .message {
-        animation: growing .4s ease both;
+        animation: growing .3s ease both;
     }
 
     .chat .message-body {

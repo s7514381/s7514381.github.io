@@ -33,12 +33,8 @@ const routerMixin = {
         })
 
         $this.$router.beforeEach(async to => {
-            $this.$refs.navbarToggle.click();
-
             if (!this.$router.hasRoute(to.name)) {
                 $this.pageLoading = true;
-
-                
 
                 let navItem = $this.getObject($this.navbar, 'to', to.path);
                 if (navItem && navItem.newTag) {
@@ -81,6 +77,9 @@ const routerMixin = {
         })
 
         $this.$router.beforeResolve(async to => {
+            if ($this.$refs.navbarCollapse.classList.contains('show'))
+                $this.$refs.navbarToggle.click();
+
             const routeComponent = to.matched[0]?.components?.default;
 
             if (routeComponent && !routeComponent?.template) {

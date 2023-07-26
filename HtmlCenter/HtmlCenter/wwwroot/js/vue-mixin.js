@@ -85,9 +85,8 @@ export const realtimeDbMixin = {
 export const firestoreMixin = {
     data() {
         return {
-            dbAssembly: {
-                ready: false,
-            },
+            dbAssembly: null,
+            firestore: null,
         }
     },
     methods: {
@@ -97,25 +96,26 @@ export const firestoreMixin = {
             return new Promise((resolve, reject) => {
                 import(`/js/firebase/firestore.js?timestamp=${Date.now()}`)
                     .then(module => {
-                        $this.dbAssembly = module.dbAssembly;
-                        resolve(true);
+                        resolve(module.dbAssembly);
+                        $this.firestore = $this;
                     })
             });
         },
         getDbAssembly: async function () {
-            let { ready } = this.dbAssembly;
-
-            if (!ready) { await this.firestoreInit(); }
+            if (this.dbAssembly == null) { this.dbAssembly = await this.firestoreInit(); }
             return this.dbAssembly;
         },
         dbInsert: async function (collectionName, data, docId = '') {
             let { addDoc, collection, db } = await this.getDbAssembly();
+            data["createDate"] = new Date();
 
             if (docId != '') { return await setDoc(doc(db, collectionName, docId), data); }
             return await addDoc(collection(db, collectionName), data);
         },
         dbUpdate: async function (collectionName, docId, data) {
             let { doc, updateDoc, db } = await this.getDbAssembly();
+            data["updateDate"] = new Date();
+
             const docRef = doc(db, collectionName, docId);
             return await updateDoc(docRef, data);
         },
@@ -127,6 +127,37 @@ export const firestoreMixin = {
             let { getDocs } = await this.getDbAssembly();
             return await getDocs(queryCondition);
         },
+        async dbSnapshot(dbName, limitCount, reverse, addFunc = null, modifiedFunc = null, removeFunc = null) {
+            let { query, collection, db, orderBy, limit, onSnapshot  } = await this.getDbAssembly();
+
+            limitCount = Number(limitCount);
+            if (limitCount > 100) { limitCount = 100; }
+            if (limitCount < 0) { limitCount = 0; }
+
+            const collectionRef = query(collection(db, dbName), orderBy("createDate", "desc"), limit(limitCount));
+
+            onSnapshot(collectionRef, async (snapshot) => {
+                let docChanges = snapshot.docChanges();
+                if (reverse) { docChanges = docChanges.reverse() }
+
+                for (let i = 0; i < docChanges.length; i++) {
+                    let change = docChanges[i];
+                    const document = change.doc.data();
+
+                    switch (change.type) {
+                        case 'added': // 處理新文檔插入事件
+                            if (addFunc) { await addFunc(document); }
+                            break;
+                        case 'modified': // 處理文檔修改事件
+                            if (modifiedFunc) { await modifiedFunc(document); }
+                            break;
+                        case 'removed': // 處理文檔刪除事件
+                            if (removeFunc) { await removeFunc(document); }
+                            break;
+                    }
+                }
+            });
+        }
     }
 }
 
@@ -172,6 +203,9 @@ export const connectMixin = {
                 ready: false,
             },
             ipClient: null,
+            chat: {
+                content: []
+            },
         }
     },
     methods: {
@@ -309,11 +343,15 @@ export const connectMixin = {
         },
         async chatInit() {
             let $this = this;
-            let { dbSnapshot } = await $this.getDbAssembly();
-            dbSnapshot('Chat', async (doc) => {
+            await $this.getDbAssembly();
+            this.dbSnapshot('Chat', true, async (doc) => {
                 let isSelf = doc.uid == $this.authInfo.user.uid;
-                $this.chat.content.push({ message: doc.content, self: isSelf, })
+                $this.chat.content.push({ message: doc.content, createDate: doc.createDate, self: isSelf, })
             })
+        },
+        async chatInput(e) {
+            this.dbInsert("Chat", { uid: this.authInfo.user.uid, content: e.target.value });
+            e.target.value = '';
         },
     },
     computed: {
@@ -322,7 +360,7 @@ export const connectMixin = {
 }
 
 export const connectTransferMixin = {
-    props: ['authInfo', 'connection', 'realtimeDb'],
+    props: ['authInfo', 'connection', 'realtimeDb', 'firestore'],
     data() {
         return {
             connectTransfer: {
@@ -330,6 +368,7 @@ export const connectTransferMixin = {
                 authInfo: null,
                 connection: null,
                 realtimeDb: null,
+                firestore: null
             },
         }
     },
@@ -339,6 +378,7 @@ export const connectTransferMixin = {
         async onAuthInfoChanged(data) { }, 
         async onConnectionChanged(data) { }, 
         async onRealtimeDbChanged(data) { }, 
+        async onFirestoreChanged(data) { }, 
     },
     watch: {
         "authInfo.ready": {
@@ -368,12 +408,23 @@ export const connectTransferMixin = {
             },
             immediate: true,
         },
+        "firestore": {
+            handler: async function (nv, ov) {
+                if (nv) {
+                    this.connectTransfer.firestore = this.firestore;
+                    await this.onFirestoreChanged(nv);
+                }
+            },
+            immediate: true,
+        },
         "connectTransfer": {
             handler: async function (nv, ov) {
+                let $this = this;
                 if (!nv.ready) {
                     let bool = true;
                     Object.keys(nv).forEach(function (v) {
-                        if (nv[v] == null) { bool = false; }
+                        //如果有傳prop進來才判斷是否有載入
+                        if ($this.$props[v] != undefined && nv[v] == null) { bool = false; }
                     })
                     
                     if (bool) {

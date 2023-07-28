@@ -1,4 +1,5 @@
-﻿
+﻿import { god } from "./firebase/app.js"
+
 //套用此Mixin之後可以直接使用v-model="value"
 export const bindModelMixin = {
     emits: ['update:modelValue'],
@@ -15,6 +16,11 @@ export const bindModelMixin = {
 }
 
 export const baseMixin = {
+    data() {
+        return {
+            god: god,
+        }
+    },
     methods: {
         newGuid: function () {
             return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>

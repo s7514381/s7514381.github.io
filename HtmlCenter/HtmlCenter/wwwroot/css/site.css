@@ -17,8 +17,13 @@ body {
 }
 
 main {
-    min-height: calc(100vh - 5em);
+    min-height: calc(100vh - 6em);
     position: relative;
+}
+
+.h-fit-screen {
+    position: relative;
+    height: calc(100vh - 6em);
 }
 
 header {

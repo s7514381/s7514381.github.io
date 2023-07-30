@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>自由發揮 園丁Tim</title>
+    <link rel="stylesheet" href="/lib/bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.2.3_dist_css_bootstrap.min.css" />
+    <link rel="stylesheet" href="/lib/font-awesome/fontawesome-free-6.4.0-web/css/all.min.css" />
+    <link rel="stylesheet" href="/css/site.css?v=6aogjtTUwWWQIuPmFOyYzWKt7YN4625LsPydBtFgwjM" />
+    <link rel="stylesheet" href="/css/image-cover-frame.css?v=LndOvmdvYvfNGZ_Xby9XErY0d5p_LhPwLQ90eOPSTYg" />
+    <link rel="stylesheet" href="/css/dynamic-form.css?v=kHNWcsTiItzqiDc_ryxKuhJWXoUb9-TTxkcO2nCvOSU" />
+
+    <script src="/lib/bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.2.3_dist_js_bootstrap.bundle.min.js"></script>
+    <script src="/lib/vue/vue.global.prod.js" type="text/javascript"></script>
+    <script src="/lib/Sortable/Sortable.min.js"></script>
+    <script src="/lib/vue/vuedraggable.umd.min.js"></script>
+    <script src="/lib/axios/unpkg.com_axios@1.4.0_dist_axios.min.js"></script>
+    <script src="https://unpkg.com/vue-router@4.2.2/dist/vue-router.global.js"></script>
+    <script src="/lib/lottie/lottie.min.js"></script>
+    <script src="/lib/font-awesome/fontawesome-free-6.4.0-web/js/all.min.js"></script>
+</head>
+
+<body id="app">
+    <header>
+        <div style="display:contents"></div>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 px-5 nav-shadow navbar-animation">
+            <div class="container-fluid">
+                <router-link to="/" class="navbar-brand fw-bold fs-3 logo-text">園丁Tim</router-link>
+
+                <button ref="navbarToggle" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div ref="navbarCollapse" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li v-for="v in navbar" class="nav-item me-3 px-2 " style="position: relative">
+                            <router-link :to="v.to"
+                                         class="nav-link text-dark"
+                                         :class="{'new-tag': v.newTag}">{{v.name}}</router-link>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav flex-grow-1" style="justify-content: flex-end">
+                        <li class="nav-item me-3 px-2">
+                            <div v-if="authInfo.ready">
+                                <a v-if="hasAuth" class="nav-link text-dark" @click="signOut()" style="cursor:pointer">{{authInfo.user.displayName}}</a>
+                                <a v-if="!hasAuth" class="nav-link text-dark" @click="signIn()" style="cursor:pointer">登入</a>
+                            </div>
+
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container header-margin">
+        <main role="main">
+            <div v-show="pageLoading" class="fill-parent flex-item-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <router-view v-if="!pageLoading"></router-view>
+        </main>
+    </div>
+
+    <script src="/js/site.js?v=DMrJW2DGQxeKC0mbeWvZ5H_XdVXPiZOSgrv02YX_-jA"></script>
+    <script src="/js/vue-component/index.js?v=x4DtUdLKDW0Ylg21mAsTVszsLEzFPE1t-Zonqbt8SY8" type="module"></script>
+</body>
+</html>
+
+

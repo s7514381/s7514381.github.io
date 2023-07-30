@@ -1,54 +1,41 @@
 ﻿import { baseMixin, connectTransferMixin } from '../vue-mixin.js'
-import jsMouseSync from './mouse-sync.js'
 
 export default {
     //connectTransferMixin傳了'authInfo', 'connection', 'realtimeDb', 'firestore'這幾個進來
     mixins: [baseMixin, connectTransferMixin],
-    components: {
-        'v-mouse-sync': jsMouseSync,
-    },
     template: `
-<v-mouse-sync :authInfo="authInfo" :connection="connection" :realtimeDb="realtimeDb">
+<div class="chat card h-100">
+    <div class="row h-100">
+        <div class="col h-100">
+            <div class="h-100 d-flex" style="flex-direction: column-reverse;">
+                <input class="form-control message-input" placeholder="能不能講一下話阿" @keyup.enter="chatInput" />
 
-    <div class="chat card fill-parent">
-        <div class="row" style="height: 100%;">
-            <div class="col-3 pe-0 border-end">
-                <div class="p-2" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                    這邊放好友名單
+                <div v-show="loading" class="fill-parent flex-item-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
-            </div>
-            <div class="col ps-0" style="height: 100%;">
 
-                <div class="" style="height: 100%;display: flex; flex-direction: column-reverse;">
-                    <input class="form-control message-input" placeholder="能不能講一下話阿" @keyup.enter="chatInput" />
-                    
-                    <div v-show="loading" class="fill-parent flex-item-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div> 
-
-                    <div v-show="!loading" ref="chatBody" class="chat-body" style="overflow-y: scroll;" @scroll="handleScroll">
-                        <div v-for="v in content" 
-                             class="d-flex pt-2 message push-up"
-                             :class="{ 'self': v.self }">
-                            <div class="message-body">
-                                {{v.message}}
-                            </div>
+                <div v-show="!loading" ref="chatBody" class="chat-body" style="overflow-y: scroll;" @scroll="handleScroll">
+                    <div v-for="(v, i) in content"
+                            class="d-flex message push-up"
+                            :class="{ 'self': v.self, 'pt-2': i > 0 }">
+                        <div class="message-body">
+                            {{v.content}}
                         </div>
                     </div>
-
-                    <div v-show="!isTrack" style="position: absolute; top: 80%; left: 55%;">
-                        <div class="keepTrack" @click="keepTrack">
-                           繼續捲動
-                        </div>
-                    </div>
-
                 </div>
+
+                <div v-show="!isTrack" style="position: absolute; top: 80%; left: 50%;">
+                    <div class="keepTrack" @click="keepTrack">
+                        繼續捲動
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-</v-mouse-sync>
+</div>
 `,
     data() {
         return {
@@ -73,9 +60,10 @@ export default {
 
             let cnt = 0;
             let limitCount = 20;
-            dbSnapshot('Chat', limitCount, true, async (doc) => {
+            dbSnapshot('Chat', limitCount, true, (doc) => {
                 let isSelf = doc.uid == $this.authInfo.user.uid;
-                $this.content.push({ message: doc.content, createDate: doc.createDate, self: isSelf, })
+                doc["self"] = isSelf;
+                $this.content.push(doc);
 
                 cnt++; if (cnt == limitCount) { $this.loading = false; }
             })
@@ -115,3 +103,9 @@ export default {
         },
     },
 }
+
+//<div class="col-3 pe-0 border-end">
+//    <div class="p-2" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+//        這邊放好友名單
+//    </div>
+//</div>

@@ -4,9 +4,14 @@ export default {
     mixins: [baseMixin, connectTransferMixin],
     template: `
 <div class="mb-2">
-    <input value='https://youtu.be/EL3oN5PU9ak' ref="videoUrlInput" class="form-control rounded-pill" placeholder="請輸入影片網址或影片代號" @keyup.enter="videoUrlInput" />
+    <input ref="videoUrlInput" class="form-control rounded-pill" placeholder="請輸入影片網址或影片代號" @keyup.enter="videoUrlInput" />
 </div>
-<div :id="playerId"></div>
+<div class="container-16_9">
+    <div class="responsive-element">
+        <div :id="playerId" class='ytPlayer'></div>
+    </div>
+</div>
+
 `,
     data() {
         return {
@@ -67,6 +72,7 @@ export default {
                             $this.ytPlayer = new YT.Player($this.playerId, ytSetting);
                         }
                         else { $this.ytPlayer.loadVideoById(childData.videoId); }
+                        console.log($this.ytPlayer)
                         break;
                     case "onPlayerStateChange":
                         //這邊的狀態屬於操作介面觸發，所以操作本人不需接收

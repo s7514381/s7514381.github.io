@@ -94,8 +94,8 @@ export const youtubeMixin = {
             this.youtube = this;
         },
         setDefaultSetting(obj) {
-            if (!obj.height) { obj.height = '390'; }
-            if (!obj.width) { obj.width = '640'; }
+            if (!obj.height) { obj.height = '100%'; }
+            if (!obj.width) { obj.width = '100%'; }
             if (!obj.playerVars) { obj.playerVars = { 'playsinline': 1 }; }
             if (!obj.events) {
                 obj.events = {

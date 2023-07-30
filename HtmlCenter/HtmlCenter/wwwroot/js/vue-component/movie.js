@@ -79,7 +79,7 @@ export default {
                         //自己發出的訊號自己不需接收
                         if (childData.visitId == this.authInfo.visitId) { return; }
                         //緩衝時不接收訊號
-                        if ($this.ytPlayer.getPlayerState() == 3) { return; }
+                        if ($this.ytPlayer == null || $this.ytPlayer.getPlayerState() == 3) { return; }
                         
                         if ($this.ytPlayer.getPlayerState() != childData.state) {
                             switch (childData.state) {

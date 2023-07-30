@@ -72,7 +72,6 @@ export default {
                             $this.ytPlayer = new YT.Player($this.playerId, ytSetting);
                         }
                         else { $this.ytPlayer.loadVideoById(childData.videoId); }
-                        console.log($this.ytPlayer)
                         break;
                     case "onPlayerStateChange":
                         //這邊的狀態屬於操作介面觸發，所以操作本人不需接收
@@ -89,7 +88,7 @@ export default {
                                 case 2:
                                     $this.ytPlayer.pauseVideo(); break;
                             }
-                            $this.ytPlayer.seekTo(childData.currentTime, false);
+                            $this.ytPlayer.seekTo(childData.currentTime, true);
                         }
 
                         break;

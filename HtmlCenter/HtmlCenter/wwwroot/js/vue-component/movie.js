@@ -107,6 +107,7 @@ export default {
             let { setRef } = this.realtimeDb;
 
             //被操作者的訊號不再發出
+
             setRef(`movie/onPlayerStateChange`, {
                 visitId: this.authInfo.visitId,
                 state: e.data,

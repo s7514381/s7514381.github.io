@@ -88,6 +88,34 @@ export const realtimeDbMixin = {
     }
 }
 
+export const youtubeMixin = {
+    data() {
+        return {
+            youtube: null,
+        }
+    },
+    methods: {
+        async getYoutube() {
+            if (this.youtube == null) { await onYouTubeReady(); }
+            this.youtube = this;
+        },
+        setDefaultSetting(obj) {
+            if (!obj.height) { obj.height = '100%'; }
+            if (!obj.width) { obj.width = '100%'; }
+            if (!obj.playerVars) { obj.playerVars = { 'playsinline': 1 }; }
+            if (!obj.events) {
+                obj.events = {
+                    'onReady': this.onPlayerReady,
+                    'onStateChange': this.onPlayerStateChange
+                };
+            }
+            return obj;
+        },
+        onPlayerReady(e) { },
+        onPlayerStateChange(e) { },
+    }
+}
+
 export const firestoreMixin = {
     data() {
         return {
@@ -102,8 +130,8 @@ export const firestoreMixin = {
             return new Promise((resolve, reject) => {
                 import(`/js/firebase/firestore.js?timestamp=${Date.now()}`)
                     .then(module => {
-                        resolve(module.dbAssembly);
                         $this.firestore = $this;
+                        resolve(module.dbAssembly);
                     })
             });
         },
@@ -171,7 +199,7 @@ export const threadMixin = {
     methods: {
         async runThreads(threadList) {
             let $this = this;
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 for (let i = 0; i < threadList.length; i++) {
                     let task = threadList[i];
 
@@ -183,7 +211,7 @@ export const threadMixin = {
             });
         },
         async checkInitThread(threadList) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 let result = true;
                 for (let i = 0; i < threadList.length; i++) {
                     let task = threadList[i];
@@ -196,12 +224,13 @@ export const threadMixin = {
 }
 
 export const connectMixin = {
-    mixins: [baseMixin, firestoreMixin, realtimeDbMixin],
+    mixins: [baseMixin, firestoreMixin, realtimeDbMixin, youtubeMixin],
     data() {
         return {
             authInfo: {
                 ready: false,
                 user: null,
+                visitId: null,
             },
             connection: {
                 name: 'connections',
@@ -250,6 +279,7 @@ export const connectMixin = {
             let authUser = await $this.getAuthUser();
             $this.authInfo.user = authUser;
             $this.authInfo.ready = true;
+            $this.authInfo.visitId = $this.visitId;
         },
         async getAuthUser() {
             let $this = this;
@@ -347,18 +377,6 @@ export const connectMixin = {
 
             this.resetUserConnection(null, uid);
         },
-        async chatInit() {
-            let $this = this;
-            await $this.getDbAssembly();
-            this.dbSnapshot('Chat', true, async (doc) => {
-                let isSelf = doc.uid == $this.authInfo.user.uid;
-                $this.chat.content.push({ message: doc.content, createDate: doc.createDate, self: isSelf, })
-            })
-        },
-        async chatInput(e) {
-            this.dbInsert("Chat", { uid: this.authInfo.user.uid, content: e.target.value });
-            e.target.value = '';
-        },
     },
     computed: {
         hasAuth() { return this.authInfo.user != null; },
@@ -366,7 +384,7 @@ export const connectMixin = {
 }
 
 export const connectTransferMixin = {
-    props: ['authInfo', 'connection', 'realtimeDb', 'firestore'],
+    props: ['authInfo', 'connection', 'realtimeDb', 'firestore', 'youtube'],
     data() {
         return {
             connectTransfer: {
@@ -374,7 +392,8 @@ export const connectTransferMixin = {
                 authInfo: null,
                 connection: null,
                 realtimeDb: null,
-                firestore: null
+                firestore: null,
+                youtube: null,
             },
         }
     },
@@ -385,6 +404,7 @@ export const connectTransferMixin = {
         async onConnectionChanged(data) { }, 
         async onRealtimeDbChanged(data) { }, 
         async onFirestoreChanged(data) { }, 
+        async onYoutubeChanged(data) { }, 
     },
     watch: {
         "authInfo.ready": {
@@ -423,6 +443,15 @@ export const connectTransferMixin = {
             },
             immediate: true,
         },
+        "youtube": {
+            handler: async function (nv, ov) {
+                if (nv) {
+                    this.connectTransfer.youtube = this.youtube;
+                    await this.onYoutubeChanged(nv);
+                }
+            },
+            immediate: true,
+        },
         "connectTransfer": {
             handler: async function (nv, ov) {
                 let $this = this;
@@ -430,7 +459,7 @@ export const connectTransferMixin = {
                     let bool = true;
                     Object.keys(nv).forEach(function (v) {
                         //如果有傳prop進來才判斷是否有載入
-                        if ($this.$props[v] != undefined && nv[v] == null) { bool = false; }
+                        if ($this.$props[v] !== undefined && nv[v] == null) { bool = false; }
                     })
                     
                     if (bool) {

@@ -4,10 +4,12 @@
 
 import jsMouseSync from './mouse-sync.js'
 import jsChat from './chat.js'
+import jsMovie from './movie.js'
 
 const publicComponents = {
     'v-mouse-sync': jsMouseSync,
     'v-chat': jsChat,
+    'v-movie': jsMovie,
 }
 
 const routerMixin = {
@@ -16,6 +18,7 @@ const routerMixin = {
             pageLoading: false,
             navbar: [
                 { to: '/chat', name: '互動大廳', newTag: false },
+                { to: '/movie', name: '電影院', newTag: false },
                 { to: '/imagecoverframe', name: '圖片框選器', newTag: false },
                 { to: '/dynamicform', name: '動態表單v1.0', newTag: false },
                 { to: '/interest', name: '利息計算機', newTag: false },
@@ -112,6 +115,7 @@ const appComponent = Vue.createApp({
             initThreads: [
                 { name: "realtimeDb", func: this.getRealtimeDb, ready: false },
                 { name: "firestore", func: this.getDbAssembly, ready: false },
+                { name: "youtube", func: this.getYoutube, ready: false },
             ],
             
         }
@@ -130,8 +134,6 @@ const appComponent = Vue.createApp({
         //大廳登入
         await this.connectInit();
 
-        //聊天室登入
-        await this.chatInit();
     },
     methods: {
     },

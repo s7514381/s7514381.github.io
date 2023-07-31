@@ -1,0 +1,17 @@
+
+<v-mouse-sync :authInfo="authInfo" :connection="connection" :realtimeDb="realtimeDb">
+    <div class="row" style="min-height: inherit;">
+        <div class="col-8">
+            <v-movie :authInfo="authInfo" :youtube="youtube" :realtimeDb="realtimeDb"> </v-movie>
+        </div>
+        <div class="col">
+            <div class="row h-fit-screen">
+                <div class="col" style="height:inherit">
+                    <v-chat :authInfo="authInfo" :firestore="firestore"></v-chat>
+                </div>
+            </div>
+        </div>
+    </div>
+</v-mouse-sync>
+
+

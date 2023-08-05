@@ -62,6 +62,9 @@
 
     <div class="container header-margin">
         <main role="main">
+            <video id="sharedScreen" autoplay playsinline controls></video>
+            <button onclick="startScreenSharing()">Share Screen</button>
+
             <div v-show="pageLoading" class="fill-parent flex-item-center">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
@@ -72,6 +75,7 @@
             <router-view v-if="!pageLoading"></router-view>
         </main>
     </div>
+
     @*<footer class="border-top footer text-muted">
     <div class="container">
     &copy; 2023 - Github - <a asp-controller="HtmlCenter" asp-action="UpdateRenderView" style="color: #6c757d">更新</a>
@@ -80,6 +84,36 @@
 
     <script src="/js/site.js" asp-append-version="true"></script>
     <script src="/js/vue-component/index.js" type="module" asp-append-version="true"></script>
+
+    <script>
+        const videoElement = document.getElementById('sharedScreen');
+
+
+        async function getUserMedia() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                videoElement.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing user media:', err);
+            }
+        }
+
+        // 定義一個 async 函數開始螢幕分享
+        async function startScreenSharing() {
+            try {
+                // 使用 navigator.mediaDevices 請求分享螢幕
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true }); //audio: true
+
+                // 將分享的視訊流連接到視訊元素
+                videoElement.srcObject = stream;
+                console.log(videoElement)
+            } catch (err) {
+                console.error('Error accessing screen:', err);
+            }
+        }
+    </script>
+
+
 </body>
 </html>
 

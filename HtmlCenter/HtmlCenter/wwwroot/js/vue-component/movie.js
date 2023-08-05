@@ -11,7 +11,6 @@ export default {
         <div :id="playerId" class='ytPlayer'></div>
     </div>
 </div>
-
 `,
     data() {
         return {

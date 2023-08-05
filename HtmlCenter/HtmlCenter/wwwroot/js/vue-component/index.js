@@ -5,11 +5,13 @@
 import jsMouseSync from './mouse-sync.js'
 import jsChat from './chat.js'
 import jsMovie from './movie.js'
+import jsScreenStream from './screenstream.js'
 
 const publicComponents = {
     'v-mouse-sync': jsMouseSync,
     'v-chat': jsChat,
     'v-movie': jsMovie,
+    'v-screenstream': jsScreenStream
 }
 
 const routerMixin = {
@@ -19,6 +21,7 @@ const routerMixin = {
             navbar: [
                 { to: '/chat', name: '互動大廳', newTag: false },
                 { to: '/movie', name: '電影院', newTag: false },
+                { to: '/screenstream', name: '視訊串流', newTag: false },
                 { to: '/imagecoverframe', name: '圖片框選器', newTag: false },
                 { to: '/dynamicform', name: '動態表單v1.0', newTag: false },
                 { to: '/interest', name: '利息計算機', newTag: false },

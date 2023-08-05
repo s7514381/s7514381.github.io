@@ -62,9 +62,6 @@
 
     <div class="container header-margin">
         <main role="main">
-            <video id="sharedScreen" autoplay playsinline controls></video>
-            <button onclick="startScreenSharing()">Share Screen</button>
-
             <div v-show="pageLoading" class="fill-parent flex-item-center">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
@@ -86,17 +83,13 @@
     <script src="/js/vue-component/index.js" type="module" asp-append-version="true"></script>
 
     <script>
-        const videoElement = document.getElementById('sharedScreen');
-
-
-        async function getUserMedia() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                videoElement.srcObject = stream;
-            } catch (err) {
-                console.error('Error accessing user media:', err);
-            }
-        }
+        const servers = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:11893' }
+                    // Add your TURN server here if needed
+                ]
+            };
+        let peerConnection = new RTCPeerConnection(servers);
 
         // 定義一個 async 函數開始螢幕分享
         async function startScreenSharing() {
@@ -104,13 +97,65 @@
                 // 使用 navigator.mediaDevices 請求分享螢幕
                 const stream = await navigator.mediaDevices.getDisplayMedia({ video: true }); //audio: true
 
-                // 將分享的視訊流連接到視訊元素
-                videoElement.srcObject = stream;
-                console.log(videoElement)
+                // 連接本地視訊流到本地視訊元素
+                const localVideo = document.getElementById('localVideo');
+                localVideo.srcObject = stream;
+                localStream = stream;
+
+                // 創建 RTC Peer 連接
+                createPeerConnection();
+
+                // 添加本地視訊流至 Peer 連接
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+                
             } catch (err) {
-                console.error('Error accessing screen:', err);
+                //console.error('Error accessing screen:', err);
             }
         }
+
+        function createPeerConnection() {
+            // 使用 STUN/TURN 伺服器，你可能需要自己配置這些伺服器
+            
+            console.log(peerConnection)
+
+            // 設定遠端視訊流處理
+            peerConnection.ontrack = event => {
+                remoteStream = event.streams[0];
+
+                console.log(event)
+
+                const remoteVideo = document.getElementById('remoteVideo');
+                remoteVideo.srcObject = remoteStream;
+            };
+
+            // 處理 ICE 候選
+            peerConnection.onicecandidate = event => {
+                if (event.candidate) {
+                    // 將 ICE 候選傳送給遠端
+                }
+            };
+        }
+
+        // 現實收到的 ICE 候選
+        function handleRemoteICECandidate(event) {
+            const candidate = event.candidate;
+            // 將收到的 ICE 候選傳送給 Peer 連接的遠端
+        }
+
+        // 現實遠端視訊流
+        function handleRemoteStream(event) {
+            remoteVideo.srcObject = event.stream;
+        }
+
+        // 設定遠端視訊流處理
+        peerConnection.ontrack = event => {
+
+            console.log(event)
+            remoteStream = event.streams[0];
+
+            remoteVideo.srcObject = remoteStream;
+        };
+
     </script>
 
 

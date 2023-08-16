@@ -47,11 +47,10 @@ export default {
         }
     },
     created() {
-        
     },
     mounted() {
         let body = this.$refs.chatBody;
-        body.addEventListener("scroll", this.handleScroll);
+        body.addEventListener("scroll", this.handleScroll); 
     },
     methods: {
         async onFirestoreChanged(data) {
@@ -70,6 +69,7 @@ export default {
         }, 
         async chatInput(e) {
             let { dbInsert } = this.firestore;
+            if (e.target.value == '') { return; }
 
             dbInsert("Chat", { uid: this.authInfo.user.uid, content: e.target.value });
             e.target.value = '';

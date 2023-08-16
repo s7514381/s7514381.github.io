@@ -11,7 +11,6 @@ export default {
         <div :id="playerId" class='ytPlayer'></div>
     </div>
 </div>
-
 `,
     data() {
         return {
@@ -52,13 +51,21 @@ export default {
                 let mode = snapshot.key;
                 let childData = snapshot.val();
                 $this.handlePlayerData(mode, childData);
-            }, null, (snapshot) => {
+            }, (snapshot) => {
+                //onChildRemoved 更新時觸發
+                let mode = snapshot.key;
+                let childData = snapshot.val();
+                let { setRef } = this.realtimeDb;
+                console.log(mode, childData)
+
+                setRef(`movie/player`, {
+                    videoId: childData.videoId,
+                })
+            }, (snapshot) => {
                 //onChildChanged 更新時觸發
                 let mode = snapshot.key;
                 let childData = snapshot.val();
                 $this.handlePlayerData(mode, childData);    
-
-                
             })
         },
         handlePlayerData(mode, childData) {

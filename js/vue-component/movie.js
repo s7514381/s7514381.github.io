@@ -72,7 +72,6 @@ export default {
                             $this.ytPlayer = new YT.Player($this.playerId, ytSetting);
                         }
                         else { $this.ytPlayer.loadVideoById(childData.videoId); }
-                        console.log($this.ytPlayer)
                         break;
                     case "onPlayerStateChange":
                         //這邊的狀態屬於操作介面觸發，所以操作本人不需接收
@@ -80,7 +79,7 @@ export default {
                         //自己發出的訊號自己不需接收
                         if (childData.visitId == this.authInfo.visitId) { return; }
                         //緩衝時不接收訊號
-                        if ($this.ytPlayer.getPlayerState() == 3) { return; }
+                        if ($this.ytPlayer == null || $this.ytPlayer.getPlayerState() == 3) { return; }
                         
                         if ($this.ytPlayer.getPlayerState() != childData.state) {
                             switch (childData.state) {
@@ -89,7 +88,7 @@ export default {
                                 case 2:
                                     $this.ytPlayer.pauseVideo(); break;
                             }
-                            $this.ytPlayer.seekTo(childData.currentTime, false);
+                            $this.ytPlayer.seekTo(childData.currentTime, true);
                         }
 
                         break;
@@ -107,9 +106,8 @@ export default {
         onPlayerStateChange(e) {
             let { setRef } = this.realtimeDb;
 
-            console.log(e.data)
-
             //被操作者的訊號不再發出
+
             setRef(`movie/onPlayerStateChange`, {
                 visitId: this.authInfo.visitId,
                 state: e.data,

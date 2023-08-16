@@ -11,3 +11,4 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
+export const god = 'JvZwbT989vhv8WvA5KycFjn4e3X2';

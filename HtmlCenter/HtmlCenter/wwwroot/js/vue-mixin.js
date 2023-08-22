@@ -355,8 +355,8 @@ export const connectMixin = {
         },
         signIn: async function () {
             let { googleSignIn } = await this.getDbAssembly();
-            let result = await googleSignIn();
-            this.authInfo.user = result.user;
+            let signInInfo = await googleSignIn();
+            this.authInfo.user = signInInfo.user;
 
             this.resetUserConnection(this.authInfo.user, this.visitId);
         },

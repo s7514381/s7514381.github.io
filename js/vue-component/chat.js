@@ -37,6 +37,7 @@ export default {
     </div>
 </div>
 `,
+    props: ['id'],
     data() {
         return {
             isTrack: true,
@@ -53,19 +54,22 @@ export default {
         body.addEventListener("scroll", this.handleScroll); 
     },
     methods: {
-        async onFirestoreChanged(data) {
+        async onConnectTransferReady(data) {
             let $this = this;
-            let { dbSnapshot } = data;
 
+            let { dbSnapshot } = $this.firestore;
             let cnt = 0;
             let limitCount = 20;
-            dbSnapshot('Chat', limitCount, true, (doc) => {
-                let isSelf = doc.uid == $this.authInfo.user.uid;
+            let connectId = `Chat`;
+            //if ($this.id) { connectId += `-${$this.id}`; }
+
+            dbSnapshot(connectId, limitCount, true, (doc) => {
+                let isSelf = doc.uid == $this.authInfo.user?.uid;
                 doc["self"] = isSelf;
                 $this.content.push(doc);
 
                 cnt++; if (cnt == limitCount) { $this.loading = false; }
-            })
+            })      
         }, 
         async chatInput(e) {
             let { dbInsert } = this.firestore;
@@ -107,5 +111,11 @@ export default {
 //<div class="col-3 pe-0 border-end">
 //    <div class="p-2" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
 //        這邊放好友名單
+//    </div>
+//</div>
+
+//<div v-show="!authInfo.user" class="fill-parent flex-item-center">
+//    <div class="card" style='font-size: 1.5em; padding: 2em 4em; background: #909090; color: white;'>
+//        登入後使用
 //    </div>
 //</div>

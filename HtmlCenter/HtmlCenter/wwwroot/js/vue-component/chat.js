@@ -61,15 +61,15 @@ export default {
             let cnt = 0;
             let limitCount = 20;
             let connectId = `Chat`;
-            //if ($this.id) { connectId += `-${$this.id}`; }
 
-            dbSnapshot(connectId, limitCount, true, (doc) => {
+            await dbSnapshot(connectId, limitCount, true, (doc) => {
                 let isSelf = doc.uid == $this.authInfo.user?.uid;
                 doc["self"] = isSelf;
                 $this.content.push(doc);
 
                 cnt++; if (cnt == limitCount) { $this.loading = false; }
             })      
+            $this.loading = false; 
         }, 
         async chatInput(e) {
             let { dbInsert } = this.firestore;

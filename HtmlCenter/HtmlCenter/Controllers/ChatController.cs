@@ -10,24 +10,9 @@ using Microsoft.Extensions.FileProviders;
 
 namespace HtmlCenter.Controllers
 {
-    public class ChatController : BaseController
+    public class ChatController : HtmlContentController
     {
-        public ChatController(BaseControllerArgument argument, ILogger<ChatController> logger) : base(argument)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
-        }
-
-
+        public ChatController(BaseControllerArgument argument, ILogger<ChatController> logger) : base(argument, logger) { }
 
     }
 }

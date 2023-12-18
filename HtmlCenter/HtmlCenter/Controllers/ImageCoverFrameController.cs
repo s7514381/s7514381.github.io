@@ -9,23 +9,9 @@ using System.Text;
 
 namespace HtmlCenter.Controllers
 {
-    public class ImageCoverFrameController : BaseController
+    public class ImageCoverFrameController : HtmlContentController
     {
-        public ImageCoverFrameController(BaseControllerArgument argument, ILogger<ImageCoverFrameController> logger): base(argument)
-        {
-            _logger = logger;
-
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
-        }
+        public ImageCoverFrameController(BaseControllerArgument argument, ILogger<ImageCoverFrameController> logger) : base(argument, logger) { }
 
     }
 }

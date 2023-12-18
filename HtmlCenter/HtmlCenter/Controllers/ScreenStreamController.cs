@@ -10,23 +10,9 @@ using Microsoft.Extensions.FileProviders;
 
 namespace HtmlCenter.Controllers
 {
-    public class ScreenStreamController : BaseController
+    public class ScreenStreamController : HtmlContentController
     {
-        public ScreenStreamController(BaseControllerArgument argument, ILogger<ScreenStreamController> logger) : base(argument)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
-        }
-
+        public ScreenStreamController(BaseControllerArgument argument, ILogger<ScreenStreamController> logger) : base(argument, logger) { }
 
 
     }

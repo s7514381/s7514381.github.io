@@ -9,23 +9,9 @@ using System.Text;
 
 namespace HtmlCenter.Controllers
 {
-    public class HomeController : BaseController
+    public class HomeController : HtmlContentController
     {
-        public HomeController(BaseControllerArgument argument, ILogger<HomeController> logger) : base(argument)
-        {
-            _logger = logger;
-
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
-        }
+        public HomeController(BaseControllerArgument argument, ILogger<HomeController> logger) : base(argument, logger) {  }
 
     }
 }

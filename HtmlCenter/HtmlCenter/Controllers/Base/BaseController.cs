@@ -67,11 +67,12 @@ namespace HtmlCenter.Controllers
             }
         }
 
-        public string HtmlContentString(string controllerName = "")
+        public string HtmlContentString(string controllerName = "", string actionName = "")
         {
             if (string.IsNullOrEmpty(controllerName)) { controllerName = CurrentController; }
 
-            string path = Path.Combine("Views", controllerName, "Index.cshtml");
+            if(string.IsNullOrEmpty(actionName)) { actionName = "Index"; }
+            string path = Path.Combine("Views", controllerName, $"{actionName}.cshtml");
             IFileInfo fileInfo = _fileProvider.GetFileInfo(path);
 
             if (!fileInfo.Exists) { return ""; }

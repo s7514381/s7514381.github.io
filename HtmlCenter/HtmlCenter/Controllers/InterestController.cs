@@ -9,23 +9,10 @@ using System.Text;
 
 namespace HtmlCenter.Controllers
 {
-    public class InterestController : BaseController
+    public class InterestController : HtmlContentController
     {
-        public InterestController(BaseControllerArgument argument, ILogger<InterestController> logger): base(argument)
-        {
-            _logger = logger;
+        public InterestController(BaseControllerArgument argument, ILogger<InterestController> logger) : base(argument, logger) {  }
 
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
-        }
 
 
     }

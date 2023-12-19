@@ -9,22 +9,9 @@ using System.Text;
 
 namespace HtmlCenter.Controllers
 {
-    public class DynamicFormController : BaseController
+    public class DynamicFormController : HtmlContentController
     {
-        public DynamicFormController(BaseControllerArgument argument, ILogger<DynamicFormController> logger): base(argument)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
-        }
+        public DynamicFormController(BaseControllerArgument argument, ILogger<DynamicFormController> logger) : base(argument, logger) { }
 
     }
 }

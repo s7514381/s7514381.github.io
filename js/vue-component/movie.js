@@ -19,13 +19,9 @@ export default {
             ytPlayer: null,
         }
     },
-    beforeCreate() {
-    },
-    created() {
-    },
-    mounted() {
-        
-    },
+    beforeCreate() { },
+    created() { },
+    mounted() { },
     methods: {
         videoUrlInput(e) {
             let $this = this;

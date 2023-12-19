@@ -10,23 +10,9 @@ using Microsoft.Extensions.FileProviders;
 
 namespace HtmlCenter.Controllers
 {
-    public class AboutMeController : BaseController
+    public class AboutMeController : HtmlContentController
     {
-        public AboutMeController(BaseControllerArgument argument, ILogger<AboutMeController> logger) : base(argument)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
-        }
-
+        public AboutMeController(BaseControllerArgument argument, ILogger<AboutMeController> logger) : base(argument, logger) { }
 
 
     }

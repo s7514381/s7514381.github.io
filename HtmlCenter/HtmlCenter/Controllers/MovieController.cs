@@ -10,24 +10,9 @@ using Microsoft.Extensions.FileProviders;
 
 namespace HtmlCenter.Controllers
 {
-    public class MovieController : BaseController
+    public class MovieController : HtmlContentController
     {
-        public MovieController(BaseControllerArgument argument, ILogger<MovieController> logger) : base(argument)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View(ViewRenderResult());
-        }
-
-        public IActionResult HtmlContent()
-        {
-            return Json(HtmlContentString());
-        }
-
-
+        public MovieController(BaseControllerArgument argument, ILogger<MovieController> logger) : base(argument, logger) { }
 
     }
 }

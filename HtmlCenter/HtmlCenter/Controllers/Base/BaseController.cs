@@ -24,7 +24,7 @@ namespace HtmlCenter.Controllers
     /// <summary>
     /// 基礎 Controller 類別
     /// </summary>
-    public class BaseController : Controller
+    public abstract class BaseController : Controller
     {
         protected readonly IWebHostEnvironment _hostingEnvironment;
         protected readonly IConfiguration _configuration;
@@ -48,7 +48,7 @@ namespace HtmlCenter.Controllers
         /// <summary>
         /// 當前的 Controller 名稱。
         /// </summary>
-        public string CurrentController
+        protected string CurrentController
         {
             get
             {
@@ -59,7 +59,7 @@ namespace HtmlCenter.Controllers
         /// <summary>
         /// 當前的 Action 名稱。
         /// </summary>
-        public string CurrentAction
+        protected string CurrentAction
         {
             get
             {
@@ -67,11 +67,11 @@ namespace HtmlCenter.Controllers
             }
         }
 
-        public string HtmlContentString(string controllerName = "", string actionName = "")
+        protected string HtmlContentString(string controllerName = "", string actionName = "")
         {
             if (string.IsNullOrEmpty(controllerName)) { controllerName = CurrentController; }
 
-            if(string.IsNullOrEmpty(actionName)) { actionName = "Index"; }
+            if (string.IsNullOrEmpty(actionName)) { actionName = "Index"; }
             string path = Path.Combine("Views", controllerName, $"{actionName}.cshtml");
             IFileInfo fileInfo = _fileProvider.GetFileInfo(path);
 
@@ -108,30 +108,47 @@ namespace HtmlCenter.Controllers
                 ex.StackTrace);
         }
 
-        public string FormComponent(string formAction = "")
+        protected string FormComponent(string formAction = "")
         {
             if (string.IsNullOrEmpty(formAction)) { formAction = CurrentAction; }
             return $"~/Views/Shared/FormComponents/{formAction}.cshtml";
         }
 
-        public string ViewRenderResult(string? sAction = null, string? sController = null)
+        protected string ViewRenderResult(string? sAction = null, string? sController = null)
         {
             ViewBag.RenderController = sController ?? CurrentController;
             ViewBag.RenderAction = sAction ?? CurrentAction;
 
             return "Views/ViewRender/Index.cshtml";
-        }   
-
-        public List<ControllerAction> GetControllerActionList()
+        }
+        //BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public
+        protected List<ControllerAction> GetControllerActionList()
         {
             Assembly asm = Assembly.GetExecutingAssembly();
             var controlleractionlist = asm.GetTypes()
                     .Where(type => typeof(Controller).IsAssignableFrom(type))
-                    .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public))
+                    .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public))
+                    .Where(method => method.GetCustomAttributes(typeof(HttpGetAttribute), true).Any()) // 添加對 HttpGet 的條件
                     .Select(x => new ControllerAction
                     {
                         Controller = x.DeclaringType?.Name,
                         Action = x.Name,
+                        CustomAttributes = x.CustomAttributes.ToList(),
+                    }).ToList();
+            return controlleractionlist;
+        }
+
+
+        protected List<ControllerAction> GetHtmlContentControllerActionList()
+        {
+            Assembly asm = Assembly.GetExecutingAssembly();
+
+            var controlleractionlist = asm.GetTypes()
+                    .Where(type => typeof(HtmlContentController).IsAssignableFrom(type))
+                    .Select(x => new ControllerAction
+                    {
+                        Controller = x.Name,
+                        Action = "Index",
                         CustomAttributes = x.CustomAttributes.ToList(),
                     }).ToList();
             return controlleractionlist;

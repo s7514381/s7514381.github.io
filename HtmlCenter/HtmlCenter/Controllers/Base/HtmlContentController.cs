@@ -10,18 +10,20 @@ using Microsoft.Extensions.FileProviders;
 
 namespace HtmlCenter.Controllers
 {
-    public class HtmlContentController : BaseController
+    public abstract class HtmlContentController : BaseController
     {
         public HtmlContentController(BaseControllerArgument argument, ILogger<HtmlContentController> logger) : base(argument)
         {
             _logger = logger;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View(ViewRenderResult());
         }
 
+        [HttpGet]
         public IActionResult HtmlContent(string actionName)
         {
             return Json(HtmlContentString(actionName: actionName));

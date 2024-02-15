@@ -17,13 +17,13 @@ namespace HtmlCenter.Controllers
             _logger = logger;
         }
 
-        public async Task RenderView(string renderController, string renderAction, ViewDataDictionary viewData)
+        protected async Task RenderView(string renderController, string renderAction, ViewDataDictionary viewData)
         {          
             string renderString = await _viewRenderService.RenderToStringAsync(ViewRenderResult(renderAction, renderController), viewData);
             await WriteFile(renderController, renderString);
         }
 
-        public async Task WriteFile(string renderController, string renderString, string fileName = "")
+        protected async Task WriteFile(string renderController, string renderString, string fileName = "")
         {
             string renderPath = RenderPath;
 
@@ -47,7 +47,7 @@ namespace HtmlCenter.Controllers
             string formDirectory = $@"{RenderPath}\HtmlCenter\HtmlCenter\wwwroot";
             CopyDirectory(formDirectory, RenderPath);
 
-            List<ControllerAction> ControllerActionList = GetControllerActionList();
+            List<ControllerAction> ControllerActionList = GetHtmlContentControllerActionList();
             var renderControllers = ControllerActionList.Where(x => x.Action == "Index").ToList();
 
             foreach (ControllerAction controllerAction in renderControllers) {
@@ -65,7 +65,7 @@ namespace HtmlCenter.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public void CopyDirectory(string fromPath, string toPath) 
+        protected void CopyDirectory(string fromPath, string toPath) 
         {
             if (!Directory.Exists(toPath))
                 Directory.CreateDirectory(toPath);

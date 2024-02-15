@@ -32,8 +32,9 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div ref="navbarCollapse" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1" style="white-space:nowrap;max-width: 85%; overflow: auto;">
+                    <ul v-show="navbar?.length > 0" class="navbar-nav flex-grow-1" style="white-space:nowrap;max-width: 85%; overflow: auto;">
                         <li v-for="v in navbar" class="nav-item me-3 px-2 " style="position: relative">
                             <router-link :to="v.to"
                                          class="nav-link text-dark"
@@ -41,7 +42,7 @@
                         </li>
                     </ul>
 
-                    <ul class="navbar-nav flex-grow-1" style="justify-content: flex-end">
+                    <ul v-show="authInfo.ready" class="navbar-nav flex-grow-1" style="justify-content: flex-end">
                         <li class="nav-item me-3 px-2">
                             <div v-if="authInfo.ready">
                                 <a v-if="hasAuth" class="nav-link text-dark" @click="signOut()" style="cursor:pointer">{{authInfo.user.displayName}}</a>
@@ -51,6 +52,7 @@
                         </li>
                     </ul>
                 </div>
+                
             </div>
         </nav>
     </header>
@@ -69,9 +71,6 @@
 
     <script src="/js/site.js?v=DMrJW2DGQxeKC0mbeWvZ5H_XdVXPiZOSgrv02YX_-jA"></script>
     <script src="/js/vue-component/index.js?v=8ygIF93_wdpM4LG7zHJ1kKJNxPyLDhqMY1NVnLuJPCo" type="module"></script>
-
-    
-
 
 </body>
 </html>

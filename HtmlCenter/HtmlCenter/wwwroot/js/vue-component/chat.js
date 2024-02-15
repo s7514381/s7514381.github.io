@@ -58,7 +58,6 @@ export default {
             let $this = this;
 
             let { dbSnapshot } = $this.firestore;
-            let cnt = 0;
             let limitCount = 20;
             let connectId = `Chat`;
 
@@ -66,8 +65,6 @@ export default {
                 let isSelf = doc.uid == $this.authInfo.user?.uid;
                 doc["self"] = isSelf;
                 $this.content.push(doc);
-
-                cnt++; if (cnt == limitCount) { $this.loading = false; }
             })      
             $this.loading = false; 
         }, 
